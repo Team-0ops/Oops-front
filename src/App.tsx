@@ -1,10 +1,27 @@
-import PostWrite from "./pages/PostWrite";
+import { createBrowserRouter, RouterProvider, type RouteObject } from "react-router-dom";
+import HomeLayout from "./layout/HomeLayout";
+import MainPage from "./pages/MainPage";
+
+const publicRoutes: RouteObject[] = [
+  {
+    path: "/",
+    element: <HomeLayout />,
+    errorElement: <div>Not Found</div>, //임시
+    children: [
+      {
+        index: true,
+        element: <MainPage />
+      },
+      //이후 추가하시면 됩니다.
+    ]
+  }
+]
+
+const router = createBrowserRouter( [...publicRoutes]);
 
 function App() {
   return (
-    <>
-      <PostWrite />
-    </>
+    <RouterProvider router={router} />
   );
 }
 
