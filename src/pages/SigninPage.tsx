@@ -1,5 +1,6 @@
 import { useState } from "react";
 import LogoMark from "../assets/icons/Logo.svg?react";
+import Button from "../components/common/Button";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
@@ -40,19 +41,9 @@ const SigninPage = () => {
                        focus:border-green-400 focus:outline-none"
           />
 
-          <button
-            type="submit"
-            disabled={!id || !pw}
-            className="w-full                    /* 부모가 310px → 버튼도 310px */
-      h-[50px]                  /* 높이 고정 50px */
-      rounded-[4px]             /* 모서리 4px */
-      bg-[#B3E378]              /* Figma 색상 */
-      text-[16px] font-semibold text-gray-900
-      flex items-center justify-center  /* 텍스트 수직·수평 가운데 */
-      transition hover:opacity-90 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={!id || !pw}>
             log in
-          </button>
+          </Button>
 
           <div className="mt-2 flex justify-end text-[12px] text-[#B3B3B3]">
             <a href="#!" className="hover:underline">
