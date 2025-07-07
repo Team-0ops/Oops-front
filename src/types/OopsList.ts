@@ -6,6 +6,5 @@ export type OopsPost = {
     images: string[];
     category: string;
     commentType: string[];
-    overcomeContent?: string; // 극복 중 내용
-    completeContent?: string; // 극복 완료 내용
+    parentId?: string; // 이전 단계 게시글 id (웁스중→극복중, 극복중→극복완료)
 };
