@@ -6,23 +6,31 @@ import {
 } from "react-router-dom";
 import HomeLayout from "./layout/HomeLayout";
 import MainPage from "./pages/MainPage";
+
+// 피드 관련 페이지
+import CategoryFeed from "./pages/CategoryFeed";
+import FavoriteFeed from "./pages/FavoriteFeed";
+import RandomFeed from "./pages/RandomFeed";
+import BestFeed from "./pages/BestFeed";
+import ExRandomFeed from "./pages/ExRandomFeed";
+import CategoryDrawerTest from "./pages/CategoryDrawerTest";
+
+// 로그인 관련 페이지
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
+
+// 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
-// 교훈작성 모달 확인용 
 import Feedback from "./components/modals/Feedback";
 
 import type { OopsPost } from "./types/OopsList";
 
 function App() {
-  // 상태 선언
   const [posts, setPosts] = useState<OopsPost[]>([]);
   const [selectedStep, setSelectedStep] = useState<0 | 1 | 2>(0);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-  // PostWrite 컴포넌트에 필요한 상태를 props로 전달하기 위해
-  // publicRoutes를 App 내부로 이동했습니다.
   const publicRoutes: RouteObject[] = [
     {
       path: "/",
@@ -30,6 +38,12 @@ function App() {
       errorElement: <div>Not Found</div>,
       children: [
         { index: true, element: <MainPage /> },
+        { path: "category-feed", element: <CategoryFeed /> },
+        { path: "favorite-feed", element: <FavoriteFeed /> },
+        { path: "random-feed", element: <RandomFeed /> },
+        { path: "best-feed", element: <BestFeed /> },
+        { path: "exrandom-feed", element: <ExRandomFeed /> },
+        { path: "drawer", element: <CategoryDrawerTest /> },
         {
           path: "post",
           element: (
@@ -48,7 +62,7 @@ function App() {
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/postsuccess", element: <PostSuccess /> },
-    { path: "/feedback", element: <Feedback /> }, 
+    { path: "/feedback", element: <Feedback /> },
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
