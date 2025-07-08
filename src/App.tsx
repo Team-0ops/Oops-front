@@ -10,6 +10,8 @@ import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
+// 교훈작성 모달 확인용 
+import Feedback from "./components/modals/Feedback";
 
 import type { OopsPost } from "./types/OopsList";
 
@@ -46,6 +48,7 @@ function App() {
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/postsuccess", element: <PostSuccess /> },
+    { path: "/feedback", element: <Feedback /> }, 
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
