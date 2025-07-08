@@ -6,16 +6,18 @@ import {
 import HomeLayout from "./layout/HomeLayout";
 import MainPage from "./pages/MainPage";
 
-// 너의 브랜치에서 추가한 피드 관련 페이지
+//  피드 관련 페이지
 import CategoryFeed from "./pages/CategoryFeed";
 import FavoriteFeed from "./pages/FavoriteFeed";
 import RandomFeed from "./pages/RandomFeed";
 import BestFeed from "./pages/BestFeed";
 import ExRandomFeed from "./pages/ExRandomFeed";
 
-// develop에서 추가된 로그인 관련 페이지
+
+// 로그인 관련 페이지
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
+import CategoryDrawerTest from "./pages/CategoryDrawerTest";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -46,6 +48,10 @@ const publicRoutes: RouteObject[] = [
       {
         path: "exrandom-feed",
         element: <ExRandomFeed />,
+      },
+      {
+        path: "drawer",
+        element: <CategoryDrawerTest />,
       },
     ],
   },
