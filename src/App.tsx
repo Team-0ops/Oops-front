@@ -1,6 +1,11 @@
 import { createBrowserRouter, RouterProvider, type RouteObject } from "react-router-dom";
 import HomeLayout from "./layout/HomeLayout";
 import MainPage from "./pages/MainPage";
+import CategoryFeed from "./pages/CategoryFeed";
+import FavoriteFeed from "./pages/FavoriteFeed";
+import RandomFeed from "./pages/RandomFeed";
+import BestFeed from "./pages/BestFeed"
+import ExRandomFeed from "./pages/ExRandomFeed";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -13,6 +18,26 @@ const publicRoutes: RouteObject[] = [
         element: <MainPage />
       },
       //이후 추가하시면 됩니다.
+      {
+        path: "category-feed", 
+        element: <CategoryFeed />, 
+      },
+      {
+        path: "favorite-feed", 
+        element: <FavoriteFeed />, 
+      },
+      {
+        path: "random-feed", 
+        element: <RandomFeed />, 
+      },
+      {
+        path: "best-feed", 
+        element: <BestFeed />, 
+      },
+      {
+        path: "exrandom-feed", 
+        element: <ExRandomFeed />, 
+      },
     ]
   }
 ]
