@@ -13,7 +13,7 @@ import FavoriteFeed from "./pages/FavoriteFeed";
 import RandomFeed from "./pages/RandomFeed";
 import BestFeed from "./pages/BestFeed";
 import ExRandomFeed from "./pages/ExRandomFeed";
-import CategoryDrawerTest from "./pages/CategoryDrawerTest";
+// import CategoryDrawerTest from "./pages/CategoryDrawerTest";
 
 // 로그인 관련 페이지
 import SigninPage from "./pages/SigninPage";
@@ -23,6 +23,7 @@ import SignupPage from "./pages/SignupPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import Feedback from "./components/modals/Feedback";
+import Report from "./components/modals/Report";
 
 import type { OopsPost } from "./types/OopsList";
 
@@ -43,7 +44,7 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
-        { path: "drawer", element: <CategoryDrawerTest /> },
+        // { path: "drawer", element: <CategoryDrawerTest /> },
         {
           path: "post",
           element: (
@@ -63,6 +64,7 @@ function App() {
     { path: "/signup", element: <SignupPage /> },
     { path: "/postsuccess", element: <PostSuccess /> },
     { path: "/feedback", element: <Feedback /> },
+    { path: "/report", element: <Report />},
   ];
 
   const router = createBrowserRouter([...publicRoutes]);

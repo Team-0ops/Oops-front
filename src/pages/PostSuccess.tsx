@@ -4,8 +4,8 @@ import Footer from "../components/common/Footer";
 
 const PostSuccess = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-[375px] h-[812px] pb-[21px] overflow-auto">
+    <div className="flex justify-center items-center ">
+      <div className="w-full h-full pb-[21px]">
         <Navbar />
         {/* 첫번째 섹션 */}
         {/* 로고 ~ 버튼 */}

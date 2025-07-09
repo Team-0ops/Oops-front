@@ -123,9 +123,9 @@ const PostWrite = ({
     "w-auto px-[13px] py-[6px] rounded-[20px]  font-semibold text-[14px] flex items-center justify-center cursor-pointer";
 
   return (
-    <div className="flex justify-center items-center min-h-screen ">
+    <div className="flex justify-center items-center ">
       {/* <Navbar /> 들어가면 됨 */}
-      <div className="w-[375px] h-[812px] bg-[#FFFBF8] overflow-auto ">
+      <div className="w-full h-full bg-[#FFFBF8] ">
         {/* 첫번째 section */}
         <section className="w-full px-[20px] pt-[17px] pb-[30px] flex flex-col gap-[20px]">
           {/* 글작성 */}
