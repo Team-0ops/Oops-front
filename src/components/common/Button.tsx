@@ -1,8 +1,7 @@
-/* src/components/common/Button.tsx */
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "inverse" | "ghost";
 type Size = "lg" | "md" | "sm";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -19,6 +18,7 @@ const base =
 const variantMap: Record<Variant, string> = {
   primary: "bg-[#B3E378] text-gray-900 hover:opacity-90",
   secondary: "bg-[#262626] text-white hover:bg-[#1D1D1D]",
+  inverse: "bg-[#262626] text-[#B3E378] hover:bg-[#1D1D1D]",
   ghost:
     "bg-transparent text-gray-900 hover:bg-gray-100 border border-gray-300",
 };
@@ -33,7 +33,7 @@ export default function Button({
   children,
   variant = "primary",
   size = "lg",
-  fullWidth = true,
+  fullWidth = false,
   isLoading = false,
   className,
   ...rest
@@ -45,7 +45,8 @@ export default function Button({
         base,
         variantMap[variant],
         sizeMap[size],
-        fullWidth && "w-full",
+        fullWidth ? "w-full" : "w-[310px]",
+        //fullWidth && "w-full",
         className
       )}
     >

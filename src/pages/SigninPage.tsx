@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LogoMark from "../assets/icons/Logo.svg?react";
 import Button from "../components/common/Button";
+import PasswordInput from "../components/auth/PasswordInput";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
@@ -31,14 +32,11 @@ const SigninPage = () => {
                        text-[14px] placeholder-[#B3B3B3]
                        focus:border-green-400 focus:outline-none"
           />
-          <input
-            type="password"
+          {/* 비밀번호 입력 (PasswordInput 컴포넌트) */}
+          <PasswordInput
             placeholder="비밀번호를 입력해주세요."
             value={pw}
             onChange={(e) => setPw(e.target.value)}
-            className="h-[44px] w-full rounded border border-[#ECE6DF] px-3
-                       text-[14px] placeholder-[#B3B3B3]
-                       focus:border-green-400 focus:outline-none"
           />
 
           <Button type="submit" disabled={!id || !pw}>

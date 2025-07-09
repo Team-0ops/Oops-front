@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import LogoMark from "../assets/icons/Logo.svg?react";
 import Button from "../components/common/Button";
+import PasswordInput from "../components/auth/PasswordInput";
+import TermsGroup from "../components/auth/TermsGroup";
 
 interface Terms {
   all: boolean;
@@ -86,101 +88,73 @@ const SignupPage = () => {
           아이디
           <input
             type="text"
-            placeholder="영문 대소문자, 숫자 조합 3자 이상 10자 이하"
             value={form.id}
             onChange={handleInput("id")}
             className="mt-1 h-[44px] w-full rounded border border-[#ECE6DF] px-3
                        text-[14px] placeholder-[#B3B3B3] focus:border-green-400 focus:outline-none"
           />
+          <span className="mt-[2px] block text-[11px] text-[#B3B3B3]">
+            영문 대소문자, 숫자로 이루어진 3자 이상 10자 이하
+          </span>
         </label>
-
-        {/* 비밀번호 */}
+        {/* 비밀번호 (PasswordInput 컴포넌트) */}
         <label className="text-[12px] font-semibold text-[#262626]">
           비밀번호
-          <input
-            type="password"
-            placeholder="영문 대소문자, 숫자, 특수문자 최소 2종류 이상 조합 8자 이상"
+          <PasswordInput
             value={form.pw}
-            onChange={handleInput("pw")}
-            className="mt-1 h-[44px] w-full rounded border border-[#ECE6DF] px-3
-                       text-[14px] placeholder-[#B3B3B3] focus:border-green-400 focus:outline-none"
+            onChange={(e) => setForm({ ...form, pw: e.target.value })}
           />
+          <span className="mt-[2px] block text-[11px] text-[#B3B3B3]">
+            영문 대소문자, 숫자, 특수문자 중 최소 2종류 이상 조합된 8자 이상
+            20자 이하 를 입력해주세요.
+          </span>
         </label>
-
         {/* 이메일 */}
         <label className="text-[12px] font-semibold text-[#262626]">
           이메일
           <input
             type="email"
-            placeholder="아이디/비밀번호 찾기에 사용됩니다."
             value={form.email}
             onChange={handleInput("email")}
             className="mt-1 h-[44px] w-full rounded border border-[#ECE6DF] px-3
                        text-[14px] placeholder-[#B3B3B3] focus:border-green-400 focus:outline-none"
           />
+          <span className="mt-[2px] block text-[11px] text-[#B3B3B3]">
+            아이디/비밀번호 찾기에 사용됩니다.
+          </span>
         </label>
-
         {/* 닉네임 */}
         <label className="text-[12px] font-semibold text-[#262626]">
           닉네임
           <input
             type="text"
-            placeholder="한글,숫자,기호 제외 3~10자를 입력해주세요."
+            placeholder="한영,숫자,기호로 이루어진 3~10자를 입력해주세요."
             value={form.nickname}
             onChange={handleInput("nickname")}
             className="mt-1 h-[44px] w-full rounded border border-[#ECE6DF] px-3
                        text-[14px] placeholder-[#B3B3B3] focus:border-green-400 focus:outline-none"
           />
+          {/* 안내 문구 */}
+          <span className="text-[11px] text-[#B3B3B3]">
+            3자 이상 10자 이하 글자수를 지켜 작성해주세요!
+          </span>
         </label>
 
-        {/* 안내 문구 */}
-        <p className="text-[11px] text-[#B3B3B3]">
-          3자 이상 10자 이하 글자수로 제가 적절히 넣기
-        </p>
-
-        {/* 약관 박스 */}
-        <div className="mt-4 rounded bg-[#F0F0F0] py-3">
-          {/* 전체 동의 */}
-          <label
-            className="mb-2 flex h-[28px] cursor-pointer items-center bg-[#B3E378] px-3 text-[13px] font-semibold text-[#262626]"
-            htmlFor="all"
-          >
-            <input
-              id="all"
-              type="checkbox"
-              checked={terms.all}
-              onChange={toggleAll}
-              className="mr-2 scale-125 accent-white"
-            />
-            전체동의
-          </label>
-
-          {/* 개별 약관 */}
-          {[
-            { key: "service", label: "이용약관 동의 (필수)" },
-            { key: "privacy", label: "개인정보 이용 동의 (필수)" },
-            { key: "marketing", label: "마케팅 동의 (선택)" },
-          ].map(({ key, label }) => (
-            <label
-              key={key}
-              className="mb-1 flex h-[28px] cursor-pointer items-center bg-white px-3 text-[13px] text-[#262626]"
-            >
-              <input
-                type="checkbox"
-                checked={terms[key as keyof Terms]}
-                onChange={() => toggle(key as keyof Terms)}
-                className="mr-2 scale-125 accent-[#B3E378]"
-              />
-              {label}
-            </label>
-          ))}
+        <div className="mt-6 w-full">
+          <hr className="w-full border-t border-[#ECE6DF]" />{" "}
+          {/* 얇은 회색 선 */}
+          <p className="mt-2 text-center text-[12px] font-semibold text-[#666666]">
+            필수항목은 모두 동의해야 합니다
+          </p>
         </div>
 
+        {/* 약관 그룹 (TermsGroup 컴포넌트) */}
+        <TermsGroup value={terms} onChange={setTerms} />
+
         <Button
-          variant="secondary"
           type="submit"
           disabled={isSubmitDisabled}
-          className="mt-6"
+          className="mt-6 bg-[#262626] text-[#B3E378] text-[14px] font-semibold hover:opacity-90 disabled:opacity-50"
         >
           회원가입
         </Button>
