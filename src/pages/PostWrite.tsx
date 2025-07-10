@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { FaAngleLeft } from "react-icons/fa";
 import type { OopsPost } from "../types/OopsList";
 import OopsList from "../components/post/OopsList";
 import { useRef } from "react";
+
+import LeftPoint from "../assets/icons/left-point.svg?react";
 
 interface PostWriteProps {
   posts: OopsPost[];
@@ -131,7 +132,7 @@ const PostWrite = ({
           {/* 글작성 */}
           <div className="flex items-center font-['Pretendard'] gap-[8px] text-[20px] font-semibold">
             <button className="cursor-pointer">
-              <FaAngleLeft />
+              <LeftPoint />
             </button>
             글작성
           </div>

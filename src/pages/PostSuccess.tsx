@@ -1,12 +1,9 @@
 import Logo from "../assets/icons/OopsLogo.svg?react";
-import Navbar from "../components/common/Navbar";
-import Footer from "../components/common/Footer";
 
 const PostSuccess = () => {
   return (
     <div className="flex justify-center items-center ">
       <div className="w-full h-full pb-[21px]">
-        <Navbar />
         {/* 첫번째 섹션 */}
         {/* 로고 ~ 버튼 */}
         <section className="bg-[#FFFBF8] flex flex-col items-center font-[pretendard] mt-[1px] mb-[30px] px-[20px]">
@@ -123,8 +120,6 @@ const PostSuccess = () => {
 
         </section>
 
-        <Footer />
-        {/* 푸터 */}
         </div>
       </div>
   

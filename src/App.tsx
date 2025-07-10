@@ -19,6 +19,9 @@ import ExRandomFeed from "./pages/ExRandomFeed";
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
 
+// 게시글 상세 페이지
+import PostDetail from "./pages/PostDetail";
+
 // 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
@@ -44,6 +47,8 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
+        { path: "postsuccess", element: <PostSuccess /> },
+        { path: "postdetail", element: <PostDetail />},
         // { path: "drawer", element: <CategoryDrawerTest /> },
         {
           path: "post",
@@ -62,7 +67,6 @@ function App() {
     },
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
-    { path: "/postsuccess", element: <PostSuccess /> },
     { path: "/feedback", element: <Feedback /> },
     { path: "/report", element: <Report />},
   ];
