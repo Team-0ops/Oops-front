@@ -7,7 +7,7 @@ import My from '../../assets/icons/my.svg?react';
 const Navbar = () => {
     return (
         <>
-            <nav className="flex justify-between items-center px-[20px] py=[12px] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
+            <nav className="flex justify-between items-center px-[20px] py-[12px] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
                 <div className="flex gap-[8px] items-center">
                     <button>
                         <Bugger className="w-[24px] h-[24px]" />
