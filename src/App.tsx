@@ -19,6 +19,7 @@ import ExRandomFeed from "./pages/ExRandomFeed";
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
 import FindIdPwPage from "./pages/FindIdPw";
+import TermsPage from "./pages/TermsPage";
 
 // 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostWrite";
@@ -63,7 +64,8 @@ function App() {
     },
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
-    { path: "find-idpw", element: <FindIdPwPage /> },
+    { path: "/find-idpw", element: <FindIdPwPage /> },
+    { path: "/terms", element: <TermsPage /> },
     { path: "/postsuccess", element: <PostSuccess /> },
     { path: "/feedback", element: <Feedback /> },
     { path: "/report", element: <Report /> },
