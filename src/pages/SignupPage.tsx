@@ -75,7 +75,7 @@ const SignupPage = () => {
     <section className="flex min-h-dvh w-full flex-col items-center bg-[#FFFBF8]">
       {/* 로고 */}
       <div className="mt-[84px] flex flex-col items-center gap-4">
-        <LogoMark className="w-[84px] h-[116px]" />
+        <LogoMark className="w-[149px] h-[205px]" />
       </div>
 
       {/* 입력 폼 */}
