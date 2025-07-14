@@ -1,5 +1,8 @@
 import { useState } from "react";
 import LogoMark from "../assets/icons/Logo.svg?react";
+import Button from "../components/common/Button";
+import PasswordInput from "../components/auth/PasswordInput";
+import { Link } from "react-router-dom";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
@@ -30,38 +33,25 @@ const SigninPage = () => {
                        text-[14px] placeholder-[#B3B3B3]
                        focus:border-green-400 focus:outline-none"
           />
-          <input
-            type="password"
+          {/* 비밀번호 입력 (PasswordInput 컴포넌트) */}
+          <PasswordInput
             placeholder="비밀번호를 입력해주세요."
             value={pw}
             onChange={(e) => setPw(e.target.value)}
-            className="h-[44px] w-full rounded border border-[#ECE6DF] px-3
-                       text-[14px] placeholder-[#B3B3B3]
-                       focus:border-green-400 focus:outline-none"
           />
 
-          <button
-            type="submit"
-            disabled={!id || !pw}
-            className="w-full                    /* 부모가 310px → 버튼도 310px */
-      h-[50px]                  /* 높이 고정 50px */
-      rounded-[4px]             /* 모서리 4px */
-      bg-[#B3E378]              /* Figma 색상 */
-      text-[16px] font-semibold text-gray-900
-      flex items-center justify-center  /* 텍스트 수직·수평 가운데 */
-      transition hover:opacity-90 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={!id || !pw}>
             log in
-          </button>
+          </Button>
 
           <div className="mt-2 flex justify-end text-[12px] text-[#B3B3B3]">
-            <a href="#!" className="hover:underline">
+            <Link to="/find-idpw" className="hover:underline">
               아이디/비밀번호 찾기
-            </a>
+            </Link>
             <span className="mx-2">|</span>
-            <a href="#!" className="hover:underline">
+            <Link to="/signup" className="hover:underline">
               회원가입
-            </a>
+            </Link>
           </div>
         </form>
       </section>

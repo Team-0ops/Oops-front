@@ -44,14 +44,14 @@ const OopsList = ({ posts, onSelect }: OopsListProps) => {
       style={{
         boxShadow: "inset 0px 0px 5.4px 0px rgba(0, 0, 0, 0.25)",
       }}
-      className="bg-[#fffbf8] w-full rounded-[4px] border-[1px] border-[#f6ebe6] px-[20px] py-[20px] mt-[8px] font-['Pretendard']"
+      className="bg-[#fffbf8] w-full rounded-[4px] border-[1px] border-[#f6ebe6] px-[20px] py-[20px] mt-[8px]"
     >
-      <div className="text-[14px] font-semibold mb-[12px]">
+      <div className="body4 mb-[12px]">
         극복 완료한 게시글을 선택해주세요!
       </div>
 
       {posts.length === 0 ? (
-        <div className="flex justify-center text-[#999] items-center">
+        <div className="body5 flex justify-center text-[#999] items-center">
           작성된 게시물이 없습니다.
         </div>
       ) : (
@@ -80,14 +80,14 @@ const OopsList = ({ posts, onSelect }: OopsListProps) => {
                         className={`flex flex-col justify-between w-full ${post.images?.[0] ? "pr-[12px]" : ""}`}
                       >
                         <div className="flex justify-between items-center w-full">
-                          <span className="font-semibold text-[14px]">
+                          <span className="body4">
                             {post.title}
                           </span>
-                          <span className="text-[12px] font-medium text-[#999999] whitespace-nowrap ml-2">
+                          <span className="caption2 text-[#999999] whitespace-nowrap ml-2">
                             {post.category}
                           </span>
                         </div>
-                        <span className="text-[12px] text-[#262626] max-w-[calc(100%-60px)] truncate">
+                        <span className="caption3 text-[#262626] max-w-[calc(100%-60px)] truncate">
                           {post.content}
                         </span>
                       </div>

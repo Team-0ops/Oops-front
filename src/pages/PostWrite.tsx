@@ -7,6 +7,8 @@ import LeftPoint from "../assets/icons/left-point.svg?react";
 import UpArrow from "../assets/icons/UpArrow.svg?react";
 import DownArrow from "../assets/icons/DownArrow.svg?react";
 
+import "../App.css";
+
 interface PostWriteProps {
   posts: OopsPost[];
   setPosts: React.Dispatch<React.SetStateAction<OopsPost[]>>;
@@ -151,7 +153,7 @@ const PostWrite = ({
 
   // button 스타일
   const buttonStyle =
-    "w-auto px-[13px] py-[6px] rounded-[20px]  font-semibold text-[14px] flex items-center justify-center cursor-pointer";
+    "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   return (
     <div className="flex justify-center items-center ">
@@ -160,7 +162,7 @@ const PostWrite = ({
         {/* 첫번째 section */}
         <section className="w-full px-[20px] pt-[17px] pb-[30px] flex flex-col gap-[20px]">
           {/* 글작성 */}
-          <div className="flex items-center font-['Pretendard'] gap-[8px] text-[20px] font-semibold">
+          <div className="h2 flex items-center gap-[8px] ">
             <button className="cursor-pointer">
               <LeftPoint />
             </button>
@@ -171,13 +173,13 @@ const PostWrite = ({
           <div className="w-full h-[209px] py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
             <input
               placeholder="제목 (필수)"
-              className="mb-[14px] font-['Pretendard'] font-semibold text-[18px] w-[177px] h-[21px] bg-transparent outline-none"
+              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
               placeholder="실패담의 내용을 입력해주세요. (필수)"
-              className="w-full h-[150px] bg-transparent outline-none text-[12px] font-['Pretendard'] font-semibold"
+              className="caption1 w-full h-[150px] bg-transparent outline-none "
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
@@ -188,8 +190,8 @@ const PostWrite = ({
 
         {/* 두번째 section */}
         {/* 진행상황 선택 */}
-        <section className="w-full px-[20px] py-[20px] font-['Pretendard'] flex flex-col gap-[12px] items-start">
-          <div className="w-[242px] h-[19px] font-semibold text-[16px]">
+        <section className="w-full px-[20px] py-[20px]  flex flex-col gap-[12px] items-start">
+          <div className="body2 w-[242px] h-[19px] ">
             진행상황 선택
           </div>
           <div className="flex items-start w-full gap-[14px] font-['Pretendard'] rounded-lg overflow-hidden border-none">
@@ -229,11 +231,11 @@ const PostWrite = ({
 
         {/* 세번째 section */}
         {/* 이미지 업로드 */}
-        <section className="w-full py-[20px] px-[20px] font-['Pretendard'] flex flex-col items-start">
-          <div className="font-semibold mb-[8px] text-[16px]">사진추가</div>
+        <section className="w-full py-[20px] px-[20px] flex flex-col items-start">
+          <div className="body2 mb-[8px] ">사진추가</div>
           <div className="flex justify-between items-center w-full ">
             <button
-              className="bg-[#E6E6E6] px-[12px] py-[6px] rounded-[20px] cursor-pointer my-[40px] text-[14px] font-semibold"
+              className="body4 bg-[#E6E6E6] px-[12px] py-[6px] rounded-[20px] cursor-pointer my-[40px]"
               onClick={handleClick}
               type="button"
             >
@@ -267,7 +269,7 @@ const PostWrite = ({
             </div>
           </div>
           <div className="w-full flex justify-end">
-            <span className="text-[12px] font-medium text-[#999999]">
+            <span className="caption2 text-[#999999]">
               jpg, png, 각 10MB 이하만 최대 5장 업로드 가능합니다.
             </span>
           </div>
@@ -277,15 +279,15 @@ const PostWrite = ({
 
         {/* 세번째 섹션 */}
         {/* 카테고리 선택 영역 */}
-        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] font-['Pretendard'] relative"
+        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] relative"
           ref={dropdownRef}
         >
           <form className="flex flex-col justify-start gap-[16px] w-[120px]">
-            <div className="font-semibold text-[16px]">카테고리 선택</div>
+            <div className="body2">카테고리 선택</div>
 
             {/* 드롭다운 버튼 */}
             <div
-              className="w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] text-[14px] rounded-[20px] cursor-pointer
+              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px]  rounded-[20px] cursor-pointer
                 bg-[#E6E6E6] outline-none select-none"
             >
               {category || "카테고리 선택"}
@@ -314,7 +316,7 @@ const PostWrite = ({
                       setCategory(item);
                       setIsDropdownOpen(false);
                     }}
-                    className={`px-[13px] py-[8px] cursor-pointer
+                    className={`body4 px-[13px] py-[8px] cursor-pointer
             ${category === item ? "text-black" : "text-[#999999]"} 
             ${idx !== categories.length - 1 ? "border-b border-[#e6e6e6]" : ""}
           `}
@@ -328,8 +330,8 @@ const PostWrite = ({
 
           {/* 댓글 종류 선택 */}
           <fieldset className="ml-[10px] flex flex-col justify-start items-start">
-            <legend className="font-bold mb-4">댓글 종류 선택</legend>
-            <div className="flex items-center mb-[8px]">
+            <legend className="body2 mb-4">댓글 종류 선택</legend>
+            <div className="flex items-center mb-[15px]">
               <input
                 type="checkbox"
                 value="조언"
@@ -343,7 +345,7 @@ const PostWrite = ({
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="mx-5" htmlFor="comment1">
+              <label className="body5 mx-5" htmlFor="comment1">
                 조언
               </label>
             </div>
@@ -362,7 +364,7 @@ const PostWrite = ({
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="mx-5">공감</label>
+              <label className="body5 mx-5">공감</label>
             </div>
 
           </fieldset>
