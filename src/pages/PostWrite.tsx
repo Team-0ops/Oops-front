@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { OopsPost } from "../types/OopsList";
 import OopsList from "../components/post/OopsList";
 import { useRef } from "react";
 
 import LeftPoint from "../assets/icons/left-point.svg?react";
+import UpArrow from "../assets/icons/UpArrow.svg?react";
+import DownArrow from "../assets/icons/DownArrow.svg?react";
 
 interface PostWriteProps {
   posts: OopsPost[];
@@ -22,6 +24,14 @@ const PostWrite = ({
   selectedPostId,
   setSelectedPostId,
 }: PostWriteProps) => {
+  // 카테고리 관련 state와 카테고리 배열
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const categories = [
+    "작은 일", "연애", "인간관계", "학교생활", "진로/취업",
+    "회사생활", "대입/입시", "창업", "여행", "재정/돈관리",
+    "건강/운동", "멘탈관리", "자유",
+  ];
   // 웁스 중 작성용 state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -119,6 +129,26 @@ const PostWrite = ({
     }
   };
 
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
+
   // button 스타일
   const buttonStyle =
     "w-auto px-[13px] py-[6px] rounded-[20px]  font-semibold text-[14px] flex items-center justify-center cursor-pointer";
@@ -164,25 +194,22 @@ const PostWrite = ({
           </div>
           <div className="flex items-start w-full gap-[14px] font-['Pretendard'] rounded-lg overflow-hidden border-none">
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(0)}
             >
               웁스 중
             </button>
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(1)}
             >
               극복 중
             </button>
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(2)}
             >
               극복 완료
@@ -220,7 +247,7 @@ const PostWrite = ({
               className="hidden"
               onChange={handleImageChange}
             />
-            <div className="flex gap-[12px] items-start overflow-x-auto max-w-[180px] scrollbar-thin">
+            <div className="flex gap-[12px] items-start overflow-x-scroll max-w-[185px]">
               {images.map((src, idx) => (
                 <div
                   key={idx}
@@ -249,35 +276,57 @@ const PostWrite = ({
         <hr className="border-gray-300" />
 
         {/* 세번째 섹션 */}
-        {/* 카테고리 */}
-        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] font-['Pretendard']">
-          <form className="flex flex-col justify-start items-center gap-[16px] w-[120px]">
-            <label className="font-semibold text-[16px]">카테고리를 선택</label>
-            <select
-              className="bg-[#F5F5F5] px-[10px] py-[6px] w-auto h-auto rounded-[20px]"
-              onChange={(e) => setCategory(e.target.value)}
-              value={category}
+        {/* 카테고리 선택 영역 */}
+        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] font-['Pretendard'] relative"
+          ref={dropdownRef}
+        >
+          <form className="flex flex-col justify-start gap-[16px] w-[120px]">
+            <div className="font-semibold text-[16px]">카테고리 선택</div>
+
+            {/* 드롭다운 버튼 */}
+            <div
+              className="w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] text-[14px] rounded-[20px] cursor-pointer
+                bg-[#E6E6E6] outline-none select-none"
             >
-              <option className="text-[14px]" value="">
-                카테고리 선택
-              </option>
-              <option className="text-[14px]" value="작은 일">작은 일</option>
-              <option className="text-[14px]" value="연애">연애</option>
-              <option className="text-[14px]" value="인간관계">인간관계</option>
-              <option className="text-[14px]" value="학교생활">학교생활</option>
-              <option className="text-[14px]" value="진로/취업">진로/취업</option>
-              <option className="text-[14px]" value="회사생활">회사생활</option>
-              <option className="text-[14px]" value="대입/입시">대입/입시</option>
-              <option className="text-[14px]" value="창업">창업</option>
-              <option className="text-[14px]" value="여행">여행</option>
-              <option className="text-[14px]" value="재정/돈관리">재정/돈관리</option>
-              <option className="text-[14px]" value="건강/운동">건강/운동</option>
-              <option className="text-[14px]" value="멘탈관리">멘탈관리</option>
-              <option className="text-[14px]" value="자유">자유</option>
-              {/* 카테고리 추가 시 아래와 같이 추가 */}
-            </select>
+              {category || "카테고리 선택"}
+              {isDropdownOpen ?
+                <UpArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
+                         className="w-[18px] h-[18px]" />
+                :
+                <DownArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
+                           className="w-[18px] h-[18px]" 
+                />}
+            </div>
+
+            {/* 드롭다운 리스트 */}
+            {isDropdownOpen && (
+              <ul
+                className="
+              absolute top-[82px] 
+              bg-[#f3f3f3]
+              w-[120px] h-[118px] 
+               rounded-b-[10px] 
+                overflow-y-scroll text-[14px] shadow">
+                {categories.map((item, idx) => (
+                  <li
+                    key={item}
+                    onClick={() => {
+                      setCategory(item);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`px-[13px] py-[8px] cursor-pointer
+            ${category === item ? "text-black" : "text-[#999999]"} 
+            ${idx !== categories.length - 1 ? "border-b border-[#e6e6e6]" : ""}
+          `}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
           </form>
 
+          {/* 댓글 종류 선택 */}
           <fieldset className="ml-[10px] flex flex-col justify-start items-start">
             <legend className="font-bold mb-4">댓글 종류 선택</legend>
             <div className="flex items-center mb-[8px]">

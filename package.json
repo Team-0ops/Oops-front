@@ -21,6 +21,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.3",
     "redux": "^5.0.1",
+    "swiper": "^11.2.10",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
