@@ -63,97 +63,105 @@ const Feedback = () => {
         <section className="mb-[20px] font-[pretendard]">
           <h1 className="w-full h-[14px] text-[12px]">교훈 태그 선택</h1>
           <div className="mb-[14px] flex justify-start gap-[8px]">
-            <span className="text-[12px] text-[#cccccc]">#본인만 확인 가능</span>
+            <span className="text-[12px] text-[#cccccc]">
+              #본인만 확인 가능
+            </span>
             <span className="text-[12px] text-[#cccccc]">#최대 10개</span>
             <span className="text-[12px] text-[#cccccc]">#삭제 불가</span>
           </div>
 
           <div className="flex w-full flex-wrap min-w-0 justify-start gap-[12px]">
-            <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#999999]
             text-[12px] text-[#ffffff]
-            ">
-              면접 
-              </button>
+            "
+            >
+              면접
+            </button>
 
-              <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#1d1d1d]
             text-[12px] text-[#ffffff]
-            ">
-              인생교훈 
-              </button>
+            "
+            >
+              인생교훈
+            </button>
 
-              <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#999999]
             text-[12px] text-[#ffffff]
-            ">
-              친구 
-              </button>
+            "
+            >
+              친구
+            </button>
 
-              <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#999999]
             text-[12px] text-[#ffffff]
-            ">
+            "
+            >
               먹을 거
-              </button>
+            </button>
 
-              <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#1d1d1d]
             text-[12px] text-[#ffffff]
-            ">
+            "
+            >
               위로
-              </button>
+            </button>
 
-              <button 
-            className="
+            <button
+              className="
             rounded-[4px]
             px-[7px]
             py-[3px]
             cursor-pointer
             bg-[#999999]
             text-[12px] text-[#ffffff]
-            ">
-              추가하기 
-              </button>
+            "
+            >
+              추가하기
+            </button>
           </div>
         </section>
 
         <button
-        className="
+          className="
         w-full h-[48px]
         flex justify-center items-center
         rounded-[10px]
         py-[14px]
         bg-[#b3e378]
-        text-[16px] font-[pretandard]">
+        text-[16px] font-[pretandard]"
+        >
           등록하기
         </button>
-
       </div>
     </div>
   );

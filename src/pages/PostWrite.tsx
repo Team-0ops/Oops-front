@@ -1,8 +1,13 @@
-import { useState } from "react";
-import { FaAngleLeft } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import type { OopsPost } from "../types/OopsList";
 import OopsList from "../components/post/OopsList";
 import { useRef } from "react";
+
+import LeftPoint from "../assets/icons/left-point.svg?react";
+import UpArrow from "../assets/icons/UpArrow.svg?react";
+import DownArrow from "../assets/icons/DownArrow.svg?react";
+
+import "../App.css";
 
 interface PostWriteProps {
   posts: OopsPost[];
@@ -21,6 +26,14 @@ const PostWrite = ({
   selectedPostId,
   setSelectedPostId,
 }: PostWriteProps) => {
+  // 카테고리 관련 state와 카테고리 배열
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const categories = [
+    "작은 일", "연애", "인간관계", "학교생활", "진로/취업",
+    "회사생활", "대입/입시", "창업", "여행", "재정/돈관리",
+    "건강/운동", "멘탈관리", "자유",
+  ];
   // 웁스 중 작성용 state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -118,9 +131,29 @@ const PostWrite = ({
     }
   };
 
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
+
   // button 스타일
   const buttonStyle =
-    "w-auto px-[13px] py-[6px] rounded-[20px]  font-semibold text-[14px] flex items-center justify-center cursor-pointer";
+    "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   return (
     <div className="flex justify-center items-center ">
@@ -129,9 +162,9 @@ const PostWrite = ({
         {/* 첫번째 section */}
         <section className="w-full px-[20px] pt-[17px] pb-[30px] flex flex-col gap-[20px]">
           {/* 글작성 */}
-          <div className="flex items-center font-['Pretendard'] gap-[8px] text-[20px] font-semibold">
+          <div className="h2 flex items-center gap-[8px] ">
             <button className="cursor-pointer">
-              <FaAngleLeft />
+              <LeftPoint />
             </button>
             글작성
           </div>
@@ -140,13 +173,13 @@ const PostWrite = ({
           <div className="w-full h-[209px] py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
             <input
               placeholder="제목 (필수)"
-              className="mb-[14px] font-['Pretendard'] font-semibold text-[18px] w-[177px] h-[21px] bg-transparent outline-none"
+              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
               placeholder="실패담의 내용을 입력해주세요. (필수)"
-              className="w-full h-[150px] bg-transparent outline-none text-[12px] font-['Pretendard'] font-semibold"
+              className="caption1 w-full h-[150px] bg-transparent outline-none "
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
@@ -157,31 +190,28 @@ const PostWrite = ({
 
         {/* 두번째 section */}
         {/* 진행상황 선택 */}
-        <section className="w-full px-[20px] py-[20px] font-['Pretendard'] flex flex-col gap-[12px] items-start">
-          <div className="w-[242px] h-[19px] font-semibold text-[16px]">
+        <section className="w-full px-[20px] py-[20px]  flex flex-col gap-[12px] items-start">
+          <div className="body2 w-[242px] h-[19px] ">
             진행상황 선택
           </div>
           <div className="flex items-start w-full gap-[14px] font-['Pretendard'] rounded-lg overflow-hidden border-none">
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(0)}
             >
               웁스 중
             </button>
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(1)}
             >
               극복 중
             </button>
             <button
-              className={`${buttonStyle} ${
-                selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-              }`}
+              className={`${buttonStyle} ${selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+                }`}
               onClick={() => setSelectedStep(2)}
             >
               극복 완료
@@ -201,11 +231,11 @@ const PostWrite = ({
 
         {/* 세번째 section */}
         {/* 이미지 업로드 */}
-        <section className="w-full py-[20px] px-[20px] font-['Pretendard'] flex flex-col items-start">
-          <div className="font-semibold mb-[8px] text-[16px]">사진추가</div>
+        <section className="w-full py-[20px] px-[20px] flex flex-col items-start">
+          <div className="body2 mb-[8px] ">사진추가</div>
           <div className="flex justify-between items-center w-full ">
             <button
-              className="bg-[#E6E6E6] px-[12px] py-[6px] rounded-[20px] cursor-pointer my-[40px] text-[14px] font-semibold"
+              className="body4 bg-[#E6E6E6] px-[12px] py-[6px] rounded-[20px] cursor-pointer my-[40px]"
               onClick={handleClick}
               type="button"
             >
@@ -219,7 +249,7 @@ const PostWrite = ({
               className="hidden"
               onChange={handleImageChange}
             />
-            <div className="flex gap-[12px] items-start overflow-x-auto max-w-[180px] scrollbar-thin">
+            <div className="flex gap-[12px] items-start overflow-x-scroll max-w-[185px]">
               {images.map((src, idx) => (
                 <div
                   key={idx}
@@ -239,7 +269,7 @@ const PostWrite = ({
             </div>
           </div>
           <div className="w-full flex justify-end">
-            <span className="text-[12px] font-medium text-[#999999]">
+            <span className="caption2 text-[#999999]">
               jpg, png, 각 10MB 이하만 최대 5장 업로드 가능합니다.
             </span>
           </div>
@@ -248,38 +278,60 @@ const PostWrite = ({
         <hr className="border-gray-300" />
 
         {/* 세번째 섹션 */}
-        {/* 카테고리 */}
-        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] font-['Pretendard']">
-          <form className="flex flex-col justify-start items-center gap-[16px] w-[120px]">
-            <label className="font-semibold text-[16px]">카테고리를 선택</label>
-            <select
-              className="bg-[#F5F5F5] px-[10px] py-[6px] w-auto h-auto rounded-[20px]"
-              onChange={(e) => setCategory(e.target.value)}
-              value={category}
+        {/* 카테고리 선택 영역 */}
+        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] relative"
+          ref={dropdownRef}
+        >
+          <form className="flex flex-col justify-start gap-[16px] w-[120px]">
+            <div className="body2">카테고리 선택</div>
+
+            {/* 드롭다운 버튼 */}
+            <div
+              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px]  rounded-[20px] cursor-pointer
+                bg-[#E6E6E6] outline-none select-none"
             >
-              <option className="text-[14px]" value="">
-                카테고리 선택
-              </option>
-              <option className="text-[14px]" value="작은 일">작은 일</option>
-              <option className="text-[14px]" value="연애">연애</option>
-              <option className="text-[14px]" value="인간관계">인간관계</option>
-              <option className="text-[14px]" value="학교생활">학교생활</option>
-              <option className="text-[14px]" value="진로/취업">진로/취업</option>
-              <option className="text-[14px]" value="회사생활">회사생활</option>
-              <option className="text-[14px]" value="대입/입시">대입/입시</option>
-              <option className="text-[14px]" value="창업">창업</option>
-              <option className="text-[14px]" value="여행">여행</option>
-              <option className="text-[14px]" value="재정/돈관리">재정/돈관리</option>
-              <option className="text-[14px]" value="건강/운동">건강/운동</option>
-              <option className="text-[14px]" value="멘탈관리">멘탈관리</option>
-              <option className="text-[14px]" value="자유">자유</option>
-              {/* 카테고리 추가 시 아래와 같이 추가 */}
-            </select>
+              {category || "카테고리 선택"}
+              {isDropdownOpen ?
+                <UpArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
+                         className="w-[18px] h-[18px]" />
+                :
+                <DownArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
+                           className="w-[18px] h-[18px]" 
+                />}
+            </div>
+
+            {/* 드롭다운 리스트 */}
+            {isDropdownOpen && (
+              <ul
+                className="
+              absolute top-[82px] 
+              bg-[#f3f3f3]
+              w-[120px] h-[118px] 
+               rounded-b-[10px] 
+                overflow-y-scroll text-[14px] shadow">
+                {categories.map((item, idx) => (
+                  <li
+                    key={item}
+                    onClick={() => {
+                      setCategory(item);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`body4 px-[13px] py-[8px] cursor-pointer
+            ${category === item ? "text-black" : "text-[#999999]"} 
+            ${idx !== categories.length - 1 ? "border-b border-[#e6e6e6]" : ""}
+          `}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
           </form>
 
+          {/* 댓글 종류 선택 */}
           <fieldset className="ml-[10px] flex flex-col justify-start items-start">
-            <legend className="font-bold mb-4">댓글 종류 선택</legend>
-            <div className="flex items-center mb-[8px]">
+            <legend className="body2 mb-4">댓글 종류 선택</legend>
+            <div className="flex items-center mb-[15px]">
               <input
                 type="checkbox"
                 value="조언"
@@ -293,7 +345,7 @@ const PostWrite = ({
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="mx-5" htmlFor="comment1">
+              <label className="body5 mx-5" htmlFor="comment1">
                 조언
               </label>
             </div>
@@ -312,7 +364,7 @@ const PostWrite = ({
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="mx-5">공감</label>
+              <label className="body5 mx-5">공감</label>
             </div>
 
           </fieldset>
