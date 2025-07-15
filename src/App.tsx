@@ -8,6 +8,7 @@ import HomeLayout from "./layout/HomeLayout";
 import MainPage from "./pages/MainPage";
 
 // 피드 관련 페이지
+import PostDetail from "./pages/PostDetail";
 import CategoryFeed from "./pages/CategoryFeed";
 import FavoriteFeed from "./pages/FavoriteFeed";
 import RandomFeed from "./pages/RandomFeed";
@@ -46,6 +47,8 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
+        { path: "/postsuccess", element: <PostSuccess /> },
+        { path: "/postdetail", element: <PostDetail />},
         // { path: "drawer", element: <CategoryDrawerTest /> },
         {
           path: "post",
@@ -66,7 +69,6 @@ function App() {
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
-    { path: "/postsuccess", element: <PostSuccess /> },
     { path: "/feedback", element: <Feedback /> },
     { path: "/report", element: <Report /> },
   ];

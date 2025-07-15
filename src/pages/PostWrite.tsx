@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { OopsPost } from "../types/OopsList";
-import OopsList from "../components/post/OopsList";
+import OopsList from "../components/post/PostList";
 import { useRef } from "react";
 
 import LeftPoint from "../assets/icons/left-point.svg?react";
