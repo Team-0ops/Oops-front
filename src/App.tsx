@@ -47,8 +47,8 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
-        { path: "/postsuccess", element: <PostSuccess /> },
-        { path: "/postdetail", element: <PostDetail />},
+        { path: "postsuccess", element: <PostSuccess /> },
+        { path: "postdetail", element: <PostDetail />},
         // { path: "drawer", element: <CategoryDrawerTest /> },
         {
           path: "post",
@@ -70,7 +70,6 @@ function App() {
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
     { path: "/feedback", element: <Feedback /> },
-    { path: "/report", element: <Report /> },
   ];
 
   const router = createBrowserRouter([...publicRoutes]);

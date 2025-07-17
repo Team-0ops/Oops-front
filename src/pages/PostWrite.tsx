@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { OopsPost } from "../types/OopsList";
-import OopsList from "../components/post/PostList";
+import PostList from "../components/post/PostList";
 import { useRef } from "react";
 
 import LeftPoint from "../assets/icons/left-point.svg?react";
@@ -30,9 +30,19 @@ const PostWrite = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const categories = [
-    "작은 일", "연애", "인간관계", "학교생활", "진로/취업",
-    "회사생활", "대입/입시", "창업", "여행", "재정/돈관리",
-    "건강/운동", "멘탈관리", "자유",
+    "작은 일",
+    "연애",
+    "인간관계",
+    "학교생활",
+    "진로/취업",
+    "회사생활",
+    "대입/입시",
+    "창업",
+    "여행",
+    "재정/돈관리",
+    "건강/운동",
+    "멘탈관리",
+    "자유",
   ];
   // 웁스 중 작성용 state
   const [title, setTitle] = useState("");
@@ -70,67 +80,75 @@ const PostWrite = ({
 
   // 최종 제출 핸들러
   const handleSubmit = () => {
-    // 웁스 중 작성
-    if (selectedStep === 0) {
-      setPosts((prev) => [
-        ...prev,
-        {
-          id:
-            Date.now().toString() + Math.random().toString(36).substring(2, 9), // uuid 대체
-          status: "웁스 중",
-          title,
-          content,
-          images,
-          category,
-          commentType,
-        },
-      ]);
-      setTitle("");
-      setContent("");
-      setImages([]);
-      setCategory("");
-      setCommentType([]);
-    } else if (selectedStep === 1 && selectedPostId) {
-      // 극복 중 작성
-      setPosts((prev) => [
-        ...prev,
-        {
-          id:
-            Date.now().toString() + Math.random().toString(36).substring(2, 9), // uuid 대체
-          status: "극복 중",
-          title: overcomeTitle,
-          content: overcomeContent,
-          images: [],
-          category: "",
-          commentType: [],
-          parentId: selectedPostId, // 웁스 중 id
-        },
-      ]);
-      setOvercomeContent("");
-      setOvercomeTitle("");
-      setSelectedPostId(null);
-    } else if (selectedStep === 2 && selectedPostId) {
-      // 극복 완료 작성
-      setPosts((prev) => [
-        ...prev,
-        {
-          id:
-            Date.now().toString() + Math.random().toString(36).substring(2, 9), // uuid 대체
-          status: "극복 완료",
-          title: completeTitle,
-          content: completeContent,
-          images: [],
-          category: "",
-          commentType: [],
-          parentId: selectedPostId, // 극복 중 id
-        },
-      ]);
-      setCompleteContent("");
-      setCompleteTitle("");
-      setSelectedPostId(null);
-    }
+    const now = new Date().toLocaleString("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+   const basePost = {
+    id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+    createdAt: now, // ✅ 추가
   };
 
+    // 웁스 중 작성
+    if (selectedStep === 0) {
+    setPosts((prev) => [
+      ...prev,
+      {
+        ...basePost,
+        status: "웁스 중",
+        title,
+        content,
+        images,
+        category,
+        commentType,
+      },
+    ]);
+    setTitle("");
+    setContent("");
+    setImages([]);
+    setCategory("");
+    setCommentType([]);
+  } else if (selectedStep === 1 && selectedPostId) {
+    // 극복 중 작성
+    setPosts((prev) => [
+      ...prev,
+      {
+        ...basePost,
+        status: "극복 중",
+        title: overcomeTitle,
+        content: overcomeContent,
+        images: [],
+        category,
+        commentType: [],
+        parentId: selectedPostId,
+      },
+    ]);
+    setOvercomeContent("");
+    setOvercomeTitle("");
+    setSelectedPostId(null);
+  } else if (selectedStep === 2 && selectedPostId) {
+    // 극복 완료 작성
+    setPosts((prev) => [
+      ...prev,
+      {
+        ...basePost,
+        status: "극복 완료",
+        title: completeTitle,
+        content: completeContent,
+        images: [],
+        category,
+        commentType: [],
+        parentId: selectedPostId,
+      },
+    ]);
+    setCompleteContent("");
+    setCompleteTitle("");
+    setSelectedPostId(null);
+  }
+  };
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -148,8 +166,6 @@ const PostWrite = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
 
   // button 스타일
   const buttonStyle =
@@ -171,6 +187,8 @@ const PostWrite = ({
 
           {/* 제목 및 본문 입력 */}
           <div className="w-full h-[209px] py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
+            {selectedStep === 0 && (
+            <>
             <input
               placeholder="제목 (필수)"
               className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
@@ -183,6 +201,42 @@ const PostWrite = ({
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
+            </>
+            )}
+
+            {selectedStep === 1 && (
+            <>
+            <input
+              placeholder="제목 (필수)"
+              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+              value={overcomeTitle}
+              onChange={(e) => setOvercomeTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="실패담의 내용을 입력해주세요. (필수)"
+              className="caption1 w-full h-[150px] bg-transparent outline-none "
+              value={overcomeContent}
+              onChange={(e) => setOvercomeContent(e.target.value)}
+            />
+            </>
+            )}
+
+            {selectedStep === 2 && (
+            <>
+            <input
+              placeholder="제목 (필수)"
+              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+              value={completeTitle}
+              onChange={(e) => setCompleteTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="실패담의 내용을 입력해주세요. (필수)"
+              className="caption1 w-full h-[150px] bg-transparent outline-none "
+              value={completeContent}
+              onChange={(e) => setCompleteContent(e.target.value)}
+            />
+            </>
+            )}
           </div>
         </section>
 
@@ -191,27 +245,28 @@ const PostWrite = ({
         {/* 두번째 section */}
         {/* 진행상황 선택 */}
         <section className="w-full px-[20px] py-[20px]  flex flex-col gap-[12px] items-start">
-          <div className="body2 w-[242px] h-[19px] ">
-            진행상황 선택
-          </div>
+          <div className="body2 w-[242px] h-[19px] ">진행상황 선택</div>
           <div className="flex items-start w-full gap-[14px] font-['Pretendard'] rounded-lg overflow-hidden border-none">
             <button
-              className={`${buttonStyle} ${selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-                }`}
+              className={`${buttonStyle} ${
+                selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+              }`}
               onClick={() => setSelectedStep(0)}
             >
               웁스 중
             </button>
             <button
-              className={`${buttonStyle} ${selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-                }`}
+              className={`${buttonStyle} ${
+                selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+              }`}
               onClick={() => setSelectedStep(1)}
             >
               극복 중
             </button>
             <button
-              className={`${buttonStyle} ${selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
-                }`}
+              className={`${buttonStyle} ${
+                selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
+              }`}
               onClick={() => setSelectedStep(2)}
             >
               극복 완료
@@ -221,10 +276,10 @@ const PostWrite = ({
           {/* 웁스 중, 극복 중, 극복 완료 리스트 */}
 
           {selectedStep === 1 && (
-            <OopsList posts={oopsList} onSelect={setSelectedPostId} />
+            <PostList posts={oopsList} onSelect={setSelectedPostId} />
           )}
           {selectedStep === 2 && (
-            <OopsList posts={overcomeList} onSelect={setSelectedPostId} />
+            <PostList posts={overcomeList} onSelect={setSelectedPostId} />
           )}
         </section>
         <hr className="border-[#E6E6E6] border-[1px]" />
@@ -279,7 +334,8 @@ const PostWrite = ({
 
         {/* 세번째 섹션 */}
         {/* 카테고리 선택 영역 */}
-        <section className="flex justify-start gap-[30px] pl-[20px] pt-[20px] relative"
+        <section
+          className="flex justify-start gap-[30px] pl-[20px] pt-[20px] relative"
           ref={dropdownRef}
         >
           <form className="flex flex-col justify-start gap-[16px] w-[120px]">
@@ -291,13 +347,17 @@ const PostWrite = ({
                 bg-[#E6E6E6] outline-none select-none"
             >
               {category || "카테고리 선택"}
-              {isDropdownOpen ?
-                <UpArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
-                         className="w-[18px] h-[18px]" />
-                :
-                <DownArrow onClick={() => setIsDropdownOpen((prev) => !prev)}
-                           className="w-[18px] h-[18px]" 
-                />}
+              {isDropdownOpen ? (
+                <UpArrow
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                  className="w-[18px] h-[18px]"
+                />
+              ) : (
+                <DownArrow
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                  className="w-[18px] h-[18px]"
+                />
+              )}
             </div>
 
             {/* 드롭다운 리스트 */}
@@ -308,7 +368,8 @@ const PostWrite = ({
               bg-[#f3f3f3]
               w-[120px] h-[118px] 
                rounded-b-[10px] 
-                overflow-y-scroll text-[14px] shadow">
+                overflow-y-scroll text-[14px] shadow"
+              >
                 {categories.map((item, idx) => (
                   <li
                     key={item}
@@ -366,9 +427,7 @@ const PostWrite = ({
               />
               <label className="body5 mx-5">공감</label>
             </div>
-
           </fieldset>
-
         </section>
 
         {/* 웁스 중 작성 */}

@@ -9,7 +9,7 @@ const CommentList = ({ comments }: CommentListProps) => {
   if (comments.length === 0) {
     return (
       <div className="text-center text-[#999999] caption3 py-[20px]">
-        댓글이 아직 없습니다.
+        작성된 댓글이 아직 없습니다.
       </div>
     );
   }
@@ -17,7 +17,10 @@ const CommentList = ({ comments }: CommentListProps) => {
   return (
     <div className="flex flex-col">
       {comments.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} />
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+        />
       ))}
     </div>
   );
