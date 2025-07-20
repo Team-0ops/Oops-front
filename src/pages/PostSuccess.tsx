@@ -1,6 +1,13 @@
 import Logo from "../assets/icons/newLogo.svg?react";
 
+import { useNavigate } from "react-router-dom";
+
 const PostSuccess = () => {
+  const navigate = useNavigate();
+  const handleMain = () => {
+    navigate("/");
+  };
+
   return (
     <div className="flex justify-center items-center ">
       <div className="w-full h-full pb-[21px] ">
@@ -19,7 +26,11 @@ const PostSuccess = () => {
             </button>
           </div>
           <div className="flex justify-center items-center">
-            <button className="body4 bg-[#1d1d1d] cursor-pointer w-[335px] h-[50px] rounded-[4px]  text-[#b3e378] ">
+            <button
+              onClick={() => handleMain()}
+              type="button"
+              className="body4 bg-[#1d1d1d] cursor-pointer w-[335px] h-[50px] rounded-[4px]  text-[#b3e378] "
+            >
               메인 피드로 돌아가기
             </button>
           </div>

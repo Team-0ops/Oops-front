@@ -69,7 +69,6 @@ function App() {
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
-    { path: "/feedback", element: <Feedback /> },
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
