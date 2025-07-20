@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -25,16 +26,8 @@ import TermsPage from "./pages/TermsPage";
 // 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
-import Feedback from "./components/modals/Feedback";
-import Report from "./components/modals/Report";
-
-import type { OopsPost } from "./types/OopsList";
 
 function App() {
-  const [posts, setPosts] = useState<OopsPost[]>([]);
-  const [selectedStep, setSelectedStep] = useState<0 | 1 | 2>(0);
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-
   const publicRoutes: RouteObject[] = [
     {
       path: "/",
@@ -48,33 +41,24 @@ function App() {
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
         { path: "postsuccess", element: <PostSuccess /> },
-        { path: "postdetail", element: <PostDetail />},
+        { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
-        {
-          path: "post",
-          element: (
-            <PostWrite
-              posts={posts}
-              setPosts={setPosts}
-              selectedStep={selectedStep}
-              setSelectedStep={setSelectedStep}
-              selectedPostId={selectedPostId}
-              setSelectedPostId={setSelectedPostId}
-            />
-          ),
-        },
+        { path: "post", element: <PostWrite /> },
       ],
     },
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
-    { path: "/feedback", element: <Feedback /> },
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  );
 }
 
 export default App;

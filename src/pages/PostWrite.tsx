@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
-import type { OopsPost } from "../types/OopsList";
-import PostList from "../components/post/PostList";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "../store/store";
+import { addPost, setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
+
+import PostList from "../components/post/PostList";
 
 import LeftPoint from "../assets/icons/left-point.svg?react";
 import UpArrow from "../assets/icons/UpArrow.svg?react";
@@ -9,24 +14,27 @@ import DownArrow from "../assets/icons/DownArrow.svg?react";
 
 import "../App.css";
 
-interface PostWriteProps {
-  posts: OopsPost[];
-  setPosts: React.Dispatch<React.SetStateAction<OopsPost[]>>;
-  selectedStep: 0 | 1 | 2;
-  setSelectedStep: (step: 0 | 1 | 2) => void;
-  selectedPostId: string | null;
-  setSelectedPostId: (id: string | null) => void;
-}
+const PostWrite = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-const PostWrite = ({
-  posts,
-  setPosts,
-  selectedStep,
-  setSelectedStep,
-  selectedPostId,
-  setSelectedPostId,
-}: PostWriteProps) => {
-  // 카테고리 관련 state와 카테고리 배열
+  const posts = useSelector((state: RootState) => state.post.posts);
+  const selectedStep = useSelector((state: RootState) => state.post.selectedStep);
+  const selectedPostId = useSelector((state: RootState) => state.post.selectedPostId);
+
+  const oopsList = posts.filter((p) => p.status === "웁스 중");
+  const overcomeList = posts.filter((p) => p.status === "극복 중");
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [overcomeTitle, setOvercomeTitle] = useState("");
+  const [overcomeContent, setOvercomeContent] = useState("");
+  const [completeTitle, setCompleteTitle] = useState("");
+  const [completeContent, setCompleteContent] = useState("");
+
+  const [images, setImages] = useState<string[]>([]);
+  const [category, setCategory] = useState("");
+  const [commentType, setCommentType] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const categories = [
@@ -44,22 +52,6 @@ const PostWrite = ({
     "멘탈관리",
     "자유",
   ];
-  // 웁스 중 작성용 state
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  // 극복 중/완료 작성용 state
-  const [overcomeContent, setOvercomeContent] = useState("");
-  const [completeContent, setCompleteContent] = useState("");
-  const [overcomeTitle, setOvercomeTitle] = useState("");
-  const [completeTitle, setCompleteTitle] = useState("");
-  // 이미지 업로드용 state
-  const [images, setImages] = useState<string[]>([]);
-  const [category, setCategory] = useState("");
-  const [commentType, setCommentType] = useState<string[]>([]);
-
-  // 단계별 리스트 필터
-  const oopsList = posts.filter((p) => p.status === "웁스 중");
-  const overcomeList = posts.filter((p) => p.status === "극복 중");
 
   // 이미지 업로드 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,75 +71,71 @@ const PostWrite = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 최종 제출 핸들러
-  const handleSubmit = () => {
+   const handleSubmit = () => {
     const now = new Date().toLocaleString("ko-KR", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-   const basePost = {
-    id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-    createdAt: now, // ✅ 추가
-  };
+    const basePost = {
+      id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+      createdAt: now,
+    };
 
-    // 웁스 중 작성
     if (selectedStep === 0) {
-    setPosts((prev) => [
-      ...prev,
-      {
-        ...basePost,
-        status: "웁스 중",
-        title,
-        content,
-        images,
-        category,
-        commentType,
-      },
-    ]);
-    setTitle("");
-    setContent("");
-    setImages([]);
-    setCategory("");
-    setCommentType([]);
-  } else if (selectedStep === 1 && selectedPostId) {
-    // 극복 중 작성
-    setPosts((prev) => [
-      ...prev,
-      {
-        ...basePost,
-        status: "극복 중",
-        title: overcomeTitle,
-        content: overcomeContent,
-        images: [],
-        category,
-        commentType: [],
-        parentId: selectedPostId,
-      },
-    ]);
-    setOvercomeContent("");
-    setOvercomeTitle("");
-    setSelectedPostId(null);
-  } else if (selectedStep === 2 && selectedPostId) {
-    // 극복 완료 작성
-    setPosts((prev) => [
-      ...prev,
-      {
-        ...basePost,
-        status: "극복 완료",
-        title: completeTitle,
-        content: completeContent,
-        images: [],
-        category,
-        commentType: [],
-        parentId: selectedPostId,
-      },
-    ]);
-    setCompleteContent("");
-    setCompleteTitle("");
-    setSelectedPostId(null);
-  }
+      dispatch(
+        addPost({
+          ...basePost,
+          status: "웁스 중",
+          title,
+          content,
+          images,
+          category,
+          commentType,
+        })
+      );
+      setTitle("");
+      setContent("");
+      setImages([]);
+      setCategory("");
+      setCommentType([]);
+    } else if (selectedStep === 1 && selectedPostId) {
+      dispatch(
+        addPost({
+          ...basePost,
+          status: "극복 중",
+          title: overcomeTitle,
+          content: overcomeContent,
+          images: [],
+          category,
+          commentType: [],
+          parentId: selectedPostId,
+        })
+      );
+      setOvercomeTitle("");
+      setOvercomeContent("");
+      dispatch(setSelectedPostId(null));
+    } else if (selectedStep === 2 && selectedPostId) {
+      dispatch(
+        addPost({
+          ...basePost,
+          status: "극복 완료",
+          title: completeTitle,
+          content: completeContent,
+          images: [],
+          category,
+          commentType: [],
+          parentId: selectedPostId,
+        })
+      );
+      setCompleteTitle("");
+      setCompleteContent("");
+      dispatch(setSelectedPostId(null));
+    }
+
+    navigate("/postsuccess");
   };
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -179,7 +167,7 @@ const PostWrite = ({
         <section className="w-full px-[20px] pt-[17px] pb-[30px] flex flex-col gap-[20px]">
           {/* 글작성 */}
           <div className="h2 flex items-center gap-[8px] ">
-            <button className="cursor-pointer">
+            <button className="cursor-pointer" onClick={() => navigate(-1)}>
               <LeftPoint />
             </button>
             글작성
@@ -188,54 +176,56 @@ const PostWrite = ({
           {/* 제목 및 본문 입력 */}
           <div className="w-full h-[209px] py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
             {selectedStep === 0 && (
-            <>
-            <input
-              placeholder="제목 (필수)"
-              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="실패담의 내용을 입력해주세요. (필수)"
-              className="caption1 w-full h-[150px] bg-transparent outline-none "
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-            </>
+              <>
+                <input
+                  required
+                  placeholder="제목 (필수)"
+                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <textarea
+                  required
+                  placeholder="실패담의 내용을 입력해주세요. (필수)"
+                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+              </>
             )}
 
             {selectedStep === 1 && (
-            <>
-            <input
-              placeholder="제목 (필수)"
-              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
-              value={overcomeTitle}
-              onChange={(e) => setOvercomeTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="실패담의 내용을 입력해주세요. (필수)"
-              className="caption1 w-full h-[150px] bg-transparent outline-none "
-              value={overcomeContent}
-              onChange={(e) => setOvercomeContent(e.target.value)}
-            />
-            </>
+              <>
+                <input
+                  placeholder="제목 (필수)"
+                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  value={overcomeTitle}
+                  onChange={(e) => setOvercomeTitle(e.target.value)}
+                />
+                <textarea
+                  placeholder="실패담의 내용을 입력해주세요. (필수)"
+                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  value={overcomeContent}
+                  onChange={(e) => setOvercomeContent(e.target.value)}
+                />
+              </>
             )}
 
             {selectedStep === 2 && (
-            <>
-            <input
-              placeholder="제목 (필수)"
-              className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
-              value={completeTitle}
-              onChange={(e) => setCompleteTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="실패담의 내용을 입력해주세요. (필수)"
-              className="caption1 w-full h-[150px] bg-transparent outline-none "
-              value={completeContent}
-              onChange={(e) => setCompleteContent(e.target.value)}
-            />
-            </>
+              <>
+                <input
+                  placeholder="제목 (필수)"
+                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  value={completeTitle}
+                  onChange={(e) => setCompleteTitle(e.target.value)}
+                />
+                <textarea
+                  placeholder="실패담의 내용을 입력해주세요. (필수)"
+                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  value={completeContent}
+                  onChange={(e) => setCompleteContent(e.target.value)}
+                />
+              </>
             )}
           </div>
         </section>
@@ -251,7 +241,7 @@ const PostWrite = ({
               className={`${buttonStyle} ${
                 selectedStep === 0 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
               }`}
-              onClick={() => setSelectedStep(0)}
+              onClick={() => dispatch(setSelectedStep(0))}
             >
               웁스 중
             </button>
@@ -259,7 +249,7 @@ const PostWrite = ({
               className={`${buttonStyle} ${
                 selectedStep === 1 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
               }`}
-              onClick={() => setSelectedStep(1)}
+              onClick={() => dispatch(setSelectedStep(1))}
             >
               극복 중
             </button>
@@ -267,7 +257,7 @@ const PostWrite = ({
               className={`${buttonStyle} ${
                 selectedStep === 2 ? "bg-[#B3E378]" : "bg-[#E6E6E6] text-black"
               }`}
-              onClick={() => setSelectedStep(2)}
+              onClick={() => dispatch(setSelectedStep(2))}
             >
               극복 완료
             </button>
@@ -276,10 +266,10 @@ const PostWrite = ({
           {/* 웁스 중, 극복 중, 극복 완료 리스트 */}
 
           {selectedStep === 1 && (
-            <PostList posts={oopsList} onSelect={setSelectedPostId} />
+            <PostList posts={oopsList} onSelect={(id) => dispatch(setSelectedPostId(id))} />
           )}
           {selectedStep === 2 && (
-            <PostList posts={overcomeList} onSelect={setSelectedPostId} />
+            <PostList posts={overcomeList} onSelect={(id) => dispatch(setSelectedPostId(id))} />
           )}
         </section>
         <hr className="border-[#E6E6E6] border-[1px]" />
@@ -436,7 +426,7 @@ const PostWrite = ({
         <div className="flex justify-center items-center mb-[32px] mt-[42px]">
           <button
             className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-            onClick={handleSubmit}
+            onClick={title && content ? handleSubmit : undefined}
           >
             작성
           </button>
