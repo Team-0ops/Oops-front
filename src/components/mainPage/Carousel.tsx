@@ -7,7 +7,7 @@ const Carousel = () => {
     return (
         <>
         <Swiper
-        className="w-[335px] h-[178px] rounded-[10px] overflow-hidden mt-[26px]"
+        className="w-full h-[178px] rounded-[10px] overflow-hidden mt-[26px]"
         modules={[Navigation, Pagination]}
         spaceBetween={10}
         slidesPerView={1}
