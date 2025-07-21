@@ -4,6 +4,8 @@ import SearchLogo from '../../assets/icons/search.svg?react';
 import WriteLogo from '../../assets/icons/write.svg?react';
 import My from '../../assets/icons/my.svg?react';
 
+import { Link } from 'react-router-dom';
+
 const Navbar = () => {
     return (
         <>
@@ -13,17 +15,19 @@ const Navbar = () => {
                         <Bugger className="w-[24px] h-[24px]" />
                     </button>
 
-                    <Logo className="w-[49.498px] h-[20px]"/>
+                    <Link to="/">
+                        <Logo className="w-[49.498px] h-[20px]"/>
+                    </Link>
                 </div>
                 <div className="flex gap-[8px] items-center ">
                     <button>
                         <SearchLogo />
                     </button>
 
-                    <button>
+                    <Link to="/post">
                         <WriteLogo />
-                    </button>
-                    
+                    </Link>
+
                     <button>
                         <My />
                     </button>

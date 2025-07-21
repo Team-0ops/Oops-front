@@ -2,6 +2,7 @@ import { useState } from "react";
 import LogoMark from "../assets/icons/Logo.svg?react";
 import Button from "../components/common/Button";
 import PasswordInput from "../components/auth/PasswordInput";
+import { Link } from "react-router-dom";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
@@ -44,13 +45,13 @@ const SigninPage = () => {
           </Button>
 
           <div className="mt-2 flex justify-end text-[12px] text-[#B3B3B3]">
-            <a href="#!" className="hover:underline">
+            <Link to="/find-idpw" className="hover:underline">
               아이디/비밀번호 찾기
-            </a>
+            </Link>
             <span className="mx-2">|</span>
-            <a href="#!" className="hover:underline">
+            <Link to="/signup" className="hover:underline">
               회원가입
-            </a>
+            </Link>
           </div>
         </form>
       </section>

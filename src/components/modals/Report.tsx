@@ -1,56 +1,67 @@
 import X from "../../assets/icons/X.svg?react";
 
-const Report = () => {
+export type ReportTarget = {
+  type: "post" | "comment";
+  id: string;
+  author: string;
+  content: string;
+};
+
+interface ReportProps {
+  comment: ReportTarget;
+  onClose: () => void;
+}
+
+const Report = ({ onClose, comment }: ReportProps) => {
   return (
     <div
-      className="
-    fixed inset-0 
-    bg-black bg-opacity-50 
-    flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+      onClick={onClose}
     >
       <div
         className="
-      rounded-[10px]
-      px-[20px] pt-[21px] pb-[26px]
-      bg-[#ffffff]
-      flex flex-col 
-      w-[302px] "
+          rounded-[10px]
+          px-[20px] pt-[21px] pb-[26px]
+          bg-[#ffffff]
+          flex flex-col 
+          w-[302px]
+        "
+        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
       >
         <section className="flex justify-center items-center">
           <div
             className="
-        flex justify-between items-center gap-[68px]
-        ml-[92px] mb-[14px]
-        text-[20px] font-semibold font-[pretendard]"
+          h2
+          flex justify-between items-center gap-[68px]
+          ml-[92px] mb-[14px]
+          "
           >
             신고하기
-            <X className="w-[24px] h-[24px]" />
+            <X className="w-[24px] h-[24px] cursor-pointer" onClick={onClose} />
           </div>
         </section>
-        {/* 닉네임과 댓글 내용 가져와야할듯 */}
 
         <section
           className="
           flex flex-col items-center justify-center gap-[6px]
-          mb-[18px]
-          font-[pretendard]  
+          mb-[18px] 
           "
         >
-          <div className="text-[12px] text-[#666666]">닉네임 님의 댓글</div>
-          <div className="text-[12px] text-[#666666]">"겁나긴댓글댓글댓글"</div>
+          <div className="caption2 text-[#666666]">{comment.author}님의 {comment.type === "post" ? "게시글" : "댓글"}</div>
+          <div className="caption2 text-[#666666]">"{comment.content}"</div>
         </section>
-    
+
         <section
           className="
             flex flex-col justify-center items-center gap-[16px]
             mb-[8px] 
-            font-[pretendard]"
+            "
         >
-          <h1 className="text-[16px]">신고하는 이유는 무엇인가요?</h1>
+          <h1 className="body2 text-[#1d1d1d]">신고하는 이유는 무엇인가요?</h1>
           <textarea
             placeholder="사유를 입력해주세요."
             className="
-              placeholder:text-[12px] text-[#b3b3b3]
+              placeholder:caption2 placeholder:text-[#b3b3b3]
               bg-[#fffbf8] 
               w-[262px] h-[136px] 
               text-[12px] rounded-[5px] 
@@ -63,8 +74,9 @@ const Report = () => {
 
         <h6
           className="
+        caption2  
         flex justify-start items-start
-        text-[12px] text-[#cccccc] leading-3.5
+        text-[#cccccc]
         w-full"
         >
           허위 신고의 경우, <br />
@@ -72,17 +84,18 @@ const Report = () => {
         </h6>
 
         <button
-        className="
+          className="
+        body2 text-[#000000]  
         w-full h-[48px]
         flex justify-center items-center
         rounded-[10px]
         mt-[12px]
         py-[14px]
         bg-[#b3e378]
-        text-[16px] font-[pretandard]">
-        신고하기
+       "
+        >
+          신고하기
         </button>
-
       </div>
     </div>
   );
