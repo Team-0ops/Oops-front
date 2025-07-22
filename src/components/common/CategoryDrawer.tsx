@@ -45,7 +45,7 @@ const CategoryDrawer = ({ onClose }: Props) => {
       <input
         value={keyword}
         onChange={(e)=> setKeyword(e.target.value)}
-        className="w-[335px] h-[48px] rounded-[4px] border border-[#F6EBE6] mt-[28px] pl-[20px] mb-[34px] placeholder:text-[16px]"
+        className="w-full h-[48px] rounded-[4px] border border-[#F6EBE6] mt-[28px] pl-[20px] mb-[34px] placeholder:text-[16px]"
         placeholder="카테고리 검색"
         style={{
           boxShadow: 'inset 0px 0px 5.4px 0px rgba(0, 0, 0, 0.25)'
@@ -61,7 +61,7 @@ const CategoryDrawer = ({ onClose }: Props) => {
           .map((cat) => (
             <div
               key={cat.name}
-              className={`flex justify-between items-center w-[335px] h-[48px] mb-[16px] rounded-[4px] py-[9px] px-[10px] ${
+              className={`flex justify-between items-center w-full h-[48px] mb-[16px] rounded-[4px] py-[9px] px-[10px] ${
                 cat.active ? "bg-[#B3E378]" : "bg-[#F0E3E0]"
               }`}
             >
