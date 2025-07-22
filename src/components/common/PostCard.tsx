@@ -1,4 +1,3 @@
-
 import PostStats from "./PostStats";
 type PostCardProps = {
   title: string;
