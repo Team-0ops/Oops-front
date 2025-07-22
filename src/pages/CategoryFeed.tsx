@@ -61,7 +61,7 @@ const mockPosts = [
 
 const CategoryFeed = () => {
   return (
-    <div className="max-w-[375px] min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
       <div className="flex gap-[8px]">
         <button>
         <img src="/src/assets/icons/left-point.svg" alt="뒤로가기" className="w-[9.48px] h-[16.97px]" />
