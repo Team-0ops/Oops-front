@@ -13,7 +13,7 @@ import FavoriteFeed from "./pages/FavoriteFeed";
 import RandomFeed from "./pages/RandomFeed";
 import BestFeed from "./pages/BestFeed";
 import ExRandomFeed from "./pages/ExRandomFeed";
-import CategoryDrawerTest from "./pages/CategoryDrawerTest";
+
 
 // 로그인 관련 페이지
 import SigninPage from "./pages/SigninPage";
@@ -43,7 +43,7 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
-        { path: "drawer", element: <CategoryDrawerTest /> },
+        
         {
           path: "post",
           element: (
