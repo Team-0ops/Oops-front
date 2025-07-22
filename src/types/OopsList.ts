@@ -7,4 +7,5 @@ export type OopsPost = {
     category: string;
     commentType: string[];
     parentId?: string; // 이전 단계 게시글 id (웁스중→극복중, 극복중→극복완료)
+    createdAt: string; 
 };

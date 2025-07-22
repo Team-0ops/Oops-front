@@ -1,0 +1,117 @@
+/* PostList 스와이퍼 커스텀 style */
+.custom-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background-color: #d9d9d9;
+  opacity: 1;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  background-color: #1d1d1d;
+}
+
+/* Pretendard 로컬 폰트 선언 */
+@font-face {
+  font-family: "Pretendard";
+  src: url("../assets/font/pretendard/Pretendard-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("../assets/font/pretendard/Pretendard-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("../assets/font/pretendard/Pretendard-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("../assets/font/pretendard/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "WAGURI";
+  src: url("../assets/font/waguri/WAGURI-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.waguri {
+  font-family: "WAGURI";
+}
+
+/* Base font-family */
+* {
+  font-family: "Pretendard", sans-serif;
+}
+
+/* Heading */
+.h1 {
+  font-size: 24px;
+  font-weight: 700; /* Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.h2 {
+  font-size: 20px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+/* Body */
+.body1 {
+  font-size: 18px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body2 {
+  font-size: 16px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body3 {
+  font-size: 16px;
+  font-weight: 500; /* Medium */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body4 {
+  font-size: 14px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body5 {
+  font-size: 14px;
+  font-weight: 500; /* Medium */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+/* Caption */
+.caption1 {
+  font-size: 12px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}

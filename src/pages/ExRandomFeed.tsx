@@ -1,5 +1,5 @@
 
-import PostCard from "../components/FeedPage/PostCard";
+import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 
 const mockPosts = [
