@@ -5,10 +5,10 @@ interface Props {
 }
 
 const categoryList = [
-  { name: "작은 일", active: true },
-  { name: "연애", active: true },
-  { name: "인간관계", active: true },
-  { name: "여행", active: true },
+  { name: "작은 일", active: false },
+  { name: "연애", active: false },
+  { name: "인간관계", active: false },
+  { name: "여행", active: false },
   { name: "학교생활", active: false },
   { name: "진로/취업", active: false },
   { name: "회사생활", active: false },
@@ -21,6 +21,8 @@ const categoryList = [
 
 const CategoryDrawer = ({ onClose }: Props) => {
   const [categories, setCategories] = useState(categoryList);
+  const [keyword, setKeyword] = useState('');
+
 
   const toggleStar = (name: string) => {
     const updated = categories.map(cat =>
@@ -41,6 +43,8 @@ const CategoryDrawer = ({ onClose }: Props) => {
 
       {/* 검색창 */}
       <input
+        value={keyword}
+        onChange={(e)=> setKeyword(e.target.value)}
         className="w-[335px] h-[48px] rounded-[4px] border border-[#F6EBE6] mt-[28px] pl-[20px] mb-[34px] placeholder:text-[16px]"
         placeholder="카테고리 검색"
         style={{
@@ -52,6 +56,7 @@ const CategoryDrawer = ({ onClose }: Props) => {
       {/* 카테고리 목록 */}
       <div className="flex flex-col items-center overflow-y-auto max-h-[calc(100vh-200px)] w-full">
         {[...categories] // 복사해서 정렬
+          .filter(cat=> cat.name.includes(keyword))
           .sort((a, b) => Number(b.active) - Number(a.active)) // 즐겨찾기 먼저
           .map((cat) => (
             <div
