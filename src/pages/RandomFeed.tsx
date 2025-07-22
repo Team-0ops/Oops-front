@@ -1,5 +1,6 @@
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
+import LeftArrow from "../assets/icons/left-point.svg?react";
 
 const mockPosts = [
   {
@@ -64,7 +65,7 @@ const RandomFeed = () => {
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
       <div className="flex gap-[8px]">
         <button>
-        <img src="/src/assets/icons/left-point.svg" alt="뒤로가기" className="w-[9.48px] h-[16.97px]" />
+          <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
       </button> 
       <h2 className="text-[20px] font-semibold">발표</h2>
       <button className=" absolute right-[20px] text-[12px] text-[#B3E378]  bg-[#262626] rounded-[8px] px-[9px] py-[8px]">
