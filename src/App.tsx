@@ -29,6 +29,12 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 
+//마이페이지
+import MyPageLayout from "./pages/MyPageLayout";
+import MyFailuresPage from "./pages/MyFailuresPage";
+import MyLessonsPage from "./pages/MyLessonsPage";
+import MyProfilePage from "./pages/MyProfilePage";
+
 function App() {
   const publicRoutes: RouteObject[] = [
     {
@@ -48,6 +54,18 @@ function App() {
         { path: "post", element: <PostWrite /> },
       ],
     },
+
+    {
+      path: "/mypage",
+      element: <MyPageLayout />,
+      children: [
+        { index: true, element: <MyFailuresPage /> },
+        { path: "failures", element: <MyFailuresPage /> },
+        { path: "lesson", element: <MyLessonsPage /> },
+        { path: "profile", element: <MyProfilePage /> },
+      ],
+    },
+
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
