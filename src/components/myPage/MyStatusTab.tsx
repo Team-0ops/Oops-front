@@ -15,12 +15,12 @@ export default function MyStatusTab({ value, onChange }: Props) {
   ];
 
   return (
-    <div className="flex gap-[10px] mt-[18px] mb-[20px]">
+    <div className="flex w-full gap-[10px] mt-[18px] mb-[20px]">
       {tabs.map((t) => (
         <button
           key={t.key}
           onClick={() => onChange(t.key)}
-          className={`min-w-[60px] h-[30px] rounded-[20px] whitespace-nowrap
+          className={`flex-1 basis-0 min-w-[60px] h-[30px] rounded-[20px] whitespace-nowrap
                       px-[12px] py-[6px] text-[12px] font-semibold
                       ${
                         value === t.key

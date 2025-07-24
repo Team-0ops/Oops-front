@@ -7,16 +7,20 @@ export default function MyLessonsPage() {
   return (
     <section className="p-4">
       {/* 태그 칩 */}
-      <div className="mb-4 flex gap-2 overflow-x-auto">
+      <div className="flex w-full flex-wrap gap-[10px] mb-4">
         {tags.map((t) => (
           <button
             key={t}
             onClick={() => setTag(t)}
-            className={`rounded-full px-3 py-1 text-sm ${
-              tag === t
-                ? "bg-green-400 text-white"
-                : "bg-gray-200 text-gray-600"
-            }`}
+            className={`flex-1 basis-0 min-w-[80px] whitespace-nowrap
+              flex items-center justify-center
+              h-[28px] px-[13px] rounded-full 
+              text-sm font-semibold 
+              ${
+                tag === t
+                  ? "bg-[#1D1D1D] text-[#FFFFFF]"
+                  : "bg-[#E6E6E6] text-[#1D1D1D]"
+              }`}
           >
             {t}
           </button>

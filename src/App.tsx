@@ -61,7 +61,7 @@ function App() {
       children: [
         { index: true, element: <MyFailuresPage /> },
         { path: "failures", element: <MyFailuresPage /> },
-        { path: "lesson", element: <MyLessonsPage /> },
+        { path: "lessons", element: <MyLessonsPage /> },
         { path: "profile", element: <MyProfilePage /> },
       ],
     },
