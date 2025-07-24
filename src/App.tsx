@@ -28,6 +28,7 @@ import TermsPage from "./pages/TermsPage";
 // 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -52,6 +53,7 @@ function App() {
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
+    { path: "/search", element: <SearchPage /> },
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
