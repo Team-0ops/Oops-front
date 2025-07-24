@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../store/store";
-import { addPost, setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
+import {
+  addPost,
+  setSelectedStep,
+  setSelectedPostId,
+} from "../store/slices/postSlice";
 
 import PostList from "../components/post/PostList";
 
@@ -19,8 +23,12 @@ const PostWrite = () => {
   const dispatch = useDispatch();
 
   const posts = useSelector((state: RootState) => state.post.posts);
-  const selectedStep = useSelector((state: RootState) => state.post.selectedStep);
-  const selectedPostId = useSelector((state: RootState) => state.post.selectedPostId);
+  const selectedStep = useSelector(
+    (state: RootState) => state.post.selectedStep
+  );
+  const selectedPostId = useSelector(
+    (state: RootState) => state.post.selectedPostId
+  );
 
   const oopsList = posts.filter((p) => p.status === "웁스 중");
   const overcomeList = posts.filter((p) => p.status === "극복 중");
@@ -71,7 +79,7 @@ const PostWrite = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 최종 제출 핸들러
-   const handleSubmit = () => {
+  const handleSubmit = () => {
     const now = new Date().toLocaleString("ko-KR", {
       month: "long",
       day: "numeric",
@@ -174,20 +182,20 @@ const PostWrite = () => {
           </div>
 
           {/* 제목 및 본문 입력 */}
-          <div className="w-full h-[209px] py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
+          <div className="w-full py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
             {selectedStep === 0 && (
               <>
                 <input
                   required
                   placeholder="제목 (필수)"
-                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <textarea
                   required
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px] "
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                 />
@@ -198,13 +206,13 @@ const PostWrite = () => {
               <>
                 <input
                   placeholder="제목 (필수)"
-                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
                   value={overcomeTitle}
                   onChange={(e) => setOvercomeTitle(e.target.value)}
                 />
                 <textarea
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
                   value={overcomeContent}
                   onChange={(e) => setOvercomeContent(e.target.value)}
                 />
@@ -215,13 +223,13 @@ const PostWrite = () => {
               <>
                 <input
                   placeholder="제목 (필수)"
-                  className="body1 mb-[14px] w-[177px] h-[21px] bg-transparent outline-none"
+                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
                   value={completeTitle}
                   onChange={(e) => setCompleteTitle(e.target.value)}
                 />
                 <textarea
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 w-full h-[150px] bg-transparent outline-none "
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
                   value={completeContent}
                   onChange={(e) => setCompleteContent(e.target.value)}
                 />
@@ -266,10 +274,16 @@ const PostWrite = () => {
           {/* 웁스 중, 극복 중, 극복 완료 리스트 */}
 
           {selectedStep === 1 && (
-            <PostList posts={oopsList} onSelect={(id) => dispatch(setSelectedPostId(id))} />
+            <PostList
+              posts={oopsList}
+              onSelect={(id) => dispatch(setSelectedPostId(id))}
+            />
           )}
           {selectedStep === 2 && (
-            <PostList posts={overcomeList} onSelect={(id) => dispatch(setSelectedPostId(id))} />
+            <PostList
+              posts={overcomeList}
+              onSelect={(id) => dispatch(setSelectedPostId(id))}
+            />
           )}
         </section>
         <hr className="border-[#E6E6E6] border-[1px]" />
@@ -355,10 +369,10 @@ const PostWrite = () => {
               <ul
                 className="
               absolute top-[82px] 
-              bg-[#f3f3f3]
+            bg-[#f3f3f3]
               w-[120px] h-[118px] 
-               rounded-b-[10px] 
-                overflow-y-scroll text-[14px] shadow"
+              rounded-b-[10px] 
+              overflow-y-scroll text-[14px] shadow"
               >
                 {categories.map((item, idx) => (
                   <li

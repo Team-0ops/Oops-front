@@ -43,7 +43,12 @@ const CommentItem = ({ comment }: CommentProps) => {
             <button
               className="flex items-center"
               onClick={handleLikeClick}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
             >
               {isLiked ? (
                 <ColorLike className="w-[14px] h-[14px]" />
@@ -51,7 +56,9 @@ const CommentItem = ({ comment }: CommentProps) => {
                 <NoColorLike className="w-[14px] h-[14px]" />
               )}
             </button>
-            <p className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}>
+            <p
+              className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
+            >
               {likeCount > 0 ? likeCount : "공감"}
             </p>
             <div className="flex justify-center gap-[4px] ml-[18px]">
@@ -63,10 +70,7 @@ const CommentItem = ({ comment }: CommentProps) => {
       </div>
 
       {isReportOpen && (
-        <Report
-          comment={comment}
-          onClose={() => setIsReportOpen(false)}
-        />
+        <Report comment={comment} onClose={() => setIsReportOpen(false)} />
       )}
     </>
   );

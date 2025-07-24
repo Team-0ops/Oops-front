@@ -43,9 +43,7 @@ const PostList = ({ posts, onSelect }: PostListProps) => {
       style={{ boxShadow: "inset 0px 0px 5.4px 0px rgba(0, 0, 0, 0.25)" }}
       className="bg-[#fffbf8] w-full rounded-[4px] border-[1px] border-[#f6ebe6] px-[20px] py-[20px] mt-[8px]"
     >
-      <div className="body4 mb-[12px]">
-        극복 완료한 게시글을 선택해주세요!
-      </div>
+      <div className="body4 mb-[12px]">극복 완료한 게시글을 선택해주세요!</div>
 
       {posts.length === 0 ? (
         <div className="body5 flex justify-center text-[#999] items-center">
