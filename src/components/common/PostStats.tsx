@@ -1,6 +1,6 @@
 import HeartIcon from "../../assets/icons/majesticons_heart.svg?react";
 import CommentIcon from "../../assets/icons/fluent_comment-48-filled.svg?react";
-import ViewIcon from "../../assets/icons/iconoir_eye-solid.svg?react";
+import ViewIcon from "../../assets/icons/views.svg?react";
 
 type PostStatsProps = {
   likes: number;
