@@ -29,6 +29,7 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
+import FailWiki from "./pages/FailWiki";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -47,6 +48,7 @@ function App() {
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
+        { path: "fail-wiki", element: <FailWiki /> },
       ],
     },
     { path: "/signin", element: <SigninPage /> },
