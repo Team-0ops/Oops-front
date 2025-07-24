@@ -1,42 +1,117 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* PostList 스와이퍼 커스텀 style */
+.custom-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background-color: #d9d9d9;
+  opacity: 1;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.custom-pagination .swiper-pagination-bullet-active {
+  background-color: #1d1d1d;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@font-face {
+  font-family: "WAGURI";
+  src: url("./assets/font/waguri/WAGURI-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.waguri {
+  font-family: "WAGURI";
 }
 
-.card {
-  padding: 2em;
+/* Pretendard 로컬 폰트 선언 */
+@font-face {
+  font-family: "Pretendard";
+  src: url("./assets/font/pretendard/Pretendard-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
 }
 
-.read-the-docs {
-  color: #888;
+@font-face {
+  font-family: "Pretendard";
+  src: url("./assets/font/pretendard/Pretendard-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("./assets/font/pretendard/Pretendard-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("./assets/font/pretendard/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Pretendard 폰트 스타일링 */
+* {
+  font-family: "Pretendard", sans-serif;
+}
+
+/* Heading */
+.h1 {
+  font-size: 24px;
+  font-weight: 700; /* Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.h2 {
+  font-size: 20px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+/* Body */
+.body1 {
+  font-size: 18px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body2 {
+  font-size: 16px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body3 {
+  font-size: 16px;
+  font-weight: 500; /* Medium */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body4 {
+  font-size: 14px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.body5 {
+  font-size: 14px;
+  font-weight: 500; /* Medium */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+/* Caption */
+.caption1 {
+  font-size: 12px;
+  font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
 }
