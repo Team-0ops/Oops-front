@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Star from "../../assets/icons/star_empty.svg?react"
+import StarFilled from "../../assets/icons/star_filled.svg?react"
+import CloseButton from "../../assets/icons/X.svg?react"
 
 interface Props {
   onClose: () => void;
@@ -46,7 +49,7 @@ const CategoryDrawer = ({ onClose }: Props) => {
       <div className="flex justify-end justify-center mt-[27.81px] items-center w-full relative">
         <p className="text-center text-[20px] font-semibold w-full">카테고리 목록</p>
         <button className="absolute right-[24px]" onClick={onClose}>
-          <img src="src/assets/icons/X.svg" alt="닫기 버튼" className="w-[24px] h-[24px]" />
+          <CloseButton className="w-[24px] h-[24px]"/>
         </button>
       </div>
 
@@ -74,17 +77,14 @@ const CategoryDrawer = ({ onClose }: Props) => {
                 cat.active ? "bg-[#B3E378]" : "bg-[#F0E3E0]"
               }`}
             >
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center ">
                 <button onClick={() => toggleStar(cat.name)} className="pl-[10px] pr-[6px]">
-                  <img
-                    className="w-[24px] h-[24px]"
-                    src={
-                      cat.active
-                        ? "src/assets/icons/star_filled.svg"
-                        : "src/assets/icons/star (2).svg"
-                    }
-                    alt="별 아이콘"
-                  />
+                  {cat.active?(
+                    <StarFilled className="w-[24px] h-[24px]"/>
+                    
+                  ):(
+                    <Star className="w-[24px] h-[24px]"/>
+                  )}
                 </button>
                 <p className="text-[16px] font-semibold">{cat.name}</p>
               </div>
