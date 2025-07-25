@@ -4,7 +4,7 @@ import SearchInput from "../components/SearchPage/SearchInput";
 const SearchPage = () => {
   return (
     <>
-      <div className="px-[20px] gap-[30px] flex flex-col justify-center">
+      <div className="px-[20px] gap-[30px] flex flex-col justify-center bg-[#FFFBF8]">
         <div>
           <SearchHeader />
         </div>

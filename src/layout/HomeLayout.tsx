@@ -4,18 +4,17 @@ import Footer from "../components/common/Footer";
 
 //로그인 구현 전 nav바, footer만 구현
 const HomeLayout = () => {
-    return(
-        <>
-            <div>
-                <Navbar />
-                <main>
-                    <Outlet />
-                </main>
-
-                <Footer />
-                </div>
-        </>
-    )
-}
+  return (
+    <>
+      <div>
+        <Navbar />
+        <main className="px-[20px] bg-[#FFFBF8]">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </>
+  );
+};
 
 export default HomeLayout;
