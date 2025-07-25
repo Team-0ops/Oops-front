@@ -12,10 +12,10 @@ export default function MyLessonsPage() {
           <button
             key={t}
             onClick={() => setTag(t)}
-            className={`flex-1 basis-0 min-w-[80px] whitespace-nowrap
-              flex items-center justify-center
+            className={`flex-1 basis-0 
+              flex items-center justify-center whitespace-nowrap
               h-[28px] px-[13px] rounded-full 
-              text-sm font-semibold 
+              text-[12px] font-semibold 
               ${
                 tag === t
                   ? "bg-[#1D1D1D] text-[#FFFFFF]"
@@ -28,9 +28,9 @@ export default function MyLessonsPage() {
       </div>
 
       {tag ? (
-        <p className="text-center text-gray-500">추후 {tag} 교훈 목록 표시</p>
+        <p className="text-center text-[#808080]">추후 {tag} 교훈 목록 표시</p>
       ) : (
-        <p className="mt-20 text-center text-gray-400">
+        <p className="mt-20 text-center text-[#808080]">
           보고 싶은 교훈 태그를 선택해 주세요.
         </p>
       )}
