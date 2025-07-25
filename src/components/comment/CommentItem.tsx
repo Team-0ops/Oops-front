@@ -1,7 +1,7 @@
 import { useState } from "react";
-
 import type { Comment } from "../../types/Comment";
 import Report from "../modals/Report";
+import CommentForm from "./CommentForm";
 
 import NoColorReport from "../../assets/icons/NoColorReport.svg?react";
 import NoColorLike from "../../assets/icons/gray_heart.svg?react";
@@ -17,14 +17,34 @@ const CommentItem = ({ comment }: CommentProps) => {
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
+  const [selectedReply, setSelectedReply] = useState<Comment | null>(null);
+
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replies, setReplies] = useState<Comment[]>([]);
+
   const handleLikeClick = () => {
-    setLikeCount(likeCount + 1);
-    setIsLiked(true);
+    if (!isLiked) {
+      setLikeCount(likeCount + 1);
+      setIsLiked(true);
+    }
+  };
+
+  const handleReplySubmit = (text: string) => {
+    const newReply: Comment = {
+      type: "comment",
+      id: Date.now().toString(),
+      author: "익명", // 실제 사용자 정보가 있다면 대체
+      content: text,
+      createdAt: new Date().toLocaleString(),
+    };
+    setReplies((prev) => [...prev, newReply]);
+    setShowReplyForm(false);
   };
 
   return (
     <>
-      <div className="flex flex-col w-full pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border-[1px] border-solid border-[#f0e7e0]">
+      {/* 댓글 본문 */}
+      <div className="flex flex-col w-full pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
         <div className="mb-[4px] flex justify-between items-center">
           <span className="body5 text-[#808080]">{comment.author}</span>
           <NoColorReport
@@ -43,7 +63,12 @@ const CommentItem = ({ comment }: CommentProps) => {
             <button
               className="flex items-center"
               onClick={handleLikeClick}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
             >
               {isLiked ? (
                 <ColorLike className="w-[14px] h-[14px]" />
@@ -51,20 +76,81 @@ const CommentItem = ({ comment }: CommentProps) => {
                 <NoColorLike className="w-[14px] h-[14px]" />
               )}
             </button>
-            <p className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}>
+            <p
+              className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
+            >
               {likeCount > 0 ? likeCount : "공감"}
             </p>
             <div className="flex justify-center gap-[4px] ml-[18px]">
               <GrayComment className="w-[14px] h-[14px]" />
-              <p className="caption3 text-[#b3b3b3]">대댓글 달기</p>
+              <button onClick={() => setShowReplyForm(!showReplyForm)}>
+                <p className="caption3 text-[#b3b3b3]">대댓글 달기</p>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* 대댓글 작성 폼 */}
+      {showReplyForm && (
+        <CommentForm
+          onSubmit={handleReplySubmit}
+          onCancel={() => setShowReplyForm(false)}
+        />
+      )}
+
+      {/* 대댓글 리스트 */}
+      {replies.map((reply) => (
+        <div key={reply.id} className="ml-[34px]">
+          <div className="w-full flex flex-col pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
+            <div className="mb-[4px] flex justify-between items-center">
+              <span className="body5 text-[#808080]">{reply.author}</span>
+              <NoColorReport
+                className="w-[24px] h-[24px] cursor-pointer"
+                onClick={() => setSelectedReply(reply)}
+              />
+            </div>
+
+            <div className="flex justify-start">
+              <span className="body5 text-[#1d1d1d]">{reply.content}</span>
+            </div>
+
+            <div className="flex justify-between items-center mt-[12px]">
+              <span className="caption3 text-[#b3b3b3]">{reply.createdAt}</span>
+              <ReplyLike />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* 대댓글 신고 모달 */}
+      {selectedReply && (
+        <Report
+          comment={{
+            type: "reComment", // ✅ 대댓글 신고 타입 지정
+            id: selectedReply.id,
+            author: selectedReply.author,
+            content:
+              selectedReply.content.length > 20
+                ? selectedReply.content.slice(0, 20) + "..."
+                : selectedReply.content,
+          }}
+          onClose={() => setSelectedReply(null)}
+        />
+      )}
+
+      {/* 일반 댓글 신고 모달 */}
       {isReportOpen && (
         <Report
-          comment={comment}
+          comment={{
+            type: "comment",
+            id: comment.id,
+            author: comment.author,
+            content:
+              comment.content.length > 20
+                ? comment.content.slice(0, 20) + "..."
+                : comment.content,
+          }}
           onClose={() => setIsReportOpen(false)}
         />
       )}
@@ -73,3 +159,42 @@ const CommentItem = ({ comment }: CommentProps) => {
 };
 
 export default CommentItem;
+
+// 대댓글용 공감 버튼 분리
+const ReplyLike = () => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+  const handleLike = () => {
+    if (!isLiked) {
+      setLikeCount((prev) => prev + 1);
+      setIsLiked(true);
+    }
+  };
+
+  return (
+    <div className="flex justify-center gap-[4px]">
+      <button
+        onClick={handleLike}
+        className="flex items-center"
+        style={{
+          background: "none",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+        }}
+      >
+        {isLiked ? (
+          <ColorLike className="w-[14px] h-[14px]" />
+        ) : (
+          <NoColorLike className="w-[14px] h-[14px]" />
+        )}
+      </button>
+      <p
+        className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
+      >
+        {likeCount > 0 ? likeCount : "공감"}
+      </p>
+    </div>
+  );
+};
