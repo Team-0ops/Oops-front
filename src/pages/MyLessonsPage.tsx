@@ -12,8 +12,7 @@ export default function MyLessonsPage() {
           <button
             key={t}
             onClick={() => setTag(t)}
-            className={`flex-1 basis-0 
-              flex items-center justify-center whitespace-nowrap
+            className={`inlineflex items-center justify-center whitespace-nowrap
               h-[28px] px-[13px] rounded-full 
               text-[12px] font-semibold 
               ${
