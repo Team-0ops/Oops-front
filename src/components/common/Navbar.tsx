@@ -1,5 +1,5 @@
 import Bugger from "../../assets/icons/Vector.svg?react";
-import Logo from "../../assets/icons/MainLogo2.svg?react";
+import Logo from "../../assets/icons/navbar.svg?react";
 import SearchLogo from "../../assets/icons/search.svg?react";
 import WriteLogo from "../../assets/icons/write.svg?react";
 import My from "../../assets/icons/my.svg?react";
