@@ -30,6 +30,7 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
+import FailWiki from "./pages/FailWiki";
 
 //마이페이지
 import MyPageLayout from "./pages/MyPageLayout";
@@ -56,6 +57,7 @@ function App() {
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
+        { path: "fail-wiki", element: <FailWiki /> },
       ],
     },
 
