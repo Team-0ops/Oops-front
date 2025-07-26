@@ -2,9 +2,9 @@ import LeftArrow from "../../assets/icons/LeftArrow.svg?react";
 const WikiHead = () => {
   return (
     <>
-      <div className="">
+      <div className="flex items-center gap-[10px] ">
         <LeftArrow />
-        <h2>실패위키</h2>
+        <p className="h2">실패위키</p>
       </div>
     </>
   );

@@ -12,6 +12,11 @@
   background-color: #1d1d1d;
 }
 
+/* 검색어 Input 스타일 */
+.shadowcustom-inset {
+  box-shadow: inset 0px 0px 5.4px rgba(0, 0, 0, 0.25);
+}
+
 @font-face {
   font-family: "WAGURI";
   src: url("./assets/font/waguri/WAGURI-Regular.woff") format("woff");
@@ -112,6 +117,20 @@
 .caption1 {
   font-size: 12px;
   font-weight: 600; /* Semi Bold */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.caption2 {
+  font-size: 12px;
+  font-weight: 500; /* Medium */
+  line-height: 120%;
+  letter-spacing: 0;
+}
+
+.caption3 {
+  font-size: 12px;
+  font-weight: 400; /* Regular */
   line-height: 120%;
   letter-spacing: 0;
 }
