@@ -32,9 +32,9 @@ const Navbar = () => {
             <WriteLogo />
           </Link>
 
-          <button>
+          <Link to="/mypage">
             <My />
-          </button>
+          </Link>
         </div>
       </nav>
 
