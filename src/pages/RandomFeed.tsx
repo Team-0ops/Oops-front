@@ -62,7 +62,7 @@ const mockPosts = [
 
 const RandomFeed = () => {
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] ">
       <div className="flex gap-[8px]">
         <button>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />

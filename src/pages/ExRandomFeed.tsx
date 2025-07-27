@@ -61,7 +61,7 @@ const ExRandomFeed = () => {
   const restPosts = mockPosts.slice(3);
 
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] ">
       {/* 상단 제목 및 주차 표시 */}
       <div className="flex gap-[8px] relative items-center mb-[10px] ">
         <button>
