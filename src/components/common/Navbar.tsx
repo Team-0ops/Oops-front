@@ -24,9 +24,9 @@ const Navbar = () => {
         </div>
 
         <div className="flex gap-[8px] items-center">
-          <button>
+          <Link to="search">
             <SearchLogo />
-          </button>
+          </Link>
 
           <Link to="/post">
             <WriteLogo />
