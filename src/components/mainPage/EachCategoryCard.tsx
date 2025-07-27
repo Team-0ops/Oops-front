@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import FeedCard from "./FeedCard";
+import ToSeeButton from "./ToSeeButton";
 
 const EachCategoryCard = () => {
   return (
@@ -10,20 +10,11 @@ const EachCategoryCard = () => {
             <div className="w-[8px] h-[20px] bg-[#B3E378]">
               {/* 카테고리 이름 옆 바*/}
             </div>
-            <span className="text-[#1D1D1D] text-[14px] font-semibold leading-normal">
-              카테고리 이름
-            </span>
+            <span className="body4 text-[#1D1D1D]">카테고리 이름</span>
           </div>
 
           {/* 카테고리 이름을 Props로 받아서 link 추가 예정 */}
-          <Link
-            to="/category-feed"
-            className="flex w-[75px] h-[30px] py-[3px] justify-center items-center rounded-[20px] border-[1px] border-[#E6E6E6]"
-          >
-            <span className="text-[#4E4E4E] text-[14px] font-medium leading-[140%]">
-              보러가기
-            </span>
-          </Link>
+          <ToSeeButton nav="category-feed" />
         </div>
         <div className="flex justify-center items-center">
           <FeedCard />

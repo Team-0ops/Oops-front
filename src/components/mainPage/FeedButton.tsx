@@ -5,16 +5,14 @@ import RandomFeed from "../../assets/icons/randomfeed.svg?react";
 const FeedButton = () => {
   return (
     <>
-      <div className="flex items-center justify-center w-full gap-[26px]">
+      <div className="caption1 text-[#FFF] flex items-center justify-center w-full gap-[26px]">
         <Link
           to="/fail-wiki"
           className="w-[94px] h-[93px] bg-[#262626] px-[20px] py-[11px] rounded-[15px]"
         >
           <div className="flex flex-col items-center w-[53px] gap-[4px]">
             <FailWiki className="w-[53px] h-[53px]" />
-            <p className="text-[#FFFFFF] text-[12px] leading-[1] font-semibold">
-              실패 위키
-            </p>
+            <p>실패 위키</p>
           </div>
         </Link>
         <Link
@@ -23,9 +21,7 @@ const FeedButton = () => {
         >
           <div className="flex flex-col items-center w-[68px] gap-[4px]">
             <RandomFeed className="w-[53px] h-[53px]" />
-            <p className="text-[#FFFFFF] text-[12px] leading-[1] font-semibold">
-              랜덤주제 피드
-            </p>
+            <p>랜덤주제 피드</p>
           </div>
         </Link>
         <Link
@@ -34,9 +30,7 @@ const FeedButton = () => {
         >
           <div className="flex flex-col items-center w-[66px] gap-[4px]">
             <LuckyAmulet className="w-[53px] h-[53px] pt-[4.416px] pr-[13.25px] pb-[5.471px] pl-[13.25px]" />
-            <p className="text-[#FFFFFF] text-[12px] leading-[1] font-semibold">
-              행운부적 추첨
-            </p>
+            <p>행운부적 추첨</p>
           </div>
         </Link>
       </div>
