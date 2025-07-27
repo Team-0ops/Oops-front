@@ -4,6 +4,7 @@ import "./App.css";
 import { useState } from "react";
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
   type RouteObject,
 } from "react-router-dom";
@@ -30,6 +31,14 @@ import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
 
+//마이페이지
+import MyPageLayout from "./pages/MyPageLayout";
+import MyFailuresPage from "./pages/MyFailuresPage";
+import MyLessonsPage from "./pages/MyLessonsPage";
+import MyProfilePage from "./pages/MyProfilePage";
+
+import OthersProfilePage from "./pages/OthersProfilePage";
+
 function App() {
   const publicRoutes: RouteObject[] = [
     {
@@ -49,6 +58,23 @@ function App() {
         { path: "post", element: <PostWrite /> },
       ],
     },
+
+    {
+      path: "/mypage",
+      element: <MyPageLayout />,
+      children: [
+        { index: true, element: <Navigate to="failures" replace /> },
+        { path: "failures", element: <MyFailuresPage /> },
+        { path: "lessons", element: <MyLessonsPage /> },
+        { path: "profile", element: <MyProfilePage /> },
+      ],
+    },
+
+    {
+      path: "/users/:userId",
+      element: <OthersProfilePage />,
+    },
+
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },
