@@ -39,6 +39,9 @@ import MyProfilePage from "./pages/MyProfilePage";
 
 import OthersProfilePage from "./pages/OthersProfilePage";
 
+//행운부적 페이지
+import LuckyDraw from "./pages/LuckyDraw";
+
 function App() {
   const publicRoutes: RouteObject[] = [
     {
@@ -56,6 +59,7 @@ function App() {
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
+        {path:"/lucky-draw", element:<LuckyDraw/>}
       ],
     },
 
@@ -80,6 +84,7 @@ function App() {
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
     { path: "/search", element: <SearchPage /> },
+
   ];
 
   const router = createBrowserRouter([...publicRoutes]);

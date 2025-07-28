@@ -1,6 +1,7 @@
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
+import { useNavigate } from "react-router-dom";
 
 const mockPosts = [
   {
@@ -68,17 +69,19 @@ const mockPosts = [
 
 
 const FavoriteFeed = () => {
+
+  const navigate = useNavigate();
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] ">
       <div className="flex gap-[8px]">
-        <button>
+        <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
       </button> 
       <h2 className="text-[20px] font-semibold flex gap-[4px]"><img src="src\assets\icons\star.svg" alt="" />즐겨찾기한 카테고리</h2>
       </div>
       {/* 웁스중, 극복중, 극복완료번튼 */}
       <PostStatusTab/> 
-      <div className="flex flex-col gap-[12px]">
+      <div className="flex flex-col gap-[12px] mb-[50px]">
         {mockPosts.map((post) => (
           <PostCard
             key={post.id}

@@ -2,6 +2,8 @@ import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 
 const categoryMap: Record<string, string> = {
@@ -195,13 +197,15 @@ const CategoryFeed = () => {
   const { categoryName } = useParams();
   const displayName = categoryMap[categoryName ?? ""] ?? "알 수 없음";
   const filteredPosts = mockPosts.filter(post => post.category === categoryName);
+  const navigate = useNavigate();
+
 
 
 
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
       <div className="flex gap-[8px]">
-        <button>
+        <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
         </button>
         <h2 className="text-[20px] font-semibold">{displayName}</h2>

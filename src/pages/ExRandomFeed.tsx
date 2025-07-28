@@ -2,6 +2,7 @@
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
+import { useNavigate } from "react-router-dom";
 
 const mockPosts = [
   {
@@ -59,12 +60,13 @@ const ExRandomFeed = () => {
 
   const top3Posts = mockPosts.slice(0, 3);
   const restPosts = mockPosts.slice(3);
+  const navigate = useNavigate();
 
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] ">
       {/* 상단 제목 및 주차 표시 */}
       <div className="flex gap-[8px] relative items-center mb-[10px] ">
-        <button>
+        <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
         </button>
         <h2 className="text-[20px] font-semibold ">노래</h2>
