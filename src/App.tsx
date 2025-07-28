@@ -48,7 +48,7 @@ function App() {
       errorElement: <div>Not Found</div>,
       children: [
         { index: true, element: <MainPage /> },
-        { path: "category-feed", element: <CategoryFeed /> },
+        { path: "category-feed/:categoryName", element: <CategoryFeed /> },
         { path: "favorite-feed", element: <FavoriteFeed /> },
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
