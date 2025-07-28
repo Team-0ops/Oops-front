@@ -1,7 +1,6 @@
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import "./App.css";
-import { useState } from "react";
 import {
   createBrowserRouter,
   Navigate,
