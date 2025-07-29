@@ -1,9 +1,11 @@
 import { useState } from "react";
 import LeftArrow from "../assets/icons/left-point.svg?react";
 import CardFlip from "../pages/CardFlip";
+import { useNavigate } from "react-router-dom";
 
 const LuckyDraw = () => {
   const [forceStop, setForceStop] = useState(false);
+  const navigate = useNavigate();
 
   const handleDrawClick = () => {
     setForceStop(true); // 모든 카드 뒷면으로 고정
@@ -11,7 +13,7 @@ const LuckyDraw = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <button className="w-[24px] h-[24px] self-start mt-[20px]">
+      <button onClick={() => navigate("/")} className="w-[24px] h-[24px] self-start mt-[20px]">
         <LeftArrow />
       </button>
       <div className="flex flex-col items-center">
