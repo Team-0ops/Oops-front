@@ -41,28 +41,28 @@ const SignupPage = () => {
     setEmailChecked(true); // ← “확인됨” 상태로 강제
   };
 
-  //개별 체크
-  const toggle = (key: keyof Terms) =>
-    setTerms((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      //all 체크 상태 동기화
-      if (key !== "all") {
-        next.all = next.service && next.privacy && next.marketing;
-      }
-      return next;
-    });
+  // //개별 체크
+  // const toggle = (key: keyof Terms) =>
+  //   setTerms((prev) => {
+  //     const next = { ...prev, [key]: !prev[key] };
+  //     //all 체크 상태 동기화
+  //     if (key !== "all") {
+  //       next.all = next.service && next.privacy && next.marketing;
+  //     }
+  //     return next;
+  //   });
 
-  //전체 동의
-  const toggleAll = () =>
-    setTerms((prev) => {
-      const nextValue = !prev.all;
-      return {
-        all: nextValue,
-        service: nextValue,
-        privacy: nextValue,
-        marketing: nextValue,
-      };
-    });
+  // //전체 동의
+  // const toggleAll = () =>
+  //   setTerms((prev) => {
+  //     const nextValue = !prev.all;
+  //     return {
+  //       all: nextValue,
+  //       service: nextValue,
+  //       privacy: nextValue,
+  //       marketing: nextValue,
+  //     };
+  //   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

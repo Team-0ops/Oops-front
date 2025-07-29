@@ -1,4 +1,4 @@
-import { type ChangeEvent, type MouseEvent } from "react";
+//import { type ChangeEvent, type MouseEvent } from "react";
 
 export interface Terms {
   all: boolean;
@@ -33,11 +33,11 @@ export default function TermsGroup({ value, onChange }: Props) {
     onChange(nextState);
   };
 
-  /* 공통 스타일 함수 → 배경색 결정 */
-  const bg = (k: keyof Terms, highlight?: boolean) => {
-    if (value[k]) return "bg-[#B3E378]";
-    return highlight ? "bg-[#B3B3B3]" : "bg-[#E6E6E6]";
-  };
+  // /* 공통 스타일 함수 → 배경색 결정 */
+  // const bg = (k: keyof Terms, highlight?: boolean) => {
+  //   if (value[k]) return "bg-[#B3E378]";
+  //   return highlight ? "bg-[#B3B3B3]" : "bg-[#E6E6E6]";
+  // };
 
   const Row = ({
     label,
