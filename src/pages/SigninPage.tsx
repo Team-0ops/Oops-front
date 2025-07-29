@@ -22,7 +22,7 @@ const SigninPage = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-[36px] w-[320px] flex flex-col gap-3"
+          className="mt-[36px] w-[310px] flex flex-col gap-3"
         >
           <input
             type="text"
@@ -40,7 +40,7 @@ const SigninPage = () => {
             onChange={(e) => setPw(e.target.value)}
           />
 
-          <Button type="submit" disabled={!id || !pw}>
+          <Button type="submit" disabled={!id || !pw} className="text-[20px]">
             log in
           </Button>
 
