@@ -1,5 +1,7 @@
 import Logo from "../assets/icons/newLogo.svg?react";
 
+import { useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 const PostSuccess = () => {
@@ -8,9 +10,13 @@ const PostSuccess = () => {
     navigate("/");
   };
 
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, []);
+
   return (
     <div className="flex justify-center items-center ">
-      <div className="w-full h-full pb-[21px] ">
+      <div className="w-full h-full pb-[20px] ">
         {/* 첫번째 섹션 */}
         {/* 로고 ~ 버튼 */}
         <section className="bg-[#FFFBF8] flex flex-col items-center mt-[1px] mb-[30px] px-[20px]">
@@ -38,7 +44,8 @@ const PostSuccess = () => {
 
         {/* 두번째 섹션 */}
         {/* 추천 글 */}
-        <section className="bg-[#FFFBF8] flex flex-col items-center w-full mb-[20px]">
+        <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen
+         mb-[20px]">
           {/* 추천 글을 여기다 끌어오면 됨 */}
 
           {/* 주제 */}
@@ -91,7 +98,7 @@ const PostSuccess = () => {
 
         {/* 세번째 섹션 */}
         {/* 베스트 글 */}
-        <section className="bg-[#FFFBF8] flex flex-col items-center font-[pretendard] w-full mb-[20px]">
+        <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center font-[pretendard] w-screen mb-[30px]">
           {/* 주제 */}
           <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
             베스트 Failers
