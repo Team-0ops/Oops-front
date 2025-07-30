@@ -26,10 +26,8 @@ const LuckyDraw = () => {
 
   return (
     <div className="w-full flex flex-col items-center relative bg-[#FFFBF8] min-h-screen">
-      {showResult && (
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.3)] z-20"></div>
-      )}
-      {showFullCard && <FullResultCard />}
+    
+      {showFullCard && <FullResultCard onClose={() => setShowFullCard(false)} />}
 
       <button onClick={() => navigate("/")} className="w-[24px] h-[24px] self-start mt-[20px] z-30">
         <LeftArrow />
