@@ -1,8 +1,15 @@
 import Star from "../../assets/icons/star.svg?react";
+import type { Post } from "../../types/post";
+import PostCard from "../common/PostCard";
 import FeedCard from "./FeedCard";
 import ToSeeButton from "./ToSeeButton";
 
-const FavoritesCategoryList = () => {
+interface FavoritesCategoryListProps {
+  favoritesPosts: Post[];
+}
+const FavoritesCategoryList = ({
+  favoritesPosts,
+}: FavoritesCategoryListProps) => {
   return (
     <>
       <div className="flex flex-col w-full justify-center items-center gap-[16px]">
@@ -13,8 +20,19 @@ const FavoritesCategoryList = () => {
           </div>
           <ToSeeButton nav="favorite-feed" />
         </div>
-        <div className="flex justify-center items-center">
-          <FeedCard />
+        <div className="flex flex-col w-full justify-center items-center gap-[16px]">
+          {favoritesPosts?.map((post) => (
+            <PostCard
+              key={post.postId}
+              title={post.title}
+              content={post.content}
+              imageUrl={post.image ?? "null"} // null이면 기본 이미지
+              likes={post.likes}
+              comments={post.comments}
+              views={post.views}
+              category={post.categoryName}
+            />
+          ))}
         </div>
       </div>
     </>
