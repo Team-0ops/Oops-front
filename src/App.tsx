@@ -40,7 +40,7 @@ import MyProfilePage from "./pages/MyProfilePage";
 import OthersProfilePage from "./pages/OthersProfilePage";
 
 //행운부적 페이지
-import LuckyDraw from "./pages/LuckyDraw";
+import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
 
 function App() {
   const publicRoutes: RouteObject[] = [
