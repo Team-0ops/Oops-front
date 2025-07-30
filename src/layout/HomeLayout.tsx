@@ -8,7 +8,7 @@ const HomeLayout = () => {
     <>
       <div className="min-h-screen flex flex-col bg-[#FFFBF8]">
         <Navbar />
-        <main className="flex-1 px-[20px]">
+        <main className="flex-1 px-[20px] mb-[20px]">
           <Outlet />
         </main>
         <Footer />

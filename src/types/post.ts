@@ -11,10 +11,16 @@ export type Post = {
   image: string | null;
 };
 
-export type ResponsePostListDTO = CommonResponse<
+export type ResponseMainPostListDTO = CommonResponse<
   {
     name: string;
     posts: Post[];
     last: boolean;
   }[]
 >;
+
+export type ResponseCategoryPostListDTO = CommonResponse<{
+  name: string;
+  posts: Post[];
+  last: boolean;
+}>;

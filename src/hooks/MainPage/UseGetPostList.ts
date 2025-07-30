@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { getPostListInMainPage } from "../../apis/post";
-import type { ResponsePostListDTO } from "../../types/post";
+import type { ResponseMainPostListDTO } from "../../types/post";
 
-function useGetPostListIn() {
-  const [posts, setPosts] = useState<ResponsePostListDTO | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function useGetPostListInMain() {
+  const [posts, setPosts] = useState<ResponseMainPostListDTO | null>(null);
+  const [mainLoading, setLoading] = useState(true);
+  const [mainError, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +22,7 @@ function useGetPostListIn() {
     fetchData();
   }, []);
 
-  return { posts, loading, error };
+  return { posts, mainLoading, mainError };
 }
 
-export default useGetPostListIn;
+export default useGetPostListInMain;

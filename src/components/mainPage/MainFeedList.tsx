@@ -1,13 +1,16 @@
-import useGetPostListIn from "../../hooks/MainPage/UseGetPostList";
+import useGetPostListInMain from "../../hooks/MainPage/UseGetPostList";
+import useGetPostLIstCategory from "../../hooks/MainPage/useGetPostListCategory";
 import BestFailerList from "./BestFailerList";
 import CategoryList from "./CategoryList";
 import FavoritesCategoryList from "./FavoritesCategoryList";
 
 const MainFeedList = () => {
-  const { posts, loading, error } = useGetPostListIn();
+  const { posts, mainLoading, mainError } = useGetPostListInMain();
+  const { categoryPosts, categoryLoading, categoryError } =
+    useGetPostLIstCategory();
 
-  if (loading) return <div>로딩중...</div>;
-  if (error) return <div>{error}</div>;
+  if (mainLoading || categoryLoading) return <div>로딩중...</div>;
+  if (mainError || categoryError) return <div>에러남.</div>;
 
   const bestPosts = posts?.result?.[0]?.posts || [];
   const favoritesPosts = posts?.result?.[1]?.posts || [];
@@ -20,7 +23,7 @@ const MainFeedList = () => {
         <FavoritesCategoryList
           favoritesPosts={favoritesPosts} // posts prop 전달
         />
-        <CategoryList />
+        <CategoryList categoryPosts={categoryPosts?.result?.posts} />
       </div>
     </>
   );

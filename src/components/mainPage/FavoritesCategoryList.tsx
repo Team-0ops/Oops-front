@@ -1,7 +1,6 @@
 import Star from "../../assets/icons/star.svg?react";
 import type { Post } from "../../types/post";
 import PostCard from "../common/PostCard";
-import FeedCard from "./FeedCard";
 import ToSeeButton from "./ToSeeButton";
 
 interface FavoritesCategoryListProps {
