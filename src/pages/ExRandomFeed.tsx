@@ -1,6 +1,7 @@
 
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
+import LeftArrow from "../assets/icons/left-point.svg?react";
 
 const mockPosts = [
   {
@@ -60,15 +61,11 @@ const ExRandomFeed = () => {
   const restPosts = mockPosts.slice(3);
 
   return (
-    <div className="max-w-[375px] min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] px-[20px]">
       {/* 상단 제목 및 주차 표시 */}
-      <div className="flex gap-[8px] relative items-center mb-[10px]">
+      <div className="flex gap-[8px] relative items-center mb-[10px] ">
         <button>
-          <img
-            src="/src/assets/icons/left-point.svg"
-            alt="뒤로가기"
-            className="w-[9.48px] h-[16.97px]"
-          />
+          <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
         </button>
         <h2 className="text-[20px] font-semibold ">노래</h2>
         <div className="absolute right-0 text-[#999999] text-[12px]">

@@ -1,9 +1,9 @@
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import "./App.css";
-import { useState } from "react";
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
   type RouteObject,
 } from "react-router-dom";
@@ -29,6 +29,15 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
+import FailWiki from "./pages/FailWiki";
+
+//마이페이지
+import MyPageLayout from "./pages/MyPageLayout";
+import MyFailuresPage from "./pages/MyFailuresPage";
+import MyLessonsPage from "./pages/MyLessonsPage";
+import MyProfilePage from "./pages/MyProfilePage";
+
+import OthersProfilePage from "./pages/OthersProfilePage";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -38,7 +47,7 @@ function App() {
       errorElement: <div>Not Found</div>,
       children: [
         { index: true, element: <MainPage /> },
-        { path: "category-feed", element: <CategoryFeed /> },
+        { path: "category-feed/:categoryName", element: <CategoryFeed /> },
         { path: "favorite-feed", element: <FavoriteFeed /> },
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
@@ -47,8 +56,26 @@ function App() {
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
+        { path: "fail-wiki", element: <FailWiki /> },
       ],
     },
+
+    {
+      path: "/mypage",
+      element: <MyPageLayout />,
+      children: [
+        { index: true, element: <Navigate to="failures" replace /> },
+        { path: "failures", element: <MyFailuresPage /> },
+        { path: "lessons", element: <MyLessonsPage /> },
+        { path: "profile", element: <MyProfilePage /> },
+      ],
+    },
+
+    {
+      path: "/users/:userId",
+      element: <OthersProfilePage />,
+    },
+
     { path: "/signin", element: <SigninPage /> },
     { path: "/signup", element: <SignupPage /> },
     { path: "/find-idpw", element: <FindIdPwPage /> },

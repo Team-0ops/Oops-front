@@ -1,18 +1,18 @@
-import Bugger from '../../assets/icons/Vector.svg?react';
-import Logo from '../../assets/icons/MainLogo2.svg?react';
-import SearchLogo from '../../assets/icons/search.svg?react';
-import WriteLogo from '../../assets/icons/write.svg?react';
-import My from '../../assets/icons/my.svg?react';
-import { useState } from 'react';
-import CategoryDrawer from '../common/CategoryDrawer';
-import { Link } from 'react-router-dom';
+import Bugger from "../../assets/icons/Vector.svg?react";
+import Logo from "../../assets/icons/navbar.svg?react";
+import SearchLogo from "../../assets/icons/search.svg?react";
+import WriteLogo from "../../assets/icons/write.svg?react";
+import My from "../../assets/icons/my.svg?react";
+import { useState } from "react";
+import CategoryDrawer from "../common/CategoryDrawer";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
     <>
-      <nav className="flex justify-between items-center px-[20px] py-[12px] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
+      <nav className="flex justify-between items-center px-[20px] py-[12px] bg-[#FFF] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
         <div className="flex gap-[8px] items-center">
           <button onClick={() => setIsDrawerOpen(true)}>
             <Bugger className="w-[24px] h-[24px]" />
@@ -24,17 +24,17 @@ const Navbar = () => {
         </div>
 
         <div className="flex gap-[8px] items-center">
-          <button>
+          <Link to="search">
             <SearchLogo />
-          </button>
+          </Link>
 
           <Link to="/post">
             <WriteLogo />
           </Link>
 
-          <button>
+          <Link to="/mypage">
             <My />
-          </button>
+          </Link>
         </div>
       </nav>
 

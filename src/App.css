@@ -12,6 +12,29 @@
   background-color: #1d1d1d;
 }
 
+/* 검색어 Input 스타일 */
+.shadowcustom-inset {
+  box-shadow: inset 0px 0px 5.4px rgba(0, 0, 0, 0.25);
+}
+
+/* main Page Carousel 스타일 */
+.main-swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  background: #ddd;
+  border-radius: 9999px;
+  margin: 0 4px;
+  opacity: 1;
+}
+.main-swiper-pagination-bullet-active {
+  background: #000;
+}
+
+.main-swiper-button-prev,
+.main-swiper-button-next {
+  color: white; /* 흰색 화살표 */
+}
+
 @font-face {
   font-family: "WAGURI";
   src: url("./assets/font/waguri/WAGURI-Regular.woff") format("woff");
@@ -118,14 +141,14 @@
 
 .caption2 {
   font-size: 12px;
-  font-weight: 500; 
+  font-weight: 500; /* Medium */
   line-height: 120%;
   letter-spacing: 0;
 }
 
 .caption3 {
   font-size: 12px;
-  font-weight: 400; 
+  font-weight: 400; /* Regular */
   line-height: 120%;
   letter-spacing: 0;
 }
