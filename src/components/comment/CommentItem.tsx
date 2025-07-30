@@ -22,6 +22,26 @@ const CommentItem = ({ comment }: CommentProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replies, setReplies] = useState<Comment[]>([]);
 
+  const formatRelativeTime = (createdAt: string) => {
+  const now = new Date();
+  const createdDate = new Date(createdAt);
+  const diffMs = now.getTime() - createdDate.getTime();
+
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSeconds < 60) return "방금 전";
+  if (diffMinutes < 60) return `${diffMinutes}분 전`;
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  if (diffDays < 4) return `${diffDays}일 전`;
+
+  // 4일 이상이면 날짜로 표시
+  return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
+};
+
+
   const handleLikeClick = () => {
     if (!isLiked) {
       setLikeCount(likeCount + 1);
@@ -35,9 +55,9 @@ const CommentItem = ({ comment }: CommentProps) => {
       id: Date.now().toString(),
       author: "익명", // 실제 사용자 정보가 있다면 대체
       content: text,
-      createdAt: new Date().toLocaleString(),
-    };
-    setReplies((prev) => [...prev, newReply]);
+      createdAt: new Date().toISOString(),
+      };
+      setReplies((prev) => [...prev, newReply]);
     setShowReplyForm(false);
   };
 
@@ -54,21 +74,15 @@ const CommentItem = ({ comment }: CommentProps) => {
         </div>
 
         <div className="flex justify-start">
-          <span className="body5 text-[#1d1d1d]">{comment.content}</span>
+          <span className="body5 text-[#1d1d1d] break-words w-full">{comment.content}</span>
         </div>
 
         <div className="flex justify-between items-center mt-[12px] mr-[36px]">
-          <span className="caption3 text-[#b3b3b3]">{comment.createdAt}</span>
+          <span className="caption3 text-[#b3b3b3]">{formatRelativeTime(comment.createdAt)}</span>
           <div className="flex justify-center gap-[4px]">
             <button
-              className="flex items-center"
+              className="flex items-center bg-none border-none p-0 cursor-pointer"
               onClick={handleLikeClick}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-              }}
             >
               {isLiked ? (
                 <ColorLike className="w-[14px] h-[14px]" />
@@ -112,11 +126,11 @@ const CommentItem = ({ comment }: CommentProps) => {
             </div>
 
             <div className="flex justify-start">
-              <span className="body5 text-[#1d1d1d]">{reply.content}</span>
+              <span className="body5 text-[#1d1d1d] break-words w-full">{reply.content}</span>
             </div>
 
             <div className="flex justify-between items-center mt-[12px]">
-              <span className="caption3 text-[#b3b3b3]">{reply.createdAt}</span>
+              <span className="caption3 text-[#b3b3b3]">{formatRelativeTime(reply.createdAt)}</span>
               <ReplyLike />
             </div>
           </div>
