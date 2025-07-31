@@ -1,4 +1,5 @@
 //import { type ChangeEvent, type MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface Terms {
   all: boolean;
@@ -13,16 +14,30 @@ interface Props {
 }
 
 export default function TermsGroup({ value, onChange }: Props) {
+  const navigate = useNavigate();
   const toggle = (key: keyof Terms) => {
+    //이용약관만 단독 클릭한 경우
+    if (
+      key === "service" &&
+      !value.service && // 현재는 체크 안되어 있고
+      !value.privacy &&
+      !value.marketing &&
+      !value.all
+    ) {
+      navigate("/terms"); // 약관 페이지로 이동
+    }
+
     // 전체선택 토글
     if (key === "all") {
       const next = !value.all;
-      onChange({
+      const updated = {
         all: next,
         service: next,
         privacy: next,
         marketing: next,
-      });
+      };
+      sessionStorage.setItem("signupTerms", JSON.stringify(updated)); // 저장
+      onChange(updated);
       return;
     }
 
@@ -30,6 +45,8 @@ export default function TermsGroup({ value, onChange }: Props) {
     const nextState = { ...value, [key]: !value[key] };
     nextState.all =
       nextState.service && nextState.privacy && nextState.marketing;
+
+    sessionStorage.setItem("signupTerms", JSON.stringify(nextState)); // 저장
     onChange(nextState);
   };
 

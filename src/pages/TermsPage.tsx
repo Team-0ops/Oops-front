@@ -6,6 +6,22 @@ import rawTerms from "../assets/terms/terms.md?raw";
 export default function TermsPage() {
   const navigate = useNavigate();
 
+  // '동의 후 돌아가기' 클릭 핸들러
+  const handleAgreeAndGoBack = () => {
+    const current = sessionStorage.getItem("signupTerms");
+    const parsed = current ? JSON.parse(current) : {};
+
+    // 'service' 항목만 true로 설정
+    const updated = {
+      ...parsed,
+      service: true,
+      all: parsed.privacy && parsed.marketing && true, // 전체동의 동기화
+    };
+
+    sessionStorage.setItem("signupTerms", JSON.stringify(updated));
+    navigate(-1);
+  };
+
   return (
     <section className="flex min-h-dvh w-full flex-col items-center bg-[#FFFBF8]">
       <div className="mt-[62px] flex w-[335px] items-center gap-[10px]">
@@ -22,7 +38,7 @@ export default function TermsPage() {
           {rawTerms}
         </div>
 
-        <Button variant="primary" size="lg" onClick={() => navigate(-1)}>
+        <Button variant="primary" size="lg" onClick={handleAgreeAndGoBack}>
           동의 후 돌아가기
         </Button>
       </div>
