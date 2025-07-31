@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import LeftArrow from "../../assets/icons/left-point.svg?react";
 import CardFlip from "./CardFlip";
 import FullResultCard from "./FullResultCard";
 import { useNavigate } from "react-router-dom";
+import { getUserProfile, requestLuckyDraw } from "./luckyDrawApi";
+
+
 
 const LuckyDraw = () => {
   const [forceStop, setForceStop] = useState(false);
@@ -10,6 +13,24 @@ const LuckyDraw = () => {
   const [showResult, setShowResult] = useState(false);
   const [showFullCard, setShowFullCard] = useState(false);
   const navigate = useNavigate();
+  const [userPoint, setUserPoint] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+  const fetchPoint = async () => {
+    try {
+      const res = await getUserProfile();
+      setUserPoint(res.result.point);
+    } catch (e) {
+      console.error("포인트 조회 실패:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchPoint();
+}, []);
+
 
   const handleDrawClick = () => {
     const randomIdx = Math.floor(Math.random() * 9);
@@ -49,13 +70,19 @@ const LuckyDraw = () => {
           />
         ))}
       </div>
-
       <button
         onClick={handleDrawClick}
-        disabled={forceStop}
-        className="h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] bg-[#B3E378] z-30"
-      >
-        행운 부적 뽑으러 가기
+        disabled={forceStop || (userPoint !== null && userPoint < 150)}
+        className={`h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30 ${
+        userPoint !== null && userPoint < 150
+        ? "bg-[#D9D9D9] text-[#999999]"
+        : "bg-[#B3E378] text-black"
+        }`}>
+        {isLoading
+        ? "로딩 중..."
+        : userPoint !== null && userPoint < 150
+        ? "150 포인트가 모이면 뽑을 수 있어요!"
+        : "행운 부적 뽑으러 가기"}
       </button>
     </div>
   );
