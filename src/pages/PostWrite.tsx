@@ -19,6 +19,8 @@ import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
 
 const PostWrite = () => {
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -450,7 +452,7 @@ const PostWrite = () => {
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
               onClick={title && content ? handleOopsSubmit : undefined}
             >
-               작성
+              작성
             </button>
           )}
           {selectedStep === 1 && selectedPostId && (

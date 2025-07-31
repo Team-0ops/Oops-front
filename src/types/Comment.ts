@@ -1,5 +1,5 @@
 export interface Comment {
-  type: "post" | "comment"; 
+  type: "post" | "comment";
   id: string;
   author: string;
   content: string;
