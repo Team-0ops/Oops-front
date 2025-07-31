@@ -1,6 +1,8 @@
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const mockPosts = [
   {
@@ -11,6 +13,7 @@ const mockPosts = [
     likes: 9,
     comments: 3,
     views: 120,
+    status: "웁스 중"
   },
   {
     id: 2,
@@ -19,8 +22,9 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
+    status: "극복 중"
   },
-    {
+  {
     id: 3,
     title: "제발 발표시키지 말아줘",
     content: "발표뺴고 다 할게요..나 저번에 진짜 어땠냐면",
@@ -28,15 +32,17 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
+    status: "극복 완료"
   },
   {
     id: 4,
     title: "진짜 친했던 친구랑 손절했는데 너무 슬프다",
     content: "사진이 없는 게시물은 이런 식으로 글이 조금 더 길어지게 보이게",
-    imageUrl: "", // 이미지 없음
+    imageUrl: "",
     likes: 10,
     comments: 5,
     views: 200,
+    status: "웁스 중"
   },
   {
     id: 5,
@@ -46,6 +52,7 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
+    status: "극복 중"
   },
   {
     id: 6,
@@ -55,30 +62,32 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-  },
+    status: "극복 완료"
+  }
 ];
 
-
-
 const RandomFeed = () => {
+  const navigate = useNavigate();
+  const [selectedStatus, setSelectedStatus] = useState("웁스 중");
+
+  const filteredPosts = mockPosts.filter((post) => post.status === selectedStatus);
+
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
-      <div className="flex gap-[8px]">
-        <button>
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
+      <div className="flex gap-[8px] relative">
+        <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
-      </button> 
-      <h2 className="text-[20px] font-semibold">발표</h2>
-      <button className=" absolute right-[20px] text-[12px] text-[#B3E378]  bg-[#262626] rounded-[8px] px-[9px] py-[8px]">
-        '발표' 주제로 글 작성하기</button>
+        </button>
+        <h2 className="text-[20px] font-semibold">발표</h2>
+        <button className="absolute right-[20px] text-[12px] text-[#B3E378] bg-[#262626] rounded-[8px] px-[9px] py-[8px]">
+          '발표' 주제로 글 작성하기
+        </button>
       </div>
 
-      {/* 웁스중 극복중 극복완료 버튼 컴포넌트 */}
-      <PostStatusTab/>
-      
-      {/* 여기에 나중에 게시물 목록 추가 */}
+      <PostStatusTab selected={selectedStatus} onSelect={setSelectedStatus} />
 
       <div className="flex flex-col gap-[12px]">
-        {mockPosts.map((post) => (
+        {filteredPosts.map((post) => (
           <PostCard
             key={post.id}
             title={post.title}

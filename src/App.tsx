@@ -29,7 +29,6 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
-import FailWiki from "./pages/FailWiki";
 
 //마이페이지
 import MyPageLayout from "./pages/MyPageLayout";
@@ -38,6 +37,9 @@ import MyLessonsPage from "./pages/MyLessonsPage";
 import MyProfilePage from "./pages/MyProfilePage";
 
 import OthersProfilePage from "./pages/OthersProfilePage";
+
+//행운부적 페이지
+import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
 import PostWriteLayout from "./layout/PostWriteLayout";
 
 function App() {
@@ -56,7 +58,8 @@ function App() {
         { path: "postsuccess", element: <PostSuccess /> },
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
-        { path: "fail-wiki", element: <FailWiki /> },
+        { path: "post", element: <PostWrite /> },
+        {path:"/lucky-draw", element:<LuckyDraw/>}
       ],
     },
 
@@ -89,6 +92,7 @@ function App() {
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
     { path: "/search", element: <SearchPage /> },
+
   ];
 
   const router = createBrowserRouter([...publicRoutes]);

@@ -1,4 +1,5 @@
 import PostCard from "../components/common/PostCard";
+import { useNavigate } from "react-router-dom";
 
 const mockPosts = [
   {
@@ -65,10 +66,11 @@ const mockPosts = [
 
 
 const BestFeed = () => {
+  const navigate = useNavigate();
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] ">
       <div className="flex gap-[8px]">
-        <button>
+        <button onClick={() => navigate("/")}>
         <img src="/src/assets/icons/left-point.svg" alt="뒤로가기" className="w-[9.48px] h-[16.97px] mb-[20px]" />
       </button> 
       <h2 className="text-[20px] font-semibold mb-[20px]">베스트 Failers</h2>
