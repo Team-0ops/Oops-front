@@ -40,6 +40,7 @@ import OthersProfilePage from "./pages/OthersProfilePage";
 
 //행운부적 페이지
 import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
+import PostWriteLayout from "./layout/PostWriteLayout";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -71,6 +72,14 @@ function App() {
         { path: "lessons", element: <MyLessonsPage /> },
         { path: "profile", element: <MyProfilePage /> },
       ],
+    },
+
+    {
+      path: "/post",
+      element: <PostWriteLayout />,
+      children: [
+        { index: true, element: <PostWrite /> }, 
+      ]
     },
 
     {

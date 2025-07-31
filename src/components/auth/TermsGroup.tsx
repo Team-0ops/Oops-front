@@ -1,4 +1,4 @@
-import { type MouseEvent } from "react";
+//import { type ChangeEvent, type MouseEvent } from "react";
 
 export interface Terms {
   all: boolean;
@@ -33,6 +33,12 @@ export default function TermsGroup({ value, onChange }: Props) {
     onChange(nextState);
   };
 
+  // /* 공통 스타일 함수 → 배경색 결정 */
+  // const bg = (k: keyof Terms, highlight?: boolean) => {
+  //   if (value[k]) return "bg-[#B3E378]";
+  //   return highlight ? "bg-[#B3B3B3]" : "bg-[#E6E6E6]";
+  // };
+
   const Row = ({
     label,
     k,
@@ -41,30 +47,44 @@ export default function TermsGroup({ value, onChange }: Props) {
     label: string;
     k: keyof Terms;
     highlight?: boolean;
-  }) => (
-    <button
-      type="button"
-      onClick={(e: MouseEvent) => {
-        e.preventDefault();
-        toggle(k);
-      }}
-      className={`
-        relative mb-[10px] flex h-[29px] w-full items-center justify-center
-        rounded-[4px]
-        ${highlight ? "bg-[#B3E378]" : "bg-[#E6E6E6]"}
-      `}
-    >
-      <span
-        className={`absolute left-3 top-1/2 -translate-y-1/2    
-        h-[16px] w-[16px] rounded-full border border-[#1D1D1D]
-        ${value[k] ? (highlight ? "bg-white" : "bg-[#B3E378]") : "bg-white"}
-      `}
-      />
-      <span className="mx-auto text-[14px] font-semibold text-[#1D1D1D]">
-        {label}
-      </span>
-    </button>
-  );
+  }) => {
+    const checked = value[k];
+    const bgColor = checked ? "#B3E378" : highlight ? "#B3B3B3" : "#E6E6E6";
+
+    return (
+      <label
+        className="mb-[10px] grid h-[29px] w-full cursor-pointer
+                 grid-cols-[28px_1fr] items-center rounded-[4px]"
+        style={{ backgroundColor: bgColor }}
+      >
+        {/* 체크박스 */}
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => toggle(k)}
+          className="peer sr-only"
+        />
+        {/* 체크 아이콘 : pseudo 대신 별도 span 으로 */}
+        <span
+          className="mx-auto flex h-[16px] w-[16px]
+                       items-center justify-center rounded-[3px]
+                       border border-[#1D1D1D] bg-[#FFFFFF]"
+        >
+          {/* ✔︎ 표시 */}
+          <span
+            className={`block h-[10px] w-[6px] rotate-45 
+                      border-b-[2px] border-r-[2px] border-[#1D1D1D]
+                      transition-opacity
+                      ${checked ? "opacity-100" : "opacity-0"}`}
+          />
+        </span>
+
+        <span className="flex justify-center text-[14px] font-semibold text-[#1D1D1D]">
+          {label}
+        </span>
+      </label>
+    );
+  };
   return (
     <div className="flex w-full flex-col">
       <Row k="all" label="전체선택" highlight />

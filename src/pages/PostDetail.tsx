@@ -29,6 +29,7 @@ const PostDetail = () => {
   // 댓글 관리 로직
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
+
   const handleAddComment = () => {
     if (!commentInput.trim()) return;
 
@@ -37,12 +38,7 @@ const PostDetail = () => {
       id: Date.now().toString(),
       author: "닉네임",
       content: commentInput,
-      createdAt: new Date().toLocaleString("ko-KR", {
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      createdAt: new Date().toISOString(), // ISO 문자열로 저장
     };
 
     setComments((prev) => [...prev, newComment]);
@@ -80,7 +76,7 @@ const PostDetail = () => {
             h2
             flex justify-start items-center gap-[10px]
             h-[24px]
-            ml-[20px] my-[20px]
+            my-[20px]
             "
         >
           <LeftIcon className="w-[24px] h-[24px]" />
@@ -128,7 +124,7 @@ const PostDetail = () => {
             slidesPerView={1.2}
             centeredSlides={true}
             spaceBetween={20}
-            // className="w-full"
+            className="w-full"
           >
             <SwiperSlide className="flex justify-center items-center w-full">
               <div
@@ -136,14 +132,12 @@ const PostDetail = () => {
               p-[14px] rounded-[10px]
             bg-[#f0e7e0] flex flex-col"
               >
-                <div className="flex gap-[6px]">
-                  <div className="w-[42px] h-[42px] rounded-[4px] bg-[#9a9a9a]" />
+                <div className="flex">
+                  <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
                   <div className="flex justify-between w-full items-center">
                     <div className="flex flex-col gap-[4px]">
                       <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">
-                        3일전 or 18:09
-                      </span>
+                      <span className="body5 text-[#999999]">3일전</span>
                     </div>
                     <div className="flex items-center gap-[4px]">
                       <button
@@ -198,9 +192,7 @@ const PostDetail = () => {
                   <div className="flex justify-between w-full items-center">
                     <div className="flex flex-col gap-[4px]">
                       <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">
-                        3일전 or 18:09
-                      </span>
+                      <span className="body5 text-[#999999]">3일전</span>
                     </div>
                     <div className="flex items-center gap-[4px]">
                       <button
@@ -221,19 +213,13 @@ const PostDetail = () => {
               </div>
             </SwiperSlide>
             <SwiperSlide className="flex justify-center items-center w-full">
-              <div
-                className=" w-full
-            h-[339px] p-[14px] rounded-[10px]
-            bg-[#f0e7e0]"
-              >
+              <div className=" w-full h-[339px] p-[14px] rounded-[10px] bg-[#f0e7e0]">
                 <div className="flex gap-[6px]">
                   <div className="w-[42px] rounded-[4px] h-[42px] bg-[#9a9a9a]" />
                   <div className="flex justify-between w-full items-center">
                     <div className="flex flex-col gap-[4px]">
                       <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">
-                        3일전 or 18:09
-                      </span>
+                      <span className="body5 text-[#999999]">3일전</span>
                     </div>
                     <div className="flex items-center gap-[4px]">
                       <button
@@ -269,7 +255,7 @@ const PostDetail = () => {
         </section>
 
         {/* 두번째 섹션 댓글 입력*/}
-        <section className="flex flex-col w-full gap-[10px] px-[20px] mt-[20px]">
+        <section className="flex flex-col w-full gap-[10px] mt-[20px]">
           <div className="body2 w-full flex justify-start items-start">
             댓글로 조언 남기기
           </div>
@@ -282,9 +268,9 @@ const PostDetail = () => {
               }}
               placeholder="[조언]을 입력해주세요!"
               className="
-            body5 placeholder:body5 
-            p-[9px] w-[70%] 
-            border-[1px] border-[#8f8f8f] rounded-[4px]"
+              body5 placeholder:body5 
+              p-[9px] w-[70%] 
+              border-[1px] border-[#8f8f8f] rounded-[4px]"
             />
 
             <button
@@ -298,12 +284,12 @@ const PostDetail = () => {
         </section>
 
         {/* 댓글 목록 */}
-        <section className="mt-[20px] flex flex-col w-full">
+        <section className="mt-[20px] -mx-[20px] flex flex-col w-screen">
           <CommentList comments={comments} />
         </section>
 
         {/* 카테고리 추천 글 */}
-        <section className="mt-[40px] flex flex-col">
+        <section className="mt-[40px] -mx-[20px] flex flex-col">
           <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
             인간관계 추천 글
           </div>
@@ -334,7 +320,7 @@ const PostDetail = () => {
         </section>
 
         {/* 베스트 피드 */}
-        <section className="mt-[32px] mb-[26px] flex flex-col">
+        <section className="mt-[32px] -mx-[20px] mb-[26px] flex flex-col">
           <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
             인간관계 추천 글
           </div>

@@ -4,11 +4,10 @@ import SearchInput from "../components/SearchPage/SearchInput";
 const SearchPage = () => {
   return (
     <>
-      <div className="px-[20px] gap-[30px] flex flex-col justify-center bg-[#FFFBF8]">
+      <div className="px-[20px] gap-[30px] flex flex-col  bg-[#FFFBF8] min-h-screen">
         <div>
           <SearchHeader />
         </div>
-
         {/* 검색창 (query state 없이 단순 UI용) */}
         <div>
           <SearchInput />

@@ -1,5 +1,5 @@
 // src/store/slices/postSlice.ts
-import { createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { OopsPost } from "../../types/OopsList";
 
@@ -34,11 +34,7 @@ const postSlice = createSlice({
   },
 });
 
-export const {
-  setPosts,
-  addPost,
-  setSelectedStep,
-  setSelectedPostId,
-} = postSlice.actions;
+export const { setPosts, addPost, setSelectedStep, setSelectedPostId } =
+  postSlice.actions;
 
 export default postSlice.reducer;

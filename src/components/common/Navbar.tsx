@@ -12,7 +12,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-[20px] py-[12px] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
+      <nav className="flex justify-between items-center px-[20px] py-[12px] bg-[#FFF] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
         <div className="flex gap-[8px] items-center">
           <button onClick={() => setIsDrawerOpen(true)}>
             <Bugger className="w-[24px] h-[24px]" />
@@ -24,17 +24,17 @@ const Navbar = () => {
         </div>
 
         <div className="flex gap-[8px] items-center">
-          <button>
+          <Link to="search">
             <SearchLogo />
-          </button>
+          </Link>
 
           <Link to="/post">
             <WriteLogo />
           </Link>
 
-          <button>
+          <Link to="/mypage">
             <My />
-          </button>
+          </Link>
         </div>
       </nav>
 
