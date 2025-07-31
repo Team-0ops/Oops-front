@@ -73,11 +73,13 @@ const SignupPage = () => {
       setAlertMsg("회원가입이 완료되었습니다!");
       setShowAlert(true);
       // 로그인 페이지로 이동
-      navigate("/signin");
+      //navigate("/signin");
     } catch (error: any) {
       console.error("회원가입 실패:", error);
       console.error("서버 응답:", error.response?.data);
-      alert("회원가입 중 오류가 발생했습니다.");
+      //alert("회원가입 중 오류가 발생했습니다.");
+      setAlertMsg("회원가입 중 오류가 발생했습니다.");
+      setShowAlert(true);
     }
   };
 
@@ -92,7 +94,15 @@ const SignupPage = () => {
   return (
     <>
       {showAlert && (
-        <AlertModal message={alertMsg} onClose={() => setShowAlert(false)} />
+        <AlertModal
+          message={alertMsg}
+          onClose={() => {
+            setShowAlert(false);
+            if (alertMsg === "회원가입이 완료되었습니다!") {
+              navigate("/signin"); // 성공 시에만 이동
+            }
+          }}
+        />
       )}
       <section className="flex min-h-dvh w-full flex-col items-center bg-[#FFFBF8]">
         {/* 로고 */}
