@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { ChangeEvent, FormEvent } from "react";
 import LogoMark from "../assets/icons/logoNew.svg?react";
 import Button from "../components/common/Button";
 import PasswordInput from "../components/auth/PasswordInput";
 import TermsGroup from "../components/auth/TermsGroup";
 import TextInput from "../components/auth/TextInput";
+import { postSignup } from "../apis/auth/authApi";
 
 interface Terms {
   all: boolean;
@@ -17,9 +19,11 @@ const SignupPage = () => {
   //폼 상태
   const [form, setForm] = useState({
     email: "",
-    pw: "",
-    nickname: "",
+    password: "",
+    userName: "",
   });
+
+  const navigate = useNavigate();
 
   const [emailChecked, setEmailChecked] = useState<boolean | null>(null);
 
@@ -41,16 +45,32 @@ const SignupPage = () => {
     setEmailChecked(true); // 일단은 “확인됨” 상태로 강제
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    console.log("form값 확인:", form);
     // API 연동
-    console.log("회원가입 데이터:", form, terms);
+    try {
+      const res = await postSignup({
+        email: form.email,
+        userName: form.userName,
+        password: form.password,
+      });
+
+      console.log("회원가입 성공:", res);
+      alert("회원가입이 완료되었습니다!");
+      // 로그인 페이지로 이동
+      navigate("/signin");
+    } catch (error: any) {
+      console.error("회원가입 실패:", error);
+      console.error("서버 응답:", error.response?.data);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   const isSubmitDisabled =
-    !form.pw ||
+    !form.password ||
     !form.email ||
-    !form.nickname ||
+    !form.userName ||
     !terms.service ||
     !terms.privacy;
 
@@ -100,8 +120,8 @@ const SignupPage = () => {
         <label className="flex flex-col gap-[4px] text-[14px] text-[#4D4D4D] font-semibold">
           비밀번호
           <PasswordInput
-            value={form.pw}
-            onChange={(e) => setForm({ ...form, pw: e.target.value })}
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             height="42px"
             padding="14px 11px"
             borderColor="#F6EBE6"
@@ -116,8 +136,8 @@ const SignupPage = () => {
         <TextInput
           type="text"
           label="닉네임"
-          value={form.nickname}
-          onChange={handleInput("nickname")}
+          value={form.userName}
+          onChange={handleInput("userName")}
           placeholder="한영,숫자,기호로 이루어진 3~10자를 입력해주세요."
           height="44px"
           padding="14px 11px"
