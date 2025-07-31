@@ -19,6 +19,8 @@ import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
 
 const PostWrite = () => {
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -78,71 +80,76 @@ const PostWrite = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 최종 제출 핸들러
-  const handleSubmit = () => {
-    const now = new Date().toLocaleString("ko-KR", {
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // --- 1. 각 단계별 작성 핸들러 ---
+  const now = new Date().toLocaleString("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const basePost = {
+    id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+    createdAt: now,
+  };
 
-    const basePost = {
-      id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-      createdAt: now,
-    };
+  const handleOopsSubmit = () => {
+    dispatch(
+      addPost({
+        ...basePost,
+        status: "웁스 중",
+        title,
+        content,
+        images,
+        category,
+        commentType,
+      })
+    );
+    setTitle("");
+    setContent("");
+    setImages([]);
+    setCategory("");
+    setCommentType([]);
+    dispatch(setSelectedStep(1)); // 다음 단계로
+  };
 
-    if (selectedStep === 0) {
-      dispatch(
-        addPost({
-          ...basePost,
-          status: "웁스 중",
-          title,
-          content,
-          images,
-          category,
-          commentType,
-        })
-      );
-      setTitle("");
-      setContent("");
-      setImages([]);
-      setCategory("");
-      setCommentType([]);
-    } else if (selectedStep === 1 && selectedPostId) {
-      dispatch(
-        addPost({
-          ...basePost,
-          status: "극복 중",
-          title: overcomeTitle,
-          content: overcomeContent,
-          images: [],
-          category,
-          commentType: [],
-          parentId: selectedPostId,
-        })
-      );
-      setOvercomeTitle("");
-      setOvercomeContent("");
-      dispatch(setSelectedPostId(null));
-    } else if (selectedStep === 2 && selectedPostId) {
-      dispatch(
-        addPost({
-          ...basePost,
-          status: "극복 완료",
-          title: completeTitle,
-          content: completeContent,
-          images: [],
-          category,
-          commentType: [],
-          parentId: selectedPostId,
-        })
-      );
-      setCompleteTitle("");
-      setCompleteContent("");
-      dispatch(setSelectedPostId(null));
-    }
+  const handleOvercomeSubmit = () => {
+    if (!selectedPostId) return;
+    dispatch(
+      addPost({
+        ...basePost,
+        status: "극복 중",
+        title: overcomeTitle,
+        content: overcomeContent,
+        images: [],
+        category,
+        commentType: [],
+        parentId: selectedPostId,
+      })
+    );
+    setOvercomeTitle("");
+    setOvercomeContent("");
+    // 기존 selectedPostId 유지
+    dispatch(setSelectedStep(2)); // 다음 단계로
+  };
 
+  const handleCompleteSubmit = () => {
+    if (!selectedPostId) return;
+    dispatch(
+      addPost({
+        ...basePost,
+        status: "극복 완료",
+        title: completeTitle,
+        content: completeContent,
+        images: [],
+        category,
+        commentType: [],
+        parentId: selectedPostId,
+      })
+    );
+    setCompleteTitle("");
+    setCompleteContent("");
+    dispatch(setSelectedPostId(null));
+    dispatch(setSelectedStep(0));
     navigate("/postsuccess");
   };
 
@@ -172,7 +179,7 @@ const PostWrite = () => {
       {/* <Navbar /> 들어가면 됨 */}
       <div className="w-full h-full bg-[#FFFBF8] ">
         {/* 첫번째 section */}
-        <section className="w-full px-[20px] pt-[17px] pb-[30px] flex flex-col gap-[20px]">
+        <section className="w-full pt-[17px] pb-[30px] flex flex-col gap-[20px]">
           {/* 글작성 */}
           <div className="h2 flex items-center gap-[8px] ">
             <button className="cursor-pointer" onClick={() => navigate(-1)}>
@@ -182,7 +189,7 @@ const PostWrite = () => {
           </div>
 
           {/* 제목 및 본문 입력 */}
-          <div className="w-full py-[17px] px-[16px] border-[1px] border-[#f6ebe6] rounded-[5px] ">
+          <div className="w-full ">
             {selectedStep === 0 && (
               <>
                 <input
@@ -238,11 +245,11 @@ const PostWrite = () => {
           </div>
         </section>
 
-        <hr className="border-[#E6E6E6] border-[1px]" />
+        <hr className="border-[#E6E6E6] -mx-[20px] border-[1px]" />
 
         {/* 두번째 section */}
         {/* 진행상황 선택 */}
-        <section className="w-full px-[20px] py-[20px]  flex flex-col gap-[12px] items-start">
+        <section className="w-full py-[20px] flex flex-col gap-[12px] items-start">
           <div className="body2 w-[242px] h-[19px] ">진행상황 선택</div>
           <div className="flex items-start w-full gap-[14px] font-['Pretendard'] rounded-lg overflow-hidden border-none">
             <button
@@ -277,20 +284,22 @@ const PostWrite = () => {
             <PostList
               posts={oopsList}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
+              step={selectedStep}
             />
           )}
           {selectedStep === 2 && (
             <PostList
               posts={overcomeList}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
+              step={selectedStep}
             />
           )}
         </section>
-        <hr className="border-[#E6E6E6] border-[1px]" />
+        <hr className="border-[#E6E6E6] -mx-[20px] border-[1px]" />
 
         {/* 세번째 section */}
         {/* 이미지 업로드 */}
-        <section className="w-full py-[20px] px-[20px] flex flex-col items-start">
+        <section className="w-full py-[20px] flex flex-col items-start">
           <div className="body2 mb-[8px] ">사진추가</div>
           <div className="flex justify-between items-center w-full ">
             <button
@@ -334,12 +343,12 @@ const PostWrite = () => {
           </div>
         </section>
 
-        <hr className="border-gray-300" />
+        <hr className="border-[#E6E6E6] -mx-[20px] border-[1px]" />
 
         {/* 세번째 섹션 */}
         {/* 카테고리 선택 영역 */}
         <section
-          className="flex justify-start gap-[30px] pl-[20px] pt-[20px] relative"
+          className="flex justify-start gap-[30px] pt-[20px] relative"
           ref={dropdownRef}
         >
           <form className="flex flex-col justify-start gap-[16px] w-[120px]">
@@ -438,12 +447,38 @@ const PostWrite = () => {
 
         {/* 작성 버튼 */}
         <div className="flex justify-center items-center mb-[32px] mt-[42px]">
-          <button
-            className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-            onClick={title && content ? handleSubmit : undefined}
-          >
-            작성
-          </button>
+          {selectedStep === 0 && (
+            <button
+              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
+              onClick={title && content ? handleOopsSubmit : undefined}
+            >
+              작성
+            </button>
+          )}
+          {selectedStep === 1 && selectedPostId && (
+            <button
+              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
+              onClick={
+                overcomeTitle && overcomeContent
+                  ? handleOvercomeSubmit
+                  : undefined
+              }
+            >
+              작성
+            </button>
+          )}
+          {selectedStep === 2 && selectedPostId && (
+            <button
+              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
+              onClick={
+                completeTitle && completeContent
+                  ? handleCompleteSubmit
+                  : undefined
+              }
+            >
+              작성
+            </button>
+          )}
         </div>
       </div>
     </div>

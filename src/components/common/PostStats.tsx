@@ -1,3 +1,7 @@
+import HeartIcon from "../../assets/icons/majesticons_heart.svg?react";
+import CommentIcon from "../../assets/icons/fluent_comment-48-filled.svg?react";
+import ViewIcon from "../../assets/icons/views.svg?react";
+
 type PostStatsProps = {
   likes: number;
   comments: number;
@@ -8,17 +12,16 @@ const PostStats = ({ likes, comments, views }: PostStatsProps) => {
   return (
     <div className="flex items-center gap-[8px] text-[12px] text-[#4D4D4D]">
       <span className="flex items-center gap-[4px]">
-        <img src="src/assets/icons/majesticons_heart.svg" alt="likes" /> {likes}
+        <HeartIcon className="w-[14px] h-[14px]" /> {likes}
       </span>
       <span className="flex items-center gap-[4px]">
-        <img src="src/assets/icons/fluent_comment-48-filled.svg" alt="comments" /> {comments}
+        <CommentIcon className="w-[14px] h-[14px]" /> {comments}
       </span>
       <span className="flex items-center gap-[4px]">
-        <img src="src/assets/icons/iconoir_eye-solid.svg" alt="views" /> {views}
+        <ViewIcon className="w-[14px] h-[14px]" /> {views}
       </span>
     </div>
   );
 };
 
 export default PostStats;
-

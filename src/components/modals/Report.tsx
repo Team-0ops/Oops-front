@@ -1,7 +1,7 @@
 import X from "../../assets/icons/X.svg?react";
 
 export type ReportTarget = {
-  type: "post" | "comment";
+  type: "post" | "comment" | "reComment";
   id: string;
   author: string;
   content: string;
@@ -47,7 +47,14 @@ const Report = ({ onClose, comment }: ReportProps) => {
           mb-[18px] 
           "
         >
-          <div className="caption2 text-[#666666]">{comment.author}님의 {comment.type === "post" ? "게시글" : "댓글"}</div>
+          <div className="caption2 text-[#666666]">
+            {comment.author}님의{" "}
+            {comment.type === "post"
+              ? "게시글"
+              : comment.type === "comment"
+              ? "댓글"
+              : "대댓글"}
+          </div>
           <div className="caption2 text-[#666666]">"{comment.content}"</div>
         </section>
 

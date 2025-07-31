@@ -1,14 +1,15 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import TabBar from "../components/myPage/TabBar";
 import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 import LeftArrow from "../assets/icons/left-point.svg?react";
 
 export default function MyPageLayout() {
   const nav = useNavigate();
   return (
-    <div className="min-h-screen bg-[#FFFBF8]">
+    <div className="min-h-screen flex  flex-col bg-[#FFFBF8]">
       <Navbar />
-      <div className="flex items-center gap-[4px] px-4 pt-2 pb-4">
+      <div className="flex items-center gap-[4px] px-[20px] pt-[12px] pb-[12px]">
         <button onClick={() => nav(-1)} aria-label="뒤로가기">
           <LeftArrow className="h-5 w-5 shrink-0" />
         </button>
@@ -16,7 +17,11 @@ export default function MyPageLayout() {
       </div>
 
       <TabBar />
-      <Outlet />
+      <div className="flex-grow">
+        <Outlet />
+      </div>
+
+      <Footer />
     </div>
   );
 }

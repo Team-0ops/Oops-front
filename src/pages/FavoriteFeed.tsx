@@ -1,5 +1,6 @@
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
+import LeftArrow from "../assets/icons/left-point.svg?react";
 
 const mockPosts = [
   {
@@ -68,10 +69,10 @@ const mockPosts = [
 
 const FavoriteFeed = () => {
   return (
-    <div className="max-w-[375px] min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] px-[20px]">
       <div className="flex gap-[8px]">
         <button>
-        <img src="/src/assets/icons/left-point.svg" alt="뒤로가기" className="w-[9.48px] h-[16.97px] mr-[8px]" />
+          <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
       </button> 
       <h2 className="text-[20px] font-semibold flex gap-[4px]"><img src="src\assets\icons\star.svg" alt="" />즐겨찾기한 카테고리</h2>
       </div>
