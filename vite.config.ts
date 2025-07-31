@@ -9,7 +9,8 @@ export default defineConfig({
     proxy:{
       '/api': {
         target: 'http://15.164.217.202:8080',
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

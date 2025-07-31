@@ -8,7 +8,9 @@ import CommentList from "../components/comment/CommentList";
 import type { Comment } from "../types/Comment";
 import Report from "../components/modals/Report";
 import type { ReportTarget } from "../components/modals/Report";
+import { usePostDetail } from "../hooks/usePostDetail";
 
+import { useParams } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
@@ -16,7 +18,16 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Feedback from "../components/modals/Feedback";
 
+const SITUATION_ORDER = ["OOPS", "OVERCOMING", "OVERCOME"] as const;
+const SITUATION_LABEL: Record<string, string> = {
+  OOPS: "웁스 중",
+  OVERCOMING: "극복 중",
+  OVERCOME: "극복 완료",
+};
+
 const PostDetail = () => {
+  const { postId } = useParams<{ postId: string }>();
+  const { postDetail, loading } = usePostDetail(Number(postId));
   //교훈 작성 모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   //게시글 신고 모달

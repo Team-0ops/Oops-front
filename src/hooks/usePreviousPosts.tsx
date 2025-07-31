@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import {axiosInstance} from "../apis/axios";
 
 export interface PreviousPost {
   postId: number;
@@ -9,10 +9,9 @@ export interface PreviousPost {
 
 export const usePreviousPosts = () => {
   const [posts, setPosts] = useState<PreviousPost[]>([]);
-  const token = import.meta.env.VITE_API_KEY;
 
   const fetchPreviousPosts = async () => {
-    const res = await axios.get("/api/posts/previous");
+    const res = await axiosInstance.get("/posts/previous");
     setPosts(res.data.result);
   };
 

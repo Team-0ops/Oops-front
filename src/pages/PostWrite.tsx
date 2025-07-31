@@ -12,6 +12,7 @@ import "../App.css";
 import axios from "axios";
 
 import { usePreviousPosts } from "../hooks/usePreviousPosts";
+import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
   const navigate = useNavigate();
@@ -32,9 +33,6 @@ const PostWrite = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { posts: previousPosts } = usePreviousPosts();
-
-  const token = import.meta.env.VITE_API_KEY;
-  console.log("token", token);
 
   const categories = [
     "작은 일",
@@ -83,7 +81,7 @@ const PostWrite = () => {
     };
 
     try {
-      await axios.post("/api/posts", data);
+      await axiosInstance.post("/posts", data);
 
       if (situation === "OOPS") {
         dispatch(setSelectedStep(1));
