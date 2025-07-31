@@ -3,6 +3,7 @@ import LogoMark from "../assets/icons/logoNew.svg?react";
 import Button from "../components/common/Button";
 import PasswordInput from "../components/auth/PasswordInput";
 import { Link } from "react-router-dom";
+import TextInput from "../components/auth/TextInput";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
@@ -22,25 +23,26 @@ const SigninPage = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-[36px] w-[320px] flex flex-col gap-3"
+          className="mt-[36px] w-[310px] flex flex-col gap-3"
         >
-          <input
-            type="text"
-            placeholder="아이디를 입력해주세요."
+          <TextInput
+            type="email"
+            placeholder="이메일을 입력해주세요."
             value={id}
             onChange={(e) => setId(e.target.value)}
-            className="h-[44px] w-full rounded border border-[#ECE6DF] px-3
-                       text-[14px] placeholder-[#B3B3B3]
-                       focus:border-green-400 focus:outline-none"
           />
-          {/* 비밀번호 입력 (PasswordInput 컴포넌트) */}
+
+          {/* 비밀번호 입력 */}
           <PasswordInput
             placeholder="비밀번호를 입력해주세요."
             value={pw}
             onChange={(e) => setPw(e.target.value)}
+            height="44px"
+            padding="14px 12px"
+            borderColor="#ECE6DF"
           />
 
-          <Button type="submit" disabled={!id || !pw}>
+          <Button type="submit" disabled={!id || !pw} className="text-[20px]">
             log in
           </Button>
 
