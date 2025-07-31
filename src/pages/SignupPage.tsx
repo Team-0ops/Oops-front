@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { ChangeEvent, FormEvent } from "react";
 import LogoMark from "../assets/icons/logoNew.svg?react";
 import Button from "../components/common/Button";
@@ -38,18 +38,31 @@ const SignupPage = () => {
     marketing: false,
   });
 
-  //세션 스토리지에서 약관 값 불러오기
-  useEffect(() => {
-    const storedTerms = sessionStorage.getItem("signupTerms");
-    if (storedTerms) {
-      setTerms(JSON.parse(storedTerms));
-    }
-  }, []);
+  const location = useLocation(); // location 훅 사용
+  const setFormAndSave = (next: typeof form) => {
+    setForm(next);
+    sessionStorage.setItem("signupForm", JSON.stringify(next));
+  };
 
   //핸들러
   const handleInput =
-    (key: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) =>
-      setForm({ ...form, [key]: e.target.value });
+    (key: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
+      const nextForm = { ...form, [key]: e.target.value };
+      setFormAndSave(nextForm);
+    };
+
+  //세션 스토리지에서 약관 값 불러오기
+  useEffect(() => {
+    if (location.state?.fromTerms) {
+      const storedTerms = sessionStorage.getItem("signupTerms");
+      if (storedTerms) {
+        setTerms(JSON.parse(storedTerms));
+      }
+
+      const storedForm = sessionStorage.getItem("signupForm");
+      if (storedForm) setForm(JSON.parse(storedForm));
+    }
+  }, [location.state]);
 
   //중복확인
   const handleEmailCheck = () => {
@@ -74,6 +87,9 @@ const SignupPage = () => {
       setShowAlert(true);
       // 로그인 페이지로 이동
       //navigate("/signin");
+
+      sessionStorage.removeItem("signupTerms");
+      sessionStorage.removeItem("signupForm");
     } catch (error: any) {
       console.error("회원가입 실패:", error);
       console.error("서버 응답:", error.response?.data);
