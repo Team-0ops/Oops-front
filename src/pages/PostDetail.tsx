@@ -18,11 +18,16 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Feedback from "../components/modals/Feedback";
 
-const SITUATION_ORDER = ["OOPS", "OVERCOMING", "OVERCOME"] as const;
-const SITUATION_LABEL: Record<string, string> = {
-  OOPS: "웁스 중",
-  OVERCOMING: "극복 중",
-  OVERCOME: "극복 완료",
+const SITUATION_ORDER = [
+  "postFailure",
+  "postOvercoming",
+  "postOvercome",
+] as const;
+
+const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
+  postFailure: "웁스 중",
+  postOvercoming: "극복 중",
+  postOvercome: "극복 완료",
 };
 
 const PostDetail = () => {
@@ -41,6 +46,18 @@ const PostDetail = () => {
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
 
+  // SITUATION_ORDER 순서대로 post 배열 만들기 (데이터 없으면 null)
+  const posts = SITUATION_ORDER.map((key) =>
+    postDetail ? postDetail[key] : null
+  );
+
+  // Swiper 이동 핸들러
+  const handleSlideChange = (index: number) => {
+    setActiveIndex(index);
+    buttonSwiperRef.current?.slideTo(index);
+    contentSwiperRef.current?.slideTo(index);
+  };
+
   const handleAddComment = () => {
     if (!commentInput.trim()) return;
 
@@ -56,28 +73,16 @@ const PostDetail = () => {
     setCommentInput(""); // 입력창 비우기
   };
 
-  // 슬라이드 관련 로직
-  const states = ["웁스 중", "극복 중", "극복 완료"];
 
-  const handleSlideChange = (index: number) => {
-    setActiveIndex(index);
-    buttonSwiperRef.current?.slideTo(index);
-    contentSwiperRef.current?.slideTo(index);
-  };
+  // const reportTarget: ReportTarget = {
+  //   type: "post",
+  //   id: postDetail?.postId,
+  //   author: postDetail?.writer,
+  //   content: postDetail?.content,
+  // };
 
-  // 본문 목데이터
-  const post = {
-    id: "1",
-    author: "작성자1",
-    content: "본문 내용1",
-  };
-
-  const reportTarget: ReportTarget = {
-    type: "post",
-    id: post.id,
-    author: post.author,
-    content: post.content,
-  };
+  if (loading) return <div>로딩 중...</div>;
+  if (!postDetail) return <div>데이터 없음</div>;
 
   return (
     <>
@@ -91,7 +96,7 @@ const PostDetail = () => {
             "
         >
           <LeftIcon className="w-[24px] h-[24px]" />
-          진로 / 취업 카테고리
+          {postDetail.category.name}
         </div>
 
         {/* 첫번째 섹션 게시글 */}
@@ -104,17 +109,14 @@ const PostDetail = () => {
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
             className="w-full h-[50px]"
           >
-            {states.map((state, index) => (
+            {SITUATION_ORDER.map((key, index) => (
               <SwiperSlide
-                key={index}
+                key={key}
                 className="!w-[80px] flex justify-center items-center"
                 style={{ flexShrink: 0 }}
               >
                 <button
-                  onClick={() => {
-                    setActiveIndex(index); // 상태 업데이트
-                    buttonSwiperRef.current?.slideTo(index); // 이걸로 가운데로 이동!
-                  }}
+                  onClick={() => handleSlideChange(index)}
                   className={`body4 w-full py-[6px] h-[30px] rounded-[20px] transition 
           ${
             activeIndex === index
@@ -122,7 +124,7 @@ const PostDetail = () => {
               : "bg-[#E6E6E6] text-[#393939] opacity-40"
           }`}
                 >
-                  {state}
+                  {SITUATION_LABEL[key]}
                 </button>
               </SwiperSlide>
             ))}
@@ -137,123 +139,72 @@ const PostDetail = () => {
             spaceBetween={20}
             className="w-full"
           >
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div
-                className=" w-full
-              p-[14px] rounded-[10px]
-            bg-[#f0e7e0] flex flex-col"
+            {posts.map((post, index) => (
+              <SwiperSlide
+                key={SITUATION_ORDER[index]}
+                className="flex justify-center items-center w-full"
               >
-                <div className="flex">
-                  <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
-                    </div>
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
-                      >
-                        교훈 작성
-                      </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
+                <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
+                  <div className="flex">
+                    <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
+                    <div className="flex justify-between w-full items-center">
+                      <div className="flex flex-col gap-[4px]">
+                        <span className="body2 text-[#1d1d1d]">
+                          {post?.writer}
+                        </span>
+                        <span className="body5 text-[#999999]">
+                          {/* {post.createdAt} */}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-[4px]">
+                        <button
+                          className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                          onClick={() => setShowFeedbackModal(true)}
+                        >
+                          교훈 작성
+                        </button>
+                        <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
+                          <ReportIcon
+                            className="w-full h-full"
+                            onClick={() => setShowReportModal(true)}
+                          />
+                        </div>
                       </div>
                     </div>
+                  </div> 
+                  <div className="body1 w-full mt-[20px] mb-[16px]">
+                    {post?.title}
                   </div>
-                </div>
-                <div className="body1 w-full mt-[20px] mb-[16px]">제목</div>
-                <div className="body5 w-full mb-[22px] text-[#4d4d4d]">
-                  첫 직무 면접이어서 준비만 죽어라 했는데 막상 가서는 말
-                  한마디도 제대로 못 함;; <br />
-                  질문 나오니까 머리가 하얘지고, 준비했던 것도 다 말아먹 음.
-                  말하면서도 내가 무슨 말 하는지 모르겠고, 괜히 시간 낭비했나
-                  싶더라ㅋㅋ <br /> 면접 끝나고 진짜 집 오는 길에 현타 씨게 옴…{" "}
-                  <br />
-                  다들 첫 면접은 그럴수잇다는데 그냥 아쉽네. .........
-                </div>
-                <div className="flex justify-between items-center w-full">
-                  <div className="flex items-center">
-                    <Like className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">응원해요 10</span>
+                  <div className="body5 w-full mb-[22px] text-[#4d4d4d] break-words">
+                    {post?.content}
                   </div>
-                  <div className="flex items-center ">
-                    <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">댓글 5</span>
-                  </div>
-                  <div className="flex items-center ">
-                    <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">조회수 200</span>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div
-                className=" w-full
-             h-[339px] p-[14px] rounded-[10px]
-            bg-[#f0e7e0]"
-              >
-                <div className="flex gap-[6px]">
-                  <div className="w-[42px] h-[42px] rounded-[4px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
+                  <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center">
+                      <Like className="w-[24px] h-[24px] cursor-pointer" />
+                      <span className="caption2 text-[#666]">
+                        응원해요 {post?.likes}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
-                      >
-                        교훈 작성
-                      </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
-                      </div>
+                    <div className="flex items-center ">
+                      <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <span className="caption2 text-[#666]">
+                        댓글 {post?.comments.length}
+                      </span>
+                    </div>
+                    <div className="flex items-center ">
+                      <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <span className="caption2 text-[#666]">
+                        조회수 {post?.watching}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div className=" w-full h-[339px] p-[14px] rounded-[10px] bg-[#f0e7e0]">
-                <div className="flex gap-[6px]">
-                  <div className="w-[42px] rounded-[4px] h-[42px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
-                    </div>
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
-                      >
-                        교훈 작성
-                      </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
+              </SwiperSlide>
+            ))}
           </Swiper>
           {/* 인디케이터 */}
           <div className="flex justify-center gap-[20px] mt-[18px]">
-            {states.map((_, index) => (
+            {SITUATION_ORDER.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleSlideChange(index)}

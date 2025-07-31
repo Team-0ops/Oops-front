@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import type { DetailResponse } from "../types/OopsList";
 import { axiosInstance } from "../apis/axios";
+import type { ServerResponse, DetailResultType } from "../types/post/PostDetail";
 
 export const usePostDetail = (postId: number) => {
-  const [postDetail, setPostDetail] = useState<DetailResponse | null>(null);
+  const [postDetail, setPostDetail] = useState<DetailResultType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        const res = await axiosInstance.get<DetailResponse>(
-          `/api/posts/${postId}`,
+        const res = await axiosInstance.get<ServerResponse>(
+          `/posts/9`,
         );
-        setPostDetail(res.data);
+        setPostDetail(res.data.result);
+        console.log("상세 조회 성공:", res.data.result);
       } catch (error) {
         console.error("상세 조회 실패:", error);
       } finally {
