@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import type { PostResponse } from "../../types/OopsList";
+import type { PreviousPost } from "../../hooks/usePreviousPosts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 
@@ -10,20 +10,29 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 interface PostListProps {
-  posts: PostResponse[];
+  posts: PreviousPost[];
   onSelect: (id: number) => void;
-  step: 0 | 1 | 2;
+  step: number; // 1: 극복 중, 2: 극복 완료
 }
+
+const stepToSituationMap: Record<number, "OOPS" | "OVERCOMING"> = {
+  1: "OOPS",
+  2: "OVERCOMING",
+};
 
 const POSTS_PER_PAGE = 5;
 
 const PostList = ({ posts, onSelect, step }: PostListProps) => {
+  const targetSituation = stepToSituationMap[step];
   const paginationRef = useRef<HTMLDivElement>(null);
-  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
   const swiperRef = useRef<any>(null);
 
+  const filteredPosts = posts.filter(
+    (post) => post.situation === targetSituation
+  );
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const chunkedPosts = Array.from({ length: totalPages }, (_, i) =>
-    posts.slice(i * POSTS_PER_PAGE, (i + 1) * POSTS_PER_PAGE)
+    filteredPosts.slice(i * POSTS_PER_PAGE, (i + 1) * POSTS_PER_PAGE)
   );
 
   useEffect(() => {
@@ -38,6 +47,8 @@ const PostList = ({ posts, onSelect, step }: PostListProps) => {
     }
   }, [posts]);
 
+  if (!targetSituation) return null;
+
   return (
     <div
       style={{ boxShadow: "inset 0px 0px 5.4px 0px rgba(0, 0, 0, 0.25)" }}
@@ -49,7 +60,7 @@ const PostList = ({ posts, onSelect, step }: PostListProps) => {
           : "극복 완료한 게시글을 선택해주세요!"}
       </div>
 
-      {posts.length === 0 ? (
+      {filteredPosts.length === 0 ? (
         <div className="body5 flex justify-center text-[#999] items-center">
           작성된 게시물이 없습니다.
         </div>
@@ -70,11 +81,7 @@ const PostList = ({ posts, onSelect, step }: PostListProps) => {
               <SwiperSlide key={pageIndex}>
                 <ul className="flex flex-col gap-[12px]">
                   {chunk.map((post) => (
-                    <Post
-                      key={post.postId}
-                      post={post}
-                      onClick={onSelect}
-                    />
+                    <Post key={post.postId} post={post} onClick={onSelect} />
                   ))}
                 </ul>
               </SwiperSlide>

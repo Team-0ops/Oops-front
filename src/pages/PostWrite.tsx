@@ -11,7 +11,7 @@ import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
 import axios from "axios";
 
-import { useFetchPostLists } from "../hooks/useFetchPostList";
+import { usePreviousPosts } from "../hooks/usePreviousPosts";
 
 const PostWrite = () => {
   const navigate = useNavigate();
@@ -31,15 +31,10 @@ const PostWrite = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { oopsList, overcomeList, fetchOopsList, fetchOvercomeList } =
-    useFetchPostLists();
+  const { posts: previousPosts } = usePreviousPosts();
 
   const token = import.meta.env.VITE_API_KEY;
-
-  useEffect(() => {
-    if (selectedStep === 1) fetchOopsList();
-    if (selectedStep === 2) fetchOvercomeList();
-  }, [selectedStep, fetchOopsList, fetchOvercomeList]);
+  console.log("token", token);
 
   const categories = [
     "작은 일",
@@ -88,11 +83,7 @@ const PostWrite = () => {
     };
 
     try {
-      await axios.post("/api/posts", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post("/api/posts", data);
 
       if (situation === "OOPS") {
         dispatch(setSelectedStep(1));
@@ -108,9 +99,10 @@ const PostWrite = () => {
       setContent("");
       setImages([]);
       setCommentType([]);
+      alert("성공");
     } catch (error) {
-      console.error("Error submitting post:", error);
       alert("글 작성에 실패했습니다. 다시 시도해주세요.");
+      console.error(error)
     }
   };
 
@@ -203,14 +195,14 @@ const PostWrite = () => {
 
           {selectedStep === 1 && (
             <PostList
-              posts={oopsList}
+              posts={previousPosts.filter((p) => p.situation === "OOPS")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
             />
           )}
           {selectedStep === 2 && (
             <PostList
-              posts={overcomeList}
+              posts={previousPosts.filter((p) => p.situation === "OVERCOMING")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
             />

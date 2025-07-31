@@ -1,7 +1,7 @@
-import type { PostResponse } from "../../types/OopsList";
+import type { PreviousPost } from "../../hooks/usePreviousPosts";
 
 interface PostProps {
-  post: PostResponse;
+  post: PreviousPost
   onClick: (id: number) => void;
 }
 
@@ -13,9 +13,8 @@ const Post = ({ post, onClick }: PostProps) => {
       onClick={() => onClick(post.postId)}
     >
       <div
-        className={`flex flex-col justify-between w-full ${
-          post.imageUrl? "pr-[12px]" : ""
-        }`}
+        className="flex flex-col justify-between w-full "
+          // post.imageUrl? "pr-[12px]" : ""
       >
         <div className="flex justify-between items-center w-full">
           <span className="body4">{post.title}</span>
@@ -24,18 +23,18 @@ const Post = ({ post, onClick }: PostProps) => {
           </span>
         </div>
         <span className="caption3 text-[#262626] max-w-[calc(100%-60px)] truncate">
-          {post.content}
+          {/* {post.content} */}
         </span>
       </div>
-      {post.imageUrl && (
+      {/* {post.imageUrl && (
         <div className="w-[48px] h-[48px] flex-shrink-0 rounded ml-[8px]">
           <img
-            src={post.imageUrl}
+            // src={post.imageUrl}
             alt="preview"
             className="object-cover w-full h-full rounded"
           />
         </div>
-      )}
+      )} */}
     </li>
   );
 };

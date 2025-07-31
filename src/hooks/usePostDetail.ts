@@ -15,7 +15,7 @@ export const usePostDetail = (postId: number) => {
           `/api/posts/${postId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              AccessToken : `Bearer ${token}`,
             },
           }
         );
