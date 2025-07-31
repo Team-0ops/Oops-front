@@ -1,7 +1,11 @@
+import type { Post } from "../../types/post";
 import PostCard from "../common/PostCard";
 import ToSeeButton from "./ToSeeButton";
+interface BestFailerListProps {
+  bestPosts: Post[];
+}
 
-const BestFailerList = () => {
+const BestFailerList = ({ bestPosts }: BestFailerListProps) => {
   return (
     <>
       <div className="flex flex-col w-full justify-center items-center gap-[16px]">
@@ -10,78 +14,18 @@ const BestFailerList = () => {
           <ToSeeButton nav="best-feed" />
         </div>
         <div className="flex flex-col w-full justify-center items-center gap-[16px]">
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
-          <PostCard
-            title="노래 실패담"
-            content="노래를 부르다가 음이탈을 해서 망한 경험담입니다."
-            imageUrl="https://example.com/image.jpg"
-            likes={10}
-            comments={5}
-            views={100}
-            category="노래"
-          />
+          {bestPosts?.map((post) => (
+            <PostCard
+              key={post.postId}
+              title={post.title}
+              content={post.content}
+              imageUrl={post.image ?? "null"} // null이면 기본 이미지
+              likes={post.likes}
+              comments={post.comments}
+              views={post.views}
+              category={post.categoryName}
+            />
+          ))}
         </div>
       </div>
     </>
