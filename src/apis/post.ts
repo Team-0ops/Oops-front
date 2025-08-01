@@ -1,3 +1,4 @@
+import type { SearchParams } from "../types/common";
 import type {
   Post,
   ResponseCategoryPostListDTO,
@@ -222,3 +223,11 @@ export const getPostListCategory =
     console.log(data);
     return data;
   };
+
+export const getSearchedPostList = async (
+  params: SearchParams
+): Promise<ResponseCategoryPostListDTO> => {
+  const { data } = await axiosInstance.get("/feeds/search", { params });
+  console.log(data);
+  return data;
+};

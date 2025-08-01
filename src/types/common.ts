@@ -5,6 +5,12 @@ export type CommonResponse<T> = {
   result?: T;
 };
 
+export type SearchParams = {
+  keyword: string;
+  page?: number;
+  limit?: number;
+};
+
 export const categoryMap: Record<string, string> = {
   daily: "일상",
   love: "연애",
