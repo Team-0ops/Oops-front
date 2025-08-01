@@ -1,5 +1,6 @@
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 import "./App.css";
 import {
   createBrowserRouter,
@@ -61,13 +62,24 @@ function App() {
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
         { path: "fail-wiki", element: <FailWiki /> },
-        { path: "/lucky-draw", element: <LuckyDraw /> },
+        {
+          path: "/lucky-draw",
+          element: (
+            <ProtectedRoute>
+              <LuckyDraw />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
 
     {
       path: "/mypage",
-      element: <MyPageLayout />,
+      element: (
+        <ProtectedRoute>
+          <MyPageLayout />
+        </ProtectedRoute>
+      ),
       children: [
         { index: true, element: <Navigate to="failures" replace /> },
         { path: "failures", element: <MyFailuresPage /> },
@@ -78,7 +90,11 @@ function App() {
 
     {
       path: "/post",
-      element: <PostWriteLayout />,
+      element: (
+        <ProtectedRoute>
+          <PostWriteLayout />
+        </ProtectedRoute>
+      ),
       children: [{ index: true, element: <PostWrite /> }],
     },
 
