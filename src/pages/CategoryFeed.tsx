@@ -6,17 +6,20 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const categoryMap: Record<string, string> = {
-  small: "작은 일",
+  daily: "일상",
   love: "연애",
   relationship: "인간관계",
-  travel: "여행",
+  stock: "주식/투자",
   school: "학교생활",
-  career: "진로/취업",
   work: "회사생활",
+  career: "진로",
+  startup: "창업",
   college: "대입/입시",
-  money: "재정/돈 관리",
-  health: "건강/운동",
-  mental: "멘탈관리",
+  job: "취업/자격증",
+  marriage: "결혼",
+  travel: "여행",
+  realestate: "부동산",
+  mental: "정신건강",
   free: "자유",
 };
 
@@ -30,7 +33,7 @@ const mockPosts = [
     comments: 2,
     views: 105,
     category: "relationship",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 2,
@@ -41,7 +44,7 @@ const mockPosts = [
     comments: 3,
     views: 133,
     category: "relationship",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 3,
@@ -52,7 +55,7 @@ const mockPosts = [
     comments: 4,
     views: 128,
     category: "relationship",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 4,
@@ -233,7 +236,7 @@ const mockPosts = [
     comments: 2,
     views: 55,
     category: "small",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 8,
@@ -244,7 +247,7 @@ const mockPosts = [
     comments: 4,
     views: 80,
     category: "love",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 9,
@@ -255,8 +258,8 @@ const mockPosts = [
     comments: 1,
     views: 73,
     category: "travel",
-    status: "웁스 중"
-  }
+    status: "웁스 중",
+  },
 ];
 
 const CategoryFeed = () => {

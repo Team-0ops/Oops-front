@@ -25,8 +25,10 @@ const FailWiki = () => {
           </div>
           {inputValue ? (
             <>
-              <div>{/*빈 공간*/}</div>
-              <WikiResult />
+              <div>
+                <div>{/*빈 공간*/}</div>
+                <WikiResult />
+              </div>
             </>
           ) : (
             <div className="flex flex-col justify-center gap-[32px]">

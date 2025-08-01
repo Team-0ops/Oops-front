@@ -25,7 +25,7 @@ const FeedButton = () => {
           </div>
         </Link>
         <Link
-          to="/"
+          to="/lucky-draw"
           className="flex flex-col w-[94px] h-[93px] bg-[#262626] px-[14px] py-[11px] rounded-[15px] gap-[4px]"
         >
           <div className="flex flex-col items-center w-[66px] gap-[4px]">
