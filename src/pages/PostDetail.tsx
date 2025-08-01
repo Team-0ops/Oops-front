@@ -45,7 +45,6 @@ const PostDetail = () => {
   // 댓글 관리 로직
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
-
   // SITUATION_ORDER 순서대로 post 배열 만들기 (데이터 없으면 null)
   const posts = SITUATION_ORDER.map((key) =>
     postDetail ? postDetail[key] : null
@@ -57,7 +56,6 @@ const PostDetail = () => {
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
   };
-
   const handleAddComment = () => {
     if (!commentInput.trim()) return;
 
@@ -73,14 +71,12 @@ const PostDetail = () => {
     setCommentInput(""); // 입력창 비우기
   };
 
-
   // const reportTarget: ReportTarget = {
   //   type: "post",
-  //   id: postDetail?.postId,
-  //   author: postDetail?.writer,
-  //   content: postDetail?.content,
+  //   id: post.id,
+  //   author: post.author,
+  //   content: post.content,
   // };
-
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
 
@@ -135,7 +131,7 @@ const PostDetail = () => {
             onSwiper={(swiper) => (contentSwiperRef.current = swiper)}
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
             slidesPerView={1.2}
-            centeredSlides={true}
+            centeredSlides
             spaceBetween={20}
             className="w-full"
           >
