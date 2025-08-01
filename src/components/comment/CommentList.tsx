@@ -17,10 +17,7 @@ const CommentList = ({ comments }: CommentListProps) => {
   return (
     <div className="flex flex-col">
       {comments.map((comment) => (
-        <CommentItem
-          key={comment.id}
-          comment={comment}
-        />
+        <CommentItem key={comment.id} comment={comment} />
       ))}
     </div>
   );

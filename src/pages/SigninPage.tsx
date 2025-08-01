@@ -2,20 +2,52 @@ import { useState } from "react";
 import LogoMark from "../assets/icons/logoNew.svg?react";
 import Button from "../components/common/Button";
 import PasswordInput from "../components/auth/PasswordInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import TextInput from "../components/auth/TextInput";
+import { postLogin } from "../apis/auth/authApi";
+import AlertModal from "../components/auth/AlertModal";
 
 const SigninPage = () => {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [alertMsg, setAlertMsg] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("로그인 시도", { id, pw });
+    try {
+      const res = await postLogin({
+        email: id,
+        password: pw,
+      });
+
+      console.log("로그인 성공:", res);
+
+      const token = res.result;
+      localStorage.setItem("accessToken", token);
+      console.log("토큰:", token);
+
+      //alert("로그인에 성공했습니다!");
+      // setAlertMsg("로그인에 성공했습니다!");
+      // setShowAlert(true);
+      navigate("/"); // 로그인 후 메인페이지도 이동
+    } catch (error: any) {
+      console.error("로그인 실패:", error);
+      //alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+      // 실패 시
+      setAlertMsg("이메일 또는 비밀번호가 올바르지 않습니다.");
+      setShowAlert(true);
+    }
   };
 
   return (
     <>
+      {showAlert && (
+        <AlertModal message={alertMsg} onClose={() => setShowAlert(false)} />
+      )}
       <section className="flex min-h-dvh w-full flex-col items-center bg-[#FFFBF8]">
         <div className="mt-[156px] flex flex-col items-center gap-[50px]">
           <LogoMark className="w-[149px] h-[205px]" />

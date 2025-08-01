@@ -1,7 +1,8 @@
-
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const mockPosts = [
   {
@@ -12,7 +13,7 @@ const mockPosts = [
     likes: 40,
     comments: 9,
     views: 359,
-
+    status: "웁스 중"
   },
   {
     id: 2,
@@ -21,7 +22,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-
+    status: "극복 중"
   },
   {
     id: 3,
@@ -31,7 +32,7 @@ const mockPosts = [
     likes: 15,
     comments: 6,
     views: 210,
-
+    status: "극복 완료"
   },
   {
     id: 4,
@@ -41,7 +42,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-  
+    status: "웁스 중"
   },
   {
     id: 5,
@@ -50,38 +51,39 @@ const mockPosts = [
     likes: 19,
     comments: 5,
     views: 200,
-
-  },
+    status: "극복 중"
+  }
 ];
 
 const ExRandomFeed = () => {
+  const navigate = useNavigate();
+  const [selectedStatus, setSelectedStatus] = useState("웁스 중");
 
+  const filteredPosts = mockPosts.filter(
+    (post) => post.status === selectedStatus
+  );
 
-  const top3Posts = mockPosts.slice(0, 3);
-  const restPosts = mockPosts.slice(3);
+  const top3Posts = filteredPosts.slice(0, 3);
+  const restPosts = filteredPosts.slice(3);
 
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] px-[20px]">
-      {/* 상단 제목 및 주차 표시 */}
-      <div className="flex gap-[8px] relative items-center mb-[10px] ">
-        <button>
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
+      <div className="flex gap-[8px] relative items-center mb-[10px]">
+        <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
         </button>
-        <h2 className="text-[20px] font-semibold ">노래</h2>
+        <h2 className="text-[20px] font-semibold">노래</h2>
         <div className="absolute right-0 text-[#999999] text-[12px]">
           5월 셋째주 랜덤주제
         </div>
       </div>
 
-      {/* 웁스중 극복중 극복완료 버튼 컴포넌트 */}
-      <PostStatusTab/>
-      
+      <PostStatusTab selected={selectedStatus} onSelect={setSelectedStatus} />
 
-      {/* Top 3 */}
-      <div className="flex ">
+      <div className="flex">
         <div className="bg-[#B3E378] h-[20px] w-[8px] mr-[8px]"></div>
         <h2 className="text-[14px] font-semibold mb-[10px]">
-        최고의 노래 실패담 top 3
+          최고의 노래 실패담 top 3
         </h2>
       </div>
       <div className="flex flex-col gap-[12px] mb-[20px]">
@@ -94,16 +96,14 @@ const ExRandomFeed = () => {
             likes={post.likes}
             comments={post.comments}
             views={post.views}
-
           />
         ))}
       </div>
 
-      {/* 조회수 순 */}
-      <div className="flex ">
+      <div className="flex">
         <div className="bg-[#B3E378] h-[20px] w-[8px] mr-[8px]"></div>
         <h2 className="text-[14px] font-semibold mb-[10px]">
-        조회수 순 노래 실패담
+          조회수 순 노래 실패담
         </h2>
       </div>
       <div className="flex flex-col gap-[12px]">

@@ -14,6 +14,8 @@ import { usePreviousPosts } from "../hooks/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedStep = useSelector(

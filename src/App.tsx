@@ -1,5 +1,6 @@
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 import "./App.css";
 import {
   createBrowserRouter,
@@ -29,7 +30,6 @@ import TermsPage from "./pages/TermsPage";
 import PostWrite from "./pages/PostWrite";
 import PostSuccess from "./pages/PostSuccess";
 import SearchPage from "./pages/SearchPage";
-import FailWiki from "./pages/FailWiki";
 
 //마이페이지
 import MyPageLayout from "./pages/MyPageLayout";
@@ -38,6 +38,11 @@ import MyLessonsPage from "./pages/MyLessonsPage";
 import MyProfilePage from "./pages/MyProfilePage";
 
 import OthersProfilePage from "./pages/OthersProfilePage";
+
+//행운부적 페이지
+import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
+import PostWriteLayout from "./layout/PostWriteLayout";
+import FailWiki from "./pages/FailWiki";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -57,18 +62,40 @@ function App() {
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
         { path: "fail-wiki", element: <FailWiki /> },
+        {
+          path: "/lucky-draw",
+          element: (
+            <ProtectedRoute>
+              <LuckyDraw />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
 
     {
       path: "/mypage",
-      element: <MyPageLayout />,
+      element: (
+        <ProtectedRoute>
+          <MyPageLayout />
+        </ProtectedRoute>
+      ),
       children: [
         { index: true, element: <Navigate to="failures" replace /> },
         { path: "failures", element: <MyFailuresPage /> },
         { path: "lessons", element: <MyLessonsPage /> },
         { path: "profile", element: <MyProfilePage /> },
       ],
+    },
+
+    {
+      path: "/post",
+      element: (
+        <ProtectedRoute>
+          <PostWriteLayout />
+        </ProtectedRoute>
+      ),
+      children: [{ index: true, element: <PostWrite /> }],
     },
 
     {
