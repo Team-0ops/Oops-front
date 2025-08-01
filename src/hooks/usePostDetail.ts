@@ -10,7 +10,7 @@ export const usePostDetail = (postId: number) => {
     const fetchPostDetail = async () => {
       try {
         const res = await axiosInstance.get<ServerResponse>(
-          `/posts/9`,
+          `/posts/12`,
         );
         setPostDetail(res.data.result);
         console.log("상세 조회 성공:", res.data.result);

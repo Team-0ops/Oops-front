@@ -9,7 +9,6 @@ import LeftPoint from "../assets/icons/left-point.svg?react";
 import UpArrow from "../assets/icons/UpArrow.svg?react";
 import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
-import axios from "axios";
 
 import { usePreviousPosts } from "../hooks/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
@@ -23,6 +22,11 @@ const PostWrite = () => {
   const selectedPostId = useSelector(
     (state: RootState) => state.post.selectedPostId
   );
+
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const categoryRef = useRef<HTMLButtonElement>(null);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -100,7 +104,7 @@ const PostWrite = () => {
       alert("성공");
     } catch (error) {
       alert("글 작성에 실패했습니다. 다시 시도해주세요.");
-      console.error(error)
+      console.error(error);
     }
   };
 
@@ -123,6 +127,30 @@ const PostWrite = () => {
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
+  // 버튼 비활성화 및 자동 포커스
+  
+  const isFormValid = !!title.trim() && !!content.trim() && !!category;
+
+  const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
+    if (!title.trim()) {
+      titleRef.current?.focus();
+      return;
+    }
+
+    if (!content.trim()) {
+      contentRef.current?.focus();
+      return;
+    }
+
+    if (!category) {
+      setIsDropdownOpen(true);
+      categoryRef.current?.focus();
+      return;
+    }
+
+    submitPost(situation);
+  };
+
   return (
     <div className="flex justify-center items-center ">
       {/* <Navbar /> 들어가면 됨 */}
@@ -140,6 +168,7 @@ const PostWrite = () => {
           {/* 제목 및 본문 입력 */}
           <div className="w-full ">
             <input
+              ref={titleRef}
               required
               placeholder="제목 (필수)"
               className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
@@ -147,6 +176,7 @@ const PostWrite = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
+              ref={contentRef}
               required
               placeholder="내용을 입력해주세요. (필수)"
               className="caption1 placeholder:caption1 placeholder-[#999] w-full min-h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
@@ -266,7 +296,9 @@ const PostWrite = () => {
             <div className="body2">카테고리 선택</div>
 
             {/* 드롭다운 버튼 */}
-            <div
+            <button
+              type="button"
+              ref={categoryRef}
               className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] rounded-[20px] cursor-pointer bg-[#E6E6E6] outline-none select-none"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
             >
@@ -278,7 +310,7 @@ const PostWrite = () => {
               ) : (
                 <DownArrow className="w-[18px] h-[18px]" />
               )}
-            </div>
+            </button>
 
             {/* 드롭다운 리스트 */}
             {isDropdownOpen && (
@@ -360,28 +392,27 @@ const PostWrite = () => {
         <div className="flex justify-center items-center mb-[32px] mt-[42px]">
           {selectedStep === 0 && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={() => title && content && category && submitPost("OOPS")}
+              onClick={() => handleSubmit("OOPS")}
             >
               작성
             </button>
           )}
           {selectedStep === 1 && selectedPostId && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={() =>
-                title && content && category && submitPost("OVERCOMING")
-              }
+              onClick={() => handleSubmit("OVERCOMING")}
             >
               작성
             </button>
           )}
           {selectedStep === 2 && selectedPostId && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={() =>
-                title && content && category && submitPost("OVERCOME")
-              }
+              onClick={() => handleSubmit("OVERCOME")}
             >
               작성
             </button>
