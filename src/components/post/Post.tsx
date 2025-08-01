@@ -3,13 +3,15 @@ import type { OopsPost } from "../../types/OopsList";
 interface PostProps {
   post: OopsPost;
   onClick: (id: string) => void;
+  isSelected: boolean;
 }
 
-const Post = ({ post, onClick }: PostProps) => {
+const Post = ({ post, onClick, isSelected }: PostProps) => {
   return (
     <li
       key={post.id}
-      className="flex w-full h-[90px] justify-between items-center bg-[#f0e7e0] cursor-pointer px-[14px] py-[10px] rounded-[10px]"
+      className={`flex w-full h-[90px] justify-between items-center bg-[#f0e7e0] cursor-pointer px-[14px] py-[10px] rounded-[10px] ${isSelected ? "ring-2 ring-[#ff6b6b]" : ""
+        }`}
       onClick={() => onClick(post.id)}
     >
       <div
@@ -21,7 +23,7 @@ const Post = ({ post, onClick }: PostProps) => {
             {post.category}
           </span>
         </div>
-        <span className="caption3 text-[#262626] max-w-[calc(100%-60px)] truncate">
+        <span className="caption3 text-[#262626] max-w-[calc(100%-60px)]  truncate">
           {post.content}
         </span>
       </div>

@@ -19,8 +19,6 @@ import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
 
 const PostWrite = () => {
-
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -174,6 +172,101 @@ const PostWrite = () => {
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
+  // 버튼 비활성화 및 자동 포커스
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const overcomeTitleRef = useRef<HTMLInputElement>(null);
+  const overcomeContentRef = useRef<HTMLTextAreaElement>(null);
+  const completeTitleRef = useRef<HTMLInputElement>(null);
+  const completeContentRef = useRef<HTMLTextAreaElement>(null);
+  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
+
+  const isStep0Valid = !!title.trim() && !!content.trim() && !!category;
+
+  const isStep1Valid =
+    !!overcomeTitle.trim() &&
+    !!overcomeContent.trim() &&
+    !!category &&
+    !!selectedPostId;
+
+  const isStep2Valid =
+    !!completeTitle.trim() &&
+    !!completeContent.trim() &&
+    !!category &&
+    !!selectedPostId;
+
+  const focusFirstMissing = () => {
+    if (selectedStep === 0) {
+      if (!title.trim()) {
+        titleRef.current?.focus();
+        return;
+      }
+      if (!content.trim()) {
+        contentRef.current?.focus();
+        return;
+      }
+      if (!category) {
+        setIsDropdownOpen(true);
+        categoryTriggerRef.current?.focus();
+        return;
+      }
+    }
+    if (selectedStep === 1) {
+      if (!overcomeTitle.trim()) {
+        overcomeTitleRef.current?.focus();
+        return;
+      }
+      if (!overcomeContent.trim()) {
+        overcomeContentRef.current?.focus();
+        return;
+      }
+      if (!category) {
+        setIsDropdownOpen(true);
+        categoryTriggerRef.current?.focus();
+        return;
+      }
+    }
+    if (selectedStep === 2) {
+      if (!completeTitle.trim()) {
+        completeTitleRef.current?.focus();
+        return;
+      }
+      if (!completeContent.trim()) {
+        completeContentRef.current?.focus();
+        return;
+      }
+      if (!category) {
+        setIsDropdownOpen(true);
+        categoryTriggerRef.current?.focus();
+        return;
+      }
+    }
+  };
+
+  //작성 공통 핸들러
+  const handlePrimarySubmit = () => {
+    if (selectedStep === 0) {
+      if (!isStep0Valid) return focusFirstMissing();
+      return handleOopsSubmit();
+    }
+    if (selectedStep === 1) {
+      if (!isStep1Valid) return focusFirstMissing();
+      return handleOvercomeSubmit();
+    }
+    if (selectedStep === 2) {
+      if (!isStep2Valid) return focusFirstMissing();
+      return handleCompleteSubmit();
+    }
+  };
+
+  const handlePostSelect = (id: string) => {
+    if (selectedPostId === id) {
+      dispatch(setSelectedPostId(null)); // 다시 클릭하면 해제
+    } else {
+      dispatch(setSelectedPostId(id));
+    }
+  };
+
   return (
     <div className="flex justify-center items-center ">
       {/* <Navbar /> 들어가면 됨 */}
@@ -193,6 +286,7 @@ const PostWrite = () => {
             {selectedStep === 0 && (
               <>
                 <input
+                  ref={titleRef}
                   required
                   placeholder="제목 (필수)"
                   className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
@@ -200,9 +294,10 @@ const PostWrite = () => {
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <textarea
+                  ref={contentRef}
                   required
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px] "
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                 />
@@ -212,14 +307,18 @@ const PostWrite = () => {
             {selectedStep === 1 && (
               <>
                 <input
+                  ref={overcomeTitleRef}
+                  required
                   placeholder="제목 (필수)"
                   className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
                   value={overcomeTitle}
                   onChange={(e) => setOvercomeTitle(e.target.value)}
                 />
                 <textarea
+                  ref={overcomeContentRef}
+                  required
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] px-[16px] pt-[14px]"
                   value={overcomeContent}
                   onChange={(e) => setOvercomeContent(e.target.value)}
                 />
@@ -229,14 +328,18 @@ const PostWrite = () => {
             {selectedStep === 2 && (
               <>
                 <input
+                  ref={completeTitleRef}
+                  required
                   placeholder="제목 (필수)"
-                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
+                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] px-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
                   value={completeTitle}
                   onChange={(e) => setCompleteTitle(e.target.value)}
                 />
                 <textarea
+                  ref={completeContentRef}
+                  required
                   placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
+                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] px-[16px] pt-[14px]"
                   value={completeContent}
                   onChange={(e) => setCompleteContent(e.target.value)}
                 />
@@ -283,15 +386,17 @@ const PostWrite = () => {
           {selectedStep === 1 && (
             <PostList
               posts={oopsList}
-              onSelect={(id) => dispatch(setSelectedPostId(id))}
+              onSelect={handlePostSelect}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
           {selectedStep === 2 && (
             <PostList
               posts={overcomeList}
-              onSelect={(id) => dispatch(setSelectedPostId(id))}
+              onSelect={handlePostSelect}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
         </section>
@@ -355,23 +460,19 @@ const PostWrite = () => {
             <div className="body2">카테고리 선택</div>
 
             {/* 드롭다운 버튼 */}
-            <div
-              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px]  rounded-[20px] cursor-pointer
-                bg-[#E6E6E6] outline-none select-none"
+            <button
+              type="button"
+              ref={categoryTriggerRef}
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] rounded-[20px] cursor-pointer bg-[#E6E6E6] outline-none select-none"
             >
               {category || "카테고리 선택"}
               {isDropdownOpen ? (
-                <UpArrow
-                  onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className="w-[18px] h-[18px]"
-                />
+                <UpArrow className="w-[18px] h-[18px]" />
               ) : (
-                <DownArrow
-                  onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className="w-[18px] h-[18px]"
-                />
+                <DownArrow className="w-[18px] h-[18px]" />
               )}
-            </div>
+            </button>
 
             {/* 드롭다운 리스트 */}
             {isDropdownOpen && (
@@ -381,7 +482,7 @@ const PostWrite = () => {
             bg-[#f3f3f3]
               w-[120px] h-[118px] 
               rounded-b-[10px] 
-              overflow-y-scroll text-[14px] shadow"
+              overflow-y-scroll text-[14px] z-20 "
               >
                 {categories.map((item, idx) => (
                   <li
@@ -449,32 +550,44 @@ const PostWrite = () => {
         <div className="flex justify-center items-center mb-[32px] mt-[42px]">
           {selectedStep === 0 && (
             <button
-              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={title && content ? handleOopsSubmit : undefined}
+              type="button"
+              aria-disabled={!isStep0Valid}
+              onClick={handlePrimarySubmit}
+              className={`bg-[#B3E378] w-[335px] h-[50px] px-6 font-bold ${
+                !isStep0Valid
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
               작성
             </button>
           )}
+
           {selectedStep === 1 && selectedPostId && (
             <button
-              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={
-                overcomeTitle && overcomeContent
-                  ? handleOvercomeSubmit
-                  : undefined
-              }
+              type="button"
+              aria-disabled={!isStep1Valid}
+              onClick={handlePrimarySubmit}
+              className={`bg-[#B3E378] w-[335px] h-[50px] px-6 font-bold ${
+                !isStep1Valid
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
               작성
             </button>
           )}
+
           {selectedStep === 2 && selectedPostId && (
             <button
-              className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={
-                completeTitle && completeContent
-                  ? handleCompleteSubmit
-                  : undefined
-              }
+              type="button"
+              aria-disabled={!isStep2Valid}
+              onClick={handlePrimarySubmit}
+              className={`bg-[#B3E378] w-[335px] h-[50px] px-6 font-bold ${
+                !isStep2Valid
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
               작성
             </button>

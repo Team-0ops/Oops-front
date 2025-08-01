@@ -1,4 +1,3 @@
-// components/post/PostList.tsx
 import { useRef, useEffect } from "react";
 import type { OopsPost } from "../../types/OopsList";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -14,11 +13,12 @@ interface PostListProps {
   posts: OopsPost[];
   onSelect: (id: string) => void;
   step: 0 | 1 | 2;
+  selectedPostId: string | null;
 }
 
 const POSTS_PER_PAGE = 5;
 
-const PostList = ({ posts, onSelect, step }: PostListProps) => {
+const PostList = ({ posts, onSelect, step, selectedPostId }: PostListProps) => {
   const paginationRef = useRef<HTMLDivElement>(null);
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
   const swiperRef = useRef<any>(null);
@@ -71,7 +71,12 @@ const PostList = ({ posts, onSelect, step }: PostListProps) => {
               <SwiperSlide key={pageIndex}>
                 <ul className="flex flex-col gap-[12px]">
                   {chunk.map((post) => (
-                    <Post key={post.id} post={post} onClick={onSelect} />
+                    <Post
+                      key={post.id}
+                      post={post}
+                      onClick={onSelect}
+                      isSelected={selectedPostId === post.id}
+                    />
                   ))}
                 </ul>
               </SwiperSlide>
