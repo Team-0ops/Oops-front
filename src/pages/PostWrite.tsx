@@ -36,7 +36,7 @@ const PostWrite = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { posts: previousPosts } = usePreviousPosts();
+  const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
   const categories = [
     "작은 일",
@@ -86,7 +86,7 @@ const PostWrite = () => {
 
     try {
       await axiosInstance.post("/posts", data);
-
+      await fetchPreviousPosts();
       if (situation === "OOPS") {
         dispatch(setSelectedStep(1));
       } else if (situation === "OVERCOMING") {
