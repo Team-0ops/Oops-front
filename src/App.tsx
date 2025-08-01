@@ -1,5 +1,6 @@
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 import "./App.css";
 import {
   createBrowserRouter,
@@ -41,6 +42,7 @@ import OthersProfilePage from "./pages/OthersProfilePage";
 //행운부적 페이지
 import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
 import PostWriteLayout from "./layout/PostWriteLayout";
+import FailWiki from "./pages/FailWiki";
 
 function App() {
   const publicRoutes: RouteObject[] = [
@@ -59,13 +61,25 @@ function App() {
         { path: "postdetail", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
         { path: "post", element: <PostWrite /> },
-        {path:"/lucky-draw", element:<LuckyDraw/>}
+        { path: "fail-wiki", element: <FailWiki /> },
+        {
+          path: "/lucky-draw",
+          element: (
+            <ProtectedRoute>
+              <LuckyDraw />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
 
     {
       path: "/mypage",
-      element: <MyPageLayout />,
+      element: (
+        <ProtectedRoute>
+          <MyPageLayout />
+        </ProtectedRoute>
+      ),
       children: [
         { index: true, element: <Navigate to="failures" replace /> },
         { path: "failures", element: <MyFailuresPage /> },
@@ -76,10 +90,12 @@ function App() {
 
     {
       path: "/post",
-      element: <PostWriteLayout />,
-      children: [
-        { index: true, element: <PostWrite /> }, 
-      ]
+      element: (
+        <ProtectedRoute>
+          <PostWriteLayout />
+        </ProtectedRoute>
+      ),
+      children: [{ index: true, element: <PostWrite /> }],
     },
 
     {
@@ -92,7 +108,6 @@ function App() {
     { path: "/find-idpw", element: <FindIdPwPage /> },
     { path: "/terms", element: <TermsPage /> },
     { path: "/search", element: <SearchPage /> },
-
   ];
 
   const router = createBrowserRouter([...publicRoutes]);
