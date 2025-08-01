@@ -1,30 +1,23 @@
-import { useState, useEffect } from "react";
-import { useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useSelector, useDispatch } from "react-redux";
+import { setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
 import type { RootState } from "../store/store";
-import {
-  addPost,
-  setSelectedStep,
-  setSelectedPostId,
-} from "../store/slices/postSlice";
-
 import PostList from "../components/post/PostList";
-
+import type { OopsPost } from "../types/OopsList";
 import LeftPoint from "../assets/icons/left-point.svg?react";
 import UpArrow from "../assets/icons/UpArrow.svg?react";
 import DownArrow from "../assets/icons/DownArrow.svg?react";
-
 import "../App.css";
+
+import { usePreviousPosts } from "../hooks/usePreviousPosts";
+import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
 
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const posts = useSelector((state: RootState) => state.post.posts);
   const selectedStep = useSelector(
     (state: RootState) => state.post.selectedStep
   );
@@ -32,20 +25,20 @@ const PostWrite = () => {
     (state: RootState) => state.post.selectedPostId
   );
 
-  const oopsList = posts.filter((p) => p.status === "웁스 중");
-  const overcomeList = posts.filter((p) => p.status === "극복 중");
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const categoryRef = useRef<HTMLButtonElement>(null);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [overcomeTitle, setOvercomeTitle] = useState("");
-  const [overcomeContent, setOvercomeContent] = useState("");
-  const [completeTitle, setCompleteTitle] = useState("");
-  const [completeContent, setCompleteContent] = useState("");
-
   const [images, setImages] = useState<string[]>([]);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<number | null>(null);
   const [commentType, setCommentType] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
   const categories = [
     "작은 일",
@@ -78,82 +71,44 @@ const PostWrite = () => {
     fileInputRef.current?.click();
   };
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // 작성 핸들러
+  const submitPost = async (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
+    const data: OopsPost = {
+      title,
+      content,
+      situation,
+      categoryId: category!,
+      topicId: null,
+      previousPostId: situation !== "OOPS" ? selectedPostId : null,
+      imageUrls: images,
+      wantedCommentTypes: commentType.map((type) =>
+        type === "조언" ? "ADVICE" : "EMPATHY"
+      ),
+    };
 
-  // --- 1. 각 단계별 작성 핸들러 ---
-  const now = new Date().toLocaleString("ko-KR", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const basePost = {
-    id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-    createdAt: now,
+    try {
+      await axiosInstance.post("/posts", data);
+      await fetchPreviousPosts();
+      if (situation === "OOPS") {
+        dispatch(setSelectedStep(1));
+      } else if (situation === "OVERCOMING") {
+        dispatch(setSelectedStep(2));
+      } else {
+        dispatch(setSelectedStep(0));
+        dispatch(setSelectedPostId(null));
+        navigate("/postsuccess");
+      }
+
+      setTitle("");
+      setContent("");
+      setImages([]);
+      setCommentType([]);
+      alert("성공");
+    } catch (error) {
+      alert("글 작성에 실패했습니다. 다시 시도해주세요.");
+      console.error(error);
+    }
   };
-
-  const handleOopsSubmit = () => {
-    dispatch(
-      addPost({
-        ...basePost,
-        status: "웁스 중",
-        title,
-        content,
-        images,
-        category,
-        commentType,
-      })
-    );
-    setTitle("");
-    setContent("");
-    setImages([]);
-    setCategory("");
-    setCommentType([]);
-    dispatch(setSelectedStep(1)); // 다음 단계로
-  };
-
-  const handleOvercomeSubmit = () => {
-    if (!selectedPostId) return;
-    dispatch(
-      addPost({
-        ...basePost,
-        status: "극복 중",
-        title: overcomeTitle,
-        content: overcomeContent,
-        images: [],
-        category,
-        commentType: [],
-        parentId: selectedPostId,
-      })
-    );
-    setOvercomeTitle("");
-    setOvercomeContent("");
-    // 기존 selectedPostId 유지
-    dispatch(setSelectedStep(2)); // 다음 단계로
-  };
-
-  const handleCompleteSubmit = () => {
-    if (!selectedPostId) return;
-    dispatch(
-      addPost({
-        ...basePost,
-        status: "극복 완료",
-        title: completeTitle,
-        content: completeContent,
-        images: [],
-        category,
-        commentType: [],
-        parentId: selectedPostId,
-      })
-    );
-    setCompleteTitle("");
-    setCompleteContent("");
-    dispatch(setSelectedPostId(null));
-    dispatch(setSelectedStep(0));
-    navigate("/postsuccess");
-  };
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -174,6 +129,30 @@ const PostWrite = () => {
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
+  // 버튼 비활성화 및 자동 포커스
+  
+  const isFormValid = !!title.trim() && !!content.trim() && !!category;
+
+  const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
+    if (!title.trim()) {
+      titleRef.current?.focus();
+      return;
+    }
+
+    if (!content.trim()) {
+      contentRef.current?.focus();
+      return;
+    }
+
+    if (!category) {
+      setIsDropdownOpen(true);
+      categoryRef.current?.focus();
+      return;
+    }
+
+    submitPost(situation);
+  };
+
   return (
     <div className="flex justify-center items-center ">
       {/* <Navbar /> 들어가면 됨 */}
@@ -190,58 +169,22 @@ const PostWrite = () => {
 
           {/* 제목 및 본문 입력 */}
           <div className="w-full ">
-            {selectedStep === 0 && (
-              <>
-                <input
-                  required
-                  placeholder="제목 (필수)"
-                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <textarea
-                  required
-                  placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px] "
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              </>
-            )}
-
-            {selectedStep === 1 && (
-              <>
-                <input
-                  placeholder="제목 (필수)"
-                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
-                  value={overcomeTitle}
-                  onChange={(e) => setOvercomeTitle(e.target.value)}
-                />
-                <textarea
-                  placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
-                  value={overcomeContent}
-                  onChange={(e) => setOvercomeContent(e.target.value)}
-                />
-              </>
-            )}
-
-            {selectedStep === 2 && (
-              <>
-                <input
-                  placeholder="제목 (필수)"
-                  className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
-                  value={completeTitle}
-                  onChange={(e) => setCompleteTitle(e.target.value)}
-                />
-                <textarea
-                  placeholder="실패담의 내용을 입력해주세요. (필수)"
-                  className="caption1 placeholder:caption1 placeholder-[#999] w-full h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
-                  value={completeContent}
-                  onChange={(e) => setCompleteContent(e.target.value)}
-                />
-              </>
-            )}
+            <input
+              ref={titleRef}
+              required
+              placeholder="제목 (필수)"
+              className="body1 placeholder:body1 placeholder-[#999] mb-[14px] pl-[16px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] w-full h-[50px] bg-transparent border-transparent border-[1px] rounded-[4px]"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <textarea
+              ref={contentRef}
+              required
+              placeholder="내용을 입력해주세요. (필수)"
+              className="caption1 placeholder:caption1 placeholder-[#999] w-full min-h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
           </div>
         </section>
 
@@ -282,14 +225,14 @@ const PostWrite = () => {
 
           {selectedStep === 1 && (
             <PostList
-              posts={oopsList}
+              posts={previousPosts.filter((p) => p.situation === "OOPS")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
             />
           )}
           {selectedStep === 2 && (
             <PostList
-              posts={overcomeList}
+              posts={previousPosts.filter((p) => p.situation === "OVERCOMING")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
             />
@@ -355,23 +298,21 @@ const PostWrite = () => {
             <div className="body2">카테고리 선택</div>
 
             {/* 드롭다운 버튼 */}
-            <div
-              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px]  rounded-[20px] cursor-pointer
-                bg-[#E6E6E6] outline-none select-none"
+            <button
+              type="button"
+              ref={categoryRef}
+              className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] rounded-[20px] cursor-pointer bg-[#E6E6E6] outline-none select-none"
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
             >
-              {category || "카테고리 선택"}
+              {/* ✅ 선택된 카테고리 이름 보여주기 */}
+              {category ? categories[category - 1] : "카테고리 선택"}
+
               {isDropdownOpen ? (
-                <UpArrow
-                  onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className="w-[18px] h-[18px]"
-                />
+                <UpArrow className="w-[18px] h-[18px]" />
               ) : (
-                <DownArrow
-                  onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className="w-[18px] h-[18px]"
-                />
+                <DownArrow className="w-[18px] h-[18px]" />
               )}
-            </div>
+            </button>
 
             {/* 드롭다운 리스트 */}
             {isDropdownOpen && (
@@ -387,13 +328,17 @@ const PostWrite = () => {
                   <li
                     key={item}
                     onClick={() => {
-                      setCategory(item);
+                      setCategory(idx + 1); // 1부터 시작하는 ID로 저장
                       setIsDropdownOpen(false);
                     }}
                     className={`body4 px-[13px] py-[8px] cursor-pointer
-            ${category === item ? "text-black" : "text-[#999999]"} 
-            ${idx !== categories.length - 1 ? "border-b border-[#e6e6e6]" : ""}
-          `}
+                      ${category === idx + 1 ? "text-black" : "text-[#999999]"}
+                      ${
+                        idx !== categories.length - 1
+                          ? "border-b border-[#e6e6e6]"
+                          : ""
+                      }
+                  `}
                   >
                     {item}
                   </li>
@@ -449,32 +394,27 @@ const PostWrite = () => {
         <div className="flex justify-center items-center mb-[32px] mt-[42px]">
           {selectedStep === 0 && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={title && content ? handleOopsSubmit : undefined}
+              onClick={() => handleSubmit("OOPS")}
             >
               작성
             </button>
           )}
           {selectedStep === 1 && selectedPostId && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={
-                overcomeTitle && overcomeContent
-                  ? handleOvercomeSubmit
-                  : undefined
-              }
+              onClick={() => handleSubmit("OVERCOMING")}
             >
               작성
             </button>
           )}
           {selectedStep === 2 && selectedPostId && (
             <button
+              disabled={!isFormValid}
               className="bg-[#B3E378] cursor-pointer w-[335px] h-[50px] px-6 font-bold"
-              onClick={
-                completeTitle && completeContent
-                  ? handleCompleteSubmit
-                  : undefined
-              }
+              onClick={() => handleSubmit("OVERCOME")}
             >
               작성
             </button>
