@@ -4,6 +4,7 @@ import WikiHead from "../components/FailWiki/WikiHead";
 import WikiInput from "../components/FailWiki/WikiInput";
 import WikiKeyword from "../components/FailWiki/WikiKeyword";
 import WikiResult from "../components/FailWiki/WikiResult";
+import WikiBestFailerList from "../components/FailWiki/WikiBestFailerList";
 
 const FailWiki = () => {
   const [inputValue, setInputValue] = useState("");
@@ -25,8 +26,10 @@ const FailWiki = () => {
           </div>
           {inputValue ? (
             <>
-              <div>{/*빈 공간*/}</div>
-              <WikiResult />
+              <div>
+                <div>{/*빈 공간*/}</div>
+                <WikiResult />
+              </div>
             </>
           ) : (
             <div className="flex flex-col justify-center gap-[32px]">
