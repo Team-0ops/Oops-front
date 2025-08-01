@@ -14,6 +14,8 @@ const MainFeedList = () => {
 
   const bestPosts = posts?.result?.[0]?.posts || [];
   const favoritesPosts = posts?.result?.[1]?.posts || [];
+  const categoryPostsList = categoryPosts?.result?.posts || [];
+
   return (
     <>
       <div className="flex flex-col w-full justify-center items-center gap-[36px]">
@@ -23,7 +25,7 @@ const MainFeedList = () => {
         <FavoritesCategoryList
           favoritesPosts={favoritesPosts} // posts prop 전달
         />
-        <CategoryList categoryPosts={categoryPosts?.result?.posts} />
+        <CategoryList categoryPosts={categoryPostsList} />
       </div>
     </>
   );

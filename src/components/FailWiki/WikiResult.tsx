@@ -1,4 +1,4 @@
-import WikiResultCard from "./WikiResultCard";
+import WikiResultCard from "./WIkiResultCard";
 
 const WikiResult = () => {
   return (
