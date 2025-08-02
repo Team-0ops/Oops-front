@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import LeftArrow from "../../assets/icons/left-point.svg?react";
 import CardFlip from "./CardFlip";
 import FullResultCard from "./FullResultCard";
 import { useNavigate } from "react-router-dom";
-import { getUserProfile, requestLuckyDraw } from "./luckyDrawApi";
+import { requestLuckyDraw } from "./luckyDrawApi";
 
 const LuckyDraw = () => {
   const [forceStop, setForceStop] = useState(false);
@@ -11,27 +11,8 @@ const LuckyDraw = () => {
   const [showResult, setShowResult] = useState(false);
   const [showFullCard, setShowFullCard] = useState(false);
   const [selectedCard, setSelectedCard] = useState<any>(null);
-  const [userPoint, setUserPoint] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 포인트 조회 (mock or 실제 구현)
-  useEffect(() => {
-    const fetchPoint = async () => {
-      try {
-        const res = await getUserProfile();
-        setUserPoint(res.result.point);
-      } catch (e) {
-        console.error("❌ 포인트 조회 실패:", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPoint();
-  }, []);
-
-  // 뽑기 버튼 클릭 시
   const handleDrawClick = async () => {
     setForceStop(true);
 
@@ -39,11 +20,7 @@ const LuckyDraw = () => {
       const result = await requestLuckyDraw();
       const luckyCard = result.result;
 
-      console.log("🎯 받아온 부적:", luckyCard);
-
-      if (!luckyCard) {
-        throw new Error("서버로부터 부적 정보를 받지 못했습니다.");
-      }
+      if (!luckyCard) throw new Error("부적 정보 없음");
 
       const randomIndex = Math.floor(Math.random() * 9);
 
@@ -57,9 +34,9 @@ const LuckyDraw = () => {
         }, 600);
       }, 500);
     } catch (e: any) {
-      console.error("❌ 최종 에러:", e.response?.data || e.message);
-      alert("부적 뽑기 중 오류 발생!");
-      setForceStop(false); // 다시 뽑을 수 있게 풀어줌
+      console.error("❌ 오류 발생:", e.response?.data || e.message);
+      alert("부적 뽑기 실패!");
+      setForceStop(false);
     }
   };
 
@@ -98,18 +75,10 @@ const LuckyDraw = () => {
 
       <button
         onClick={handleDrawClick}
-        disabled={forceStop || (userPoint !== null && userPoint < 150)}
-        className={`h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30 ${
-          userPoint !== null && userPoint < 150
-            ? "bg-[#D9D9D9] text-[#999999]"
-            : "bg-[#B3E378] text-black"
-        }`}
+        disabled={forceStop}
+        className="h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30 bg-[#B3E378] text-black"
       >
-        {isLoading
-          ? "로딩 중..."
-          : userPoint !== null && userPoint < 150
-          ? "150 포인트가 모이면 뽑을 수 있어요!"
-          : "행운 부적 뽑으러 가기"}
+        행운 부적 뽑으러 가기
       </button>
     </div>
   );
