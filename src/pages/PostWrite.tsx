@@ -10,12 +10,10 @@ import UpArrow from "../assets/icons/UpArrow.svg?react";
 import DownArrow from "../assets/icons/DownArrow.svg?react";
 import "../App.css";
 
-import { usePreviousPosts } from "../hooks/usePreviousPosts";
+import { usePreviousPosts } from "../hooks/PostPage/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
-
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedStep = useSelector(
@@ -41,18 +39,20 @@ const PostWrite = () => {
   const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
   const categories = [
-    "작은 일",
+    "일상",
     "연애",
     "인간관계",
+    "주식/투자",
     "학교생활",
-    "진로/취업",
     "회사생활",
-    "대입/입시",
+    "진로",
     "창업",
+    "대입/입시",
+    "취업/자격증",
+    "결혼",
     "여행",
-    "재정/돈관리",
-    "건강/운동",
-    "멘탈관리",
+    "부동산",
+    "정신 건강",
     "자유",
   ];
 
@@ -87,7 +87,8 @@ const PostWrite = () => {
     };
 
     try {
-      await axiosInstance.post("/posts", data);
+      const res = await axiosInstance.post("/posts", data);
+      const postId = res.data.result?.postId;
       await fetchPreviousPosts();
       if (situation === "OOPS") {
         dispatch(setSelectedStep(1));
@@ -96,9 +97,8 @@ const PostWrite = () => {
       } else {
         dispatch(setSelectedStep(0));
         dispatch(setSelectedPostId(null));
-        navigate("/postsuccess");
+        navigate("/postsuccess", { state: { postId } });
       }
-
       setTitle("");
       setContent("");
       setImages([]);
@@ -130,7 +130,7 @@ const PostWrite = () => {
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   // 버튼 비활성화 및 자동 포커스
-  
+
   const isFormValid = !!title.trim() && !!content.trim() && !!category;
 
   const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {

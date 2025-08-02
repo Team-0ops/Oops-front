@@ -5,14 +5,15 @@ import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
 
 import CommentList from "../components/comment/CommentList";
-import type { Comment } from "../types/Comment";
 import Report from "../components/modals/Report";
 import type { ReportTarget } from "../components/modals/Report";
-import { usePostDetail } from "../hooks/usePostDetail";
+import { usePostDetail } from "../hooks/PostPage/usePostDetail";
+import { submitComment } from "../hooks/PostPage/useSubmitComment";
 
 import { useParams } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useNavigate } from "react-router-dom";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -31,21 +32,24 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
 };
 
 const PostDetail = () => {
+  const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const { postDetail, loading } = usePostDetail(Number(postId));
-  //교훈 작성 모달
+
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  //게시글 신고 모달
   const [showReportModal, setShowReportModal] = useState(false);
-  // swiper 상태관리
+
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // 댓글 관리 로직
+  // 댓글 입력 상태
   const [commentInput, setCommentInput] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
-  // SITUATION_ORDER 순서대로 post 배열 만들기 (데이터 없으면 null)
+
+  // 로컬 댓글 상태 (Optimistic UI)
+  const [localComments, setLocalComments] = useState<any[]>([]);
+
+  // SITUATION_ORDER 순서대로 post 배열 만들기
   const posts = SITUATION_ORDER.map((key) =>
     postDetail ? postDetail[key] : null
   );
@@ -55,20 +59,55 @@ const PostDetail = () => {
     setActiveIndex(index);
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
+
+    const nextPostId = posts[index]?.postId;
+    if (nextPostId) {
+      navigate(`/post/${nextPostId}`, { replace: false });
+    }
   };
-  const handleAddComment = () => {
-    if (!commentInput.trim()) return;
+  // 현재 활성화된 게시글 및 댓글
+  const currentPost = posts[activeIndex];
+  const currentPostId = currentPost?.postId;
+  const currentComments =
+    (currentPost?.comments ?? []).map((comment: any) => ({
+      id: comment.commentId?.toString() ?? "",
+      content: comment.content,
+      author: (comment.nickname || comment.userId?.toString()) ?? "",
+      likes: comment.likes,
+      createdAt: comment.createdAt,
+      parentId: comment.parentId,
+    })) || [];
 
-    const newComment: Comment = {
-      type: "comment",
-      id: Date.now().toString(),
-      author: "닉네임",
+  // 슬라이드 변경시 localComments 동기화 (서버 데이터로 초기화)
+  useEffect(() => {
+    setLocalComments(currentComments);
+  }, [activeIndex, postDetail]);
+
+  // 댓글 추가
+  const handleAddComment = async () => {
+    if (!commentInput.trim() || !currentPostId) return;
+
+    // localComments에 바로 추가
+    const newComment = {
+      id: Date.now().toString(), // 임시 id
       content: commentInput,
-      createdAt: new Date().toISOString(), // ISO 문자열로 저장
+      author: "나", // 실제 로그인 사용자명으로 교체
+      likes: 0,
+      createdAt: new Date().toISOString(),
+      parentId: null,
     };
+    setLocalComments((prev) => [newComment, ...prev]);
+    setCommentInput("");
 
-    setComments((prev) => [...prev, newComment]);
-    setCommentInput(""); // 입력창 비우기
+    try {
+      await submitComment(Number(currentPostId), commentInput, null);
+      // 성공하면 별도 동작 X useEffect에서 서버 데이터로 덮어쓰기
+      console.log("댓글 작성 성공!")
+    } catch (e) {
+      // 에러 시 localComments에서 제거
+      setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
+      alert("댓글 작성 실패!");
+    }
   };
 
   // const reportTarget: ReportTarget = {
@@ -146,10 +185,10 @@ const PostDetail = () => {
                     <div className="flex justify-between w-full items-center">
                       <div className="flex flex-col gap-[4px]">
                         <span className="body2 text-[#1d1d1d]">
-                          {post?.writer}
+                          {post ? post.nickname : "닉네임 없음"}
                         </span>
                         <span className="body5 text-[#999999]">
-                          {/* {post.createdAt} */}
+                          {/* {post?.created_at.getTime()} */}
                         </span>
                       </div>
                       <div className="flex items-center gap-[4px]">
@@ -167,7 +206,7 @@ const PostDetail = () => {
                         </div>
                       </div>
                     </div>
-                  </div> 
+                  </div>
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
@@ -243,7 +282,10 @@ const PostDetail = () => {
 
         {/* 댓글 목록 */}
         <section className="mt-[20px] -mx-[20px] flex flex-col w-screen">
-          <CommentList comments={comments} />
+          <CommentList
+            comments={localComments}
+            postId={Number(currentPostId)}
+          />
         </section>
 
         {/* 카테고리 추천 글 */}
@@ -315,7 +357,10 @@ const PostDetail = () => {
         />
       )}
       {showFeedbackModal && (
-        <Feedback onClose={() => setShowFeedbackModal(false)} />
+        <Feedback
+          postId={Number(currentPostId)}
+          onClose={() => setShowFeedbackModal(false)}
+        />
       )}
     </>
   );
