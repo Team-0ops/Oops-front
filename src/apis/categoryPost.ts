@@ -23,7 +23,7 @@ export const getBookmarkedPosts = async (
   page: number = 0,
   limit: number = 10
 ) => {
-  const { data } = await axiosInstance.get(`/api/feeds/bookmarked/all`, {
+  const { data } = await axiosInstance.get(`/feeds/bookmarked/all`, {
     params: { situation, page, limit },
   });
   return data;
