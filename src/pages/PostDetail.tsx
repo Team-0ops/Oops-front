@@ -60,6 +60,7 @@ const PostDetail = () => {
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
 
+ // 슬라이드시에 url 변경   
     const nextPostId = posts[index]?.postId;
     if (nextPostId) {
       navigate(`/post/${nextPostId}`, { replace: false });

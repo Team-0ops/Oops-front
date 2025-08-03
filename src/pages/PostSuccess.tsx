@@ -13,6 +13,7 @@ const PostSuccess = () => {
     if (!postId) return alert("방금 작성한 게시글이 없습니다.");
     navigate(`/post/${postId}`);
   };
+  
   const handleMain = () => {
     navigate("/");
   };

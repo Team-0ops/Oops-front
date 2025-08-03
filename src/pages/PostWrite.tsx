@@ -92,8 +92,10 @@ const PostWrite = () => {
       await fetchPreviousPosts();
       if (situation === "OOPS") {
         dispatch(setSelectedStep(1));
+        navigate("/postsuccess", { state: { postId } });
       } else if (situation === "OVERCOMING") {
         dispatch(setSelectedStep(2));
+        navigate("/postsuccess", { state: { postId } });
       } else {
         dispatch(setSelectedStep(0));
         dispatch(setSelectedPostId(null));
