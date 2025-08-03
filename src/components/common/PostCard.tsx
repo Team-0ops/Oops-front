@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import PostStats from "./PostStats";
-type PostCardProps = {
+interface PostCardProps {
+  postId: number;
   title: string;
   content: string;
   imageUrl?: string;
@@ -7,9 +9,10 @@ type PostCardProps = {
   comments: number;
   views: number;
   category?: string;
-};
+}
 
 const PostCard = ({
+  postId,
   title,
   content,
   imageUrl,
@@ -18,8 +21,12 @@ const PostCard = ({
   views,
   category,
 }: PostCardProps) => {
+  const navigate = useNavigate();
   return (
-    <div className=" relative w-full lex px-[12px] py-[10px] bg-[#F0E7E0] rounded-[10px] h-[85px]">
+    <div
+      onClick={(): void | Promise<void> => navigate(`post/${postId}`)}
+      className=" relative w-full lex px-[12px] py-[10px] bg-[#F0E7E0] rounded-[10px] h-[85px]"
+    >
       <div>
         <div className="flex items-center">
           <h3 className="text-[16px] font-semibold mb-[4px] line-clamp-1 pr-[130px]">

@@ -10,7 +10,7 @@ const mockPosts = [
     likes: 9,
     comments: 3,
     views: 120,
-    category:"인간관계"
+    category: "인간관계",
   },
   {
     id: 2,
@@ -19,9 +19,9 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    category:"인간관계"
+    category: "인간관계",
   },
-    {
+  {
     id: 3,
     title: "제목입니다",
     content: "다다다다다다다다다다 다 다다다다다 다다...",
@@ -29,7 +29,7 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    category:"일상"
+    category: "일상",
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    category:"회사"
+    category: "회사",
   },
   {
     id: 5,
@@ -49,7 +49,7 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    category:"연애"
+    category: "연애",
   },
   {
     id: 6,
@@ -59,11 +59,9 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    category:"여행"
+    category: "여행",
   },
 ];
-
-
 
 const BestFeed = () => {
   const navigate = useNavigate();
@@ -71,18 +69,21 @@ const BestFeed = () => {
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] ">
       <div className="flex gap-[8px]">
         <button onClick={() => navigate("/")}>
-        <img src="/src/assets/icons/left-point.svg" alt="뒤로가기" className="w-[9.48px] h-[16.97px] mb-[20px]" />
-      </button> 
-      <h2 className="text-[20px] font-semibold mb-[20px]">베스트 Failers</h2>
+          <img
+            src="/src/assets/icons/left-point.svg"
+            alt="뒤로가기"
+            className="w-[9.48px] h-[16.97px] mb-[20px]"
+          />
+        </button>
+        <h2 className="text-[20px] font-semibold mb-[20px]">베스트 Failers</h2>
       </div>
 
-      
       {/* 여기에 나중에 게시물 목록 추가 */}
 
       <div className="flex flex-col gap-[12px]">
         {mockPosts.map((post) => (
           <PostCard
-            key={post.id}
+            postId={post.id}
             title={post.title}
             content={post.content}
             imageUrl={post.imageUrl}
