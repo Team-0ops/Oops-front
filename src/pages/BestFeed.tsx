@@ -1,72 +1,33 @@
-import PostCard from "../components/common/PostCard";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const mockPosts = [
-  {
-    id: 1,
-    title: "제목입니다 이게",
-    content: "다우땨땨땨땨땨땨땨땨땨댜댜댜댜댜댜댜..",
-    imageUrl: "src/assets/icons/Rectangle 1 (1).svg",
-    likes: 9,
-    comments: 3,
-    views: 120,
-    category: "인간관계",
-  },
-  {
-    id: 2,
-    title: "제목을 적어요 여기에",
-    content: "사진이 없는 게시물은 이런 식으로 글이 더 길어지게 보이게",
-    likes: 10,
-    comments: 5,
-    views: 200,
-    category: "인간관계",
-  },
-  {
-    id: 3,
-    title: "제목입니다",
-    content: "다다다다다다다다다다 다 다다다다다 다다...",
-    imageUrl: "src/assets/icons/Rectangle 1 (1).svg",
-    likes: 23,
-    comments: 7,
-    views: 127,
-    category: "일상",
-  },
-  {
-    id: 4,
-    title: "부장님한테 욕함",
-    content: "사진이 없는 게시물은 이런 식으로 글이 조금 더 길어지게 보이게",
-    imageUrl: "", // 이미지 없음
-    likes: 10,
-    comments: 5,
-    views: 200,
-    category: "회사",
-  },
-  {
-    id: 5,
-    title: "저번주에 헤어짐",
-    content: "다다다다다다다다다다 다 다다다다다 다다...",
-    imageUrl: "src/assets/icons/Rectangle 1 (1).svg",
-    likes: 23,
-    comments: 7,
-    views: 127,
-    category: "연애",
-  },
-  {
-    id: 6,
-    title: "비행기 놓침",
-    content: "다다다다다다다다다다 다 다다다다다 다다...",
-    imageUrl: "src/assets/icons/Rectangle 1 (1).svg",
-    likes: 23,
-    comments: 7,
-    views: 127,
-    category: "여행",
-  },
-];
+import PostCard from "../components/common/PostCard";
+import { getBestFailersFeed } from "../apis/categoryPost"; 
+import type { Post } from "../types/post";
 
 const BestFeed = () => {
   const navigate = useNavigate();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data = await getBestFailersFeed(0, 10); 
+        console.log("응답 posts:", data);
+        setPosts(data ?? []);
+      } catch (err) {
+        console.error("베스트 피드 조회 실패:", err);
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
-    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8]   pt-[17px] ">
+    <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
       <div className="flex gap-[8px]">
         <button onClick={() => navigate("/")}>
           <img
@@ -78,22 +39,32 @@ const BestFeed = () => {
         <h2 className="text-[20px] font-semibold mb-[20px]">베스트 Failers</h2>
       </div>
 
-      {/* 여기에 나중에 게시물 목록 추가 */}
+      {isLoading ? (
+        <div className="text-center py-10">로딩 중...</div>
+      ) : (
+        <div className="flex flex-col gap-[12px]">
+          {posts.map((post) => {
+            if (!post?.postId || !post?.title) {
+              console.warn("잘못된 post 데이터:", post);
+              return null;
+            }
 
-      <div className="flex flex-col gap-[12px]">
-        {mockPosts.map((post) => (
-          <PostCard
-            postId={post.id}
-            title={post.title}
-            content={post.content}
-            imageUrl={post.imageUrl}
-            likes={post.likes}
-            comments={post.comments}
-            views={post.views}
-            category={post.category}
-          />
-        ))}
-      </div>
+            return (
+              <PostCard
+                key={post.postId}
+                postId={post.postId}
+                title={post.title}
+                content={post.content}
+                imageUrl={post.image ?? ""}
+                likes={post.likes}
+                comments={post.comments}
+                views={post.views}
+                category={post.categoryName ?? ""}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
