@@ -14,7 +14,7 @@ const mockPosts = [
     comments: 3,
     views: 120,
     category: "인간관계",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const mockPosts = [
     comments: 5,
     views: 200,
     category: "인간관계",
-    status: "극복 중"
+    status: "극복 중",
   },
   {
     id: 3,
@@ -35,7 +35,7 @@ const mockPosts = [
     comments: 7,
     views: 127,
     category: "일상",
-    status: "극복 완료"
+    status: "극복 완료",
   },
   {
     id: 4,
@@ -46,7 +46,7 @@ const mockPosts = [
     comments: 5,
     views: 200,
     category: "회사",
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 5,
@@ -57,7 +57,7 @@ const mockPosts = [
     comments: 7,
     views: 127,
     category: "연애",
-    status: "극복 중"
+    status: "극복 중",
   },
   {
     id: 6,
@@ -68,8 +68,8 @@ const mockPosts = [
     comments: 7,
     views: 127,
     category: "여행",
-    status: "극복 완료"
-  }
+    status: "극복 완료",
+  },
 ];
 
 const FavoriteFeed = () => {
@@ -97,7 +97,7 @@ const FavoriteFeed = () => {
       <div className="flex flex-col gap-[12px] mb-[50px]">
         {filteredPosts.map((post) => (
           <PostCard
-            key={post.id}
+            postId={post.id}
             title={post.title}
             content={post.content}
             imageUrl={post.imageUrl}

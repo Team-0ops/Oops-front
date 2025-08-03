@@ -13,7 +13,7 @@ const mockPosts = [
     likes: 40,
     comments: 9,
     views: 359,
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    status: "극복 중"
+    status: "극복 중",
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ const mockPosts = [
     likes: 15,
     comments: 6,
     views: 210,
-    status: "극복 완료"
+    status: "극복 완료",
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 5,
@@ -51,8 +51,8 @@ const mockPosts = [
     likes: 19,
     comments: 5,
     views: 200,
-    status: "극복 중"
-  }
+    status: "극복 중",
+  },
 ];
 
 const ExRandomFeed = () => {
@@ -89,7 +89,7 @@ const ExRandomFeed = () => {
       <div className="flex flex-col gap-[12px] mb-[20px]">
         {top3Posts.map((post) => (
           <PostCard
-            key={post.id}
+            postId={post.id}
             title={post.title}
             content={post.content}
             imageUrl={post.imageUrl}
@@ -109,7 +109,7 @@ const ExRandomFeed = () => {
       <div className="flex flex-col gap-[12px]">
         {restPosts.map((post) => (
           <PostCard
-            key={post.id}
+            postId={post.id}
             title={post.title}
             content={post.content}
             imageUrl={post.imageUrl}

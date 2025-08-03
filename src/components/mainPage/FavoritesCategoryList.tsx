@@ -22,7 +22,7 @@ const FavoritesCategoryList = ({
         <div className="flex flex-col w-full justify-center items-center gap-[16px]">
           {favoritesPosts?.map((post) => (
             <PostCard
-              key={post.postId}
+              postId={post.postId}
               title={post.title}
               content={post.content}
               imageUrl={post.image ?? "null"} // null이면 기본 이미지
