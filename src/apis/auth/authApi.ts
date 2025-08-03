@@ -34,6 +34,10 @@ export const postLogin = async ({
   const token = res.data.result;
   localStorage.setItem("accessToken", token);
 
+  Cookies.set("AccessToken", `Bearer+${token}`, {
+    path: "/",
+  });
+
   return res.data;
 };
 
