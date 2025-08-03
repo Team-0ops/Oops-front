@@ -20,7 +20,8 @@ const FavoritesCategoryList = ({
           <ToSeeButton nav="favorite-feed" />
         </div>
         {favoritesPosts.length === 0 ? (
-          <div className="gap-[36px]">
+          <div className="flex flex-col gap-[20px]">
+            <div></div>
             <div className="body4 text-[#999]">
               즐겨찾기한 카테고리가 없습니다.
             </div>
