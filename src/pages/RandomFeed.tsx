@@ -13,7 +13,7 @@ const mockPosts = [
     likes: 9,
     comments: 3,
     views: 120,
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    status: "극복 중"
+    status: "극복 중",
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    status: "극복 완료"
+    status: "극복 완료",
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const mockPosts = [
     likes: 10,
     comments: 5,
     views: 200,
-    status: "웁스 중"
+    status: "웁스 중",
   },
   {
     id: 5,
@@ -52,7 +52,7 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    status: "극복 중"
+    status: "극복 중",
   },
   {
     id: 6,
@@ -62,15 +62,17 @@ const mockPosts = [
     likes: 23,
     comments: 7,
     views: 127,
-    status: "극복 완료"
-  }
+    status: "극복 완료",
+  },
 ];
 
 const RandomFeed = () => {
   const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState("웁스 중");
 
-  const filteredPosts = mockPosts.filter((post) => post.status === selectedStatus);
+  const filteredPosts = mockPosts.filter(
+    (post) => post.status === selectedStatus
+  );
 
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
@@ -89,7 +91,7 @@ const RandomFeed = () => {
       <div className="flex flex-col gap-[12px]">
         {filteredPosts.map((post) => (
           <PostCard
-            key={post.id}
+            postId={post.id}
             title={post.title}
             content={post.content}
             imageUrl={post.imageUrl}
