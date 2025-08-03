@@ -34,7 +34,7 @@ const LuckyDraw = () => {
         }, 600);
       }, 500);
     } catch (e: any) {
-      console.error("❌ 오류 발생:", e.response?.data || e.message);
+      console.error(" 오류 발생:", e.response?.data || e.message);
       alert("부적 뽑기 실패!");
       setForceStop(false);
     }

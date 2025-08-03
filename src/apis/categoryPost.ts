@@ -1,7 +1,7 @@
 import { axiosInstance } from "./axios";
-import type { ResponseCategoryPostListDTO } from "../types/post"; 
+import type { ResponseCategoryPostListDTO } from "../types/post";
 
-// 카테고리별 게시글 리스트 조회
+//  카테고리별 게시글 리스트 조회
 export const getPostListByCategoryId = async (
   categoryId: number,
   situation: string,
@@ -9,7 +9,7 @@ export const getPostListByCategoryId = async (
   limit: number = 10
 ): Promise<ResponseCategoryPostListDTO> => {
   const { data } = await axiosInstance.get(
-    `/feeds/categories/${categoryId}/all`, 
+    `/feeds/categories/${categoryId}/all`,
     {
       params: { situation, page, limit },
     }
@@ -17,6 +17,14 @@ export const getPostListByCategoryId = async (
   return data;
 };
 
-
-
-
+//  즐겨찾기한 카테고리 게시글 리스트 조회
+export const getBookmarkedPosts = async (
+  situation: string,
+  page: number = 0,
+  limit: number = 10
+) => {
+  const { data } = await axiosInstance.get(`/api/feeds/bookmarked/all`, {
+    params: { situation, page, limit },
+  });
+  return data;
+};

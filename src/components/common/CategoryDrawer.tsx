@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Star from "../../assets/icons/star_empty.svg?react";
 import StarFilled from "../../assets/icons/star_filled.svg?react";
@@ -6,44 +6,47 @@ import CloseButton from "../../assets/icons/X.svg?react";
 import {
   favoriteCategory,
   unfavoriteCategory,
+  getAllCategories, 
 } from "../../apis/categoryApi";
-import type { CustomAxiosError } from "../../types/AxiosError"; // axios 에러 타입 정의
+import type { CustomAxiosError } from "../../types/AxiosError";
 
 interface Props {
   onClose: () => void;
 }
 
-const categoryList = [
-  { id: 1, key: "daily", name: "일상", active: false },
-  { id: 2, key: "love", name: "연애", active: false },
-  { id: 3, key: "relationship", name: "인간관계", active: false },
-  { id: 4, key: "stock", name: "주식/투자", active: false },
-  { id: 5, key: "school", name: "학교생활", active: false },
-  { id: 6, key: "work", name: "회사생활", active: false },
-  { id: 7, key: "career", name: "진로", active: false },
-  { id: 8, key: "startup", name: "창업", active: false },
-  { id: 9, key: "college", name: "대입/입시", active: false },
-  { id: 10, key: "job", name: "취업/자격증", active: false },
-  { id: 11, key: "marriage", name: "결혼", active: false },
-  { id: 12, key: "travel", name: "여행", active: false },
-  { id: 13, key: "realestate", name: "부동산", active: false },
-  { id: 14, key: "mental", name: "정신 건강", active: false },
-  { id: 15, key: "free", name: "자유", active: false },
-];
+interface Category {
+  id: number;
+  key: string;
+  name: string;
+  active: boolean;
+}
 
 const CategoryDrawer = ({ onClose }: Props) => {
-  const [categories, setCategories] = useState(categoryList);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  const goToCategory = (name: string) => {
+  //  서버에서 전체 카테고리 조회
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const result = await getAllCategories();
+        setCategories(result); 
+      } catch (err) {
+        console.error("카테고리 불러오기 실패:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const goToCategory = (key: string) => {
     window.scrollTo(0, 0);
-    navigate(`/category-feed/${name}`);
+    navigate(`/category-feed/${key}`);
     onClose();
   };
 
   const toggleStar = async (id: number, name: string, isActive: boolean) => {
-    // UI 먼저 반영
     const updated = categories.map((cat) =>
       cat.name === name ? { ...cat, active: !cat.active } : cat
     );
@@ -52,22 +55,22 @@ const CategoryDrawer = ({ onClose }: Props) => {
     try {
       if (isActive) {
         await unfavoriteCategory(id);
-        console.log(`즐겨찾기 해제 완료: ${id}`);
+        console.log(`즐겨찾기 해제: ${id}`);
       } else {
         await favoriteCategory(id);
-        console.log(`즐겨찾기 등록 완료: ${id}`);
+        console.log(`즐겨찾기 등록: ${id}`);
       }
     } catch (error) {
       const err = error as CustomAxiosError;
       const errorCode = err.response?.data?.code;
 
       if (errorCode === "CATEGORY400") {
-        console.warn("이미 등록된 카테고리입니다. 무시합니다.");
+        console.warn("이미 등록된 카테고리입니다.");
         return;
       }
 
-      console.error("즐겨찾기 처리 실패:", err.response?.data || err.message);
-      alert("즐겨찾기 요청 중 오류가 발생했습니다.");
+      console.error("즐겨찾기 실패:", err.response?.data || err.message);
+      alert("즐겨찾기 중 오류가 발생했습니다.");
     }
   };
 
