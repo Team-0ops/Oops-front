@@ -5,10 +5,13 @@ import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
 
 import CommentList from "../components/comment/CommentList";
+import FeedbackView from "../components/modals/FeedbackView";
 import Report from "../components/modals/Report";
 import type { ReportTarget } from "../components/modals/Report";
 import { usePostDetail } from "../hooks/PostPage/usePostDetail";
 import { submitComment } from "../hooks/PostPage/useSubmitComment";
+import { useCheer } from "../hooks/PostPage/useCheer";
+import { getLesson } from "../hooks/PostPage/useGetLesson";
 
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -34,15 +37,22 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
 const PostDetail = () => {
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
-  const { postDetail, loading } = usePostDetail(Number(postId));
-
+  //api 관련 훅
+  const { postDetail, loading, fetchPostDetail } = usePostDetail(
+    Number(postId)
+  );
+  const { toggleCheer, isCheered } = useCheer();
+  //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showLessonView, setShowLessonView] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [isLessonWritten, setIsLessonWritten] = useState(false);
 
+  // 슬라이드 관련 ref
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
+  // 슬라이드전환시 현재 동작중인 페이지 알려주기 위함
   const [activeIndex, setActiveIndex] = useState(0);
-
   // 댓글 입력 상태
   const [commentInput, setCommentInput] = useState("");
 
@@ -50,10 +60,9 @@ const PostDetail = () => {
   const [localComments, setLocalComments] = useState<any[]>([]);
 
   // SITUATION_ORDER 순서대로 post 배열 만들기
-  const posts = SITUATION_ORDER.map((key) =>
-    postDetail ? postDetail[key] : null
+  const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
+    (p): p is NonNullable<typeof p> => !!p
   );
-
   // Swiper 이동 핸들러
   const handleSlideChange = (index: number) => {
     setActiveIndex(index);
@@ -61,13 +70,11 @@ const PostDetail = () => {
     contentSwiperRef.current?.slideTo(index);
 
     // 슬라이드시에 url 변경
-    const nextPostId = posts[index]?.postId;
-    if (nextPostId) {
-      navigate(`/post/${nextPostId}`, { replace: false });
-    }
+    const nextPostId = validPosts[index]?.postId;
+    if (nextPostId) navigate(`/post/${nextPostId}`, { replace: false });
   };
   // 현재 활성화된 게시글 및 댓글
-  const currentPost = posts[activeIndex];
+  const currentPost = validPosts[activeIndex];
   const currentPostId = currentPost?.postId;
   const currentComments =
     (currentPost?.comments ?? []).map((comment: any) => ({
@@ -78,6 +85,22 @@ const PostDetail = () => {
       createdAt: comment.createdAt,
       parentId: comment.parentId,
     })) || [];
+
+    //작성된 교훈이 있는지 없는지 확인 
+  useEffect(() => {
+    const checkLessonExists = async () => {
+      if (!currentPostId) return;
+      try {
+        const result = await getLesson(currentPostId);
+        if (result) setIsLessonWritten(true);
+      } catch (e) {
+        setIsLessonWritten(false);
+        console.log("교훈이 아직 없음");
+      }
+    };
+
+    checkLessonExists();
+  }, [currentPostId]);
 
   // 슬라이드 변경시 localComments 동기화 (서버 데이터로 초기화)
   useEffect(() => {
@@ -145,9 +168,9 @@ const PostDetail = () => {
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
             className="w-full h-[50px]"
           >
-            {SITUATION_ORDER.map((key, index) => (
+            {validPosts.map((post, index) => (
               <SwiperSlide
-                key={key}
+                key={SITUATION_ORDER[index]}
                 className="!w-[80px] flex justify-center items-center"
                 style={{ flexShrink: 0 }}
               >
@@ -160,7 +183,7 @@ const PostDetail = () => {
               : "bg-[#E6E6E6] text-[#393939] opacity-40"
           }`}
                 >
-                  {SITUATION_LABEL[key]}
+                  {SITUATION_LABEL[SITUATION_ORDER[index]]}
                 </button>
               </SwiperSlide>
             ))}
@@ -175,7 +198,7 @@ const PostDetail = () => {
             spaceBetween={10}
             className="w-full"
           >
-            {posts.map((post, index) => (
+            {validPosts.map((post, index) => (
               <SwiperSlide
                 key={SITUATION_ORDER[index]}
                 className="flex justify-center items-center !w-[335px]"
@@ -193,12 +216,21 @@ const PostDetail = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-[4px]">
-                        <button
-                          className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                          onClick={() => setShowFeedbackModal(true)}
-                        >
-                          교훈 작성
-                        </button>
+                        {isLessonWritten ? (
+                          <button
+                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                            onClick={() => setShowLessonView(true)}
+                          >
+                            교훈 확인
+                          </button>
+                        ) : (
+                          <button
+                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                            onClick={() => setShowFeedbackModal(true)}
+                          >
+                            교훈 작성
+                          </button>
+                        )}
                         <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
                           <ReportIcon
                             className="w-full h-full"
@@ -216,7 +248,14 @@ const PostDetail = () => {
                   </div>
                   <div className="flex justify-between items-center w-full">
                     <div className="flex items-center">
-                      <Like className="w-[24px] h-[24px] cursor-pointer" />
+                      <button
+                        onClick={() =>
+                          currentPostId && toggleCheer(Number(post?.postId))
+                        }
+                        className="cursor-pointer"
+                      >
+                        <Like className="w-[24px] h-[24px] cursor-pointer" />
+                      </button>
                       <span className="caption2 text-[#666]">
                         응원해요 {post?.likes}
                       </span>
@@ -240,7 +279,7 @@ const PostDetail = () => {
           </Swiper>
           {/* 인디케이터 */}
           <div className="flex justify-center gap-[20px] mt-[18px]">
-            {SITUATION_ORDER.map((_, index) => (
+            {validPosts.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleSlideChange(index)}
@@ -286,6 +325,7 @@ const PostDetail = () => {
           <CommentList
             comments={localComments}
             postId={Number(currentPostId)}
+            onReload={fetchPostDetail}
           />
         </section>
 
@@ -361,6 +401,17 @@ const PostDetail = () => {
         <Feedback
           postId={Number(currentPostId)}
           onClose={() => setShowFeedbackModal(false)}
+          onSuccess={() => {
+            setIsLessonWritten(true);
+            setShowFeedbackModal(false);
+          }}
+        />
+      )}
+      {/* 교훈 확인 말풍선 */}
+      {showLessonView && currentPostId && (
+        <FeedbackView
+          postId={currentPostId}
+          onClose={() => setShowLessonView(false)}
         />
       )}
     </>

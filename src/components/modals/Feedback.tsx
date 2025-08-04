@@ -7,9 +7,11 @@ import { submitLesson } from "../../hooks/PostPage/useSubmitLesson";
 const Feedback = ({
   postId,
   onClose,
+  onSuccess,
 }: {
   postId: number;
   onClose: () => void;
+  onSuccess?: () => void;
 }) => {
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -43,15 +45,11 @@ const Feedback = ({
     );
   };
 
-  console.log("postId", postId);
-  console.log("title", title);
-  console.log("content", content);
-  console.log("tags", selectedTags);
-
   const handleSubmit = async () => {
     try {
       await submitLesson(postId, title, content, selectedTags);
       alert("교훈이 등록되었습니다!");
+      onSuccess?.();
       onClose();
     } catch (e) {
       alert("교훈 등록에 실패했습니다.");

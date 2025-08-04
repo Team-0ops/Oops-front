@@ -4,9 +4,10 @@ import CommentItem from "./CommentItem";
 interface CommentListProps {
   comments: Comment[];
   postId: number;
+  onReload: () => void;
 }
 
-const CommentList = ({ comments, postId }: CommentListProps) => {
+const CommentList = ({ comments, postId, onReload }: CommentListProps) => {
   if (comments.length === 0) {
     return (
       <div className="text-center text-[#999999] caption3 py-[20px]">
@@ -19,15 +20,18 @@ const CommentList = ({ comments, postId }: CommentListProps) => {
   const parentComments = comments.filter((c) => !c.parentId);
 
   // 2. 특정 부모댓글의 대댓글 반환 함수
-  const getReplies = (parentId:string|null) =>
-    comments.filter((c) => c.parentId === parentId);
- 
+  const getReplies = (parentId: string | null) =>
+    comments.filter((c) => Number(c.parentId) === Number(parentId));
   return (
     <div>
       {parentComments.map((comment) => (
         <div key={comment.id}>
           {/* 일반 댓글 */}
-          <CommentItem comment={comment} postId={postId} />
+          <CommentItem
+            comment={comment}
+            postId={postId}
+            // onReload={onReload}
+          />
 
           {/* 대댓글 */}
           {getReplies(comment.id).map((reply) => (
@@ -35,6 +39,7 @@ const CommentList = ({ comments, postId }: CommentListProps) => {
               key={reply.id}
               comment={reply}
               postId={postId}
+              // onReload={onReload}
               isReply // 대댓글임을 표시
             />
           ))}

@@ -14,9 +14,15 @@ interface CommentProps {
   comment: Comment;
   postId: number;
   isReply?: boolean;
+  // onReload: () => void
 }
 
-const CommentItem = ({ comment, postId, isReply = false }: CommentProps) => {
+const CommentItem = ({
+  comment,
+  postId,
+  isReply = false,
+  // onReload
+}: CommentProps) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -24,7 +30,6 @@ const CommentItem = ({ comment, postId, isReply = false }: CommentProps) => {
   const [selectedReply, setSelectedReply] = useState<Comment | null>(null);
 
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replies, setReplies] = useState<Comment[]>([]);
 
   const formatRelativeTime = (createdAt: string) => {
     const now = new Date();
@@ -58,6 +63,7 @@ const CommentItem = ({ comment, postId, isReply = false }: CommentProps) => {
       // 대댓글 새로고침 or 추가 로직
       console.log("대댓글 성공", comment.id);
       setShowReplyForm(false); // 작성 후 폼 닫기
+      // onReload();
     } catch (e) {
       console.log("대댓글 작성 실패!");
       throw e;

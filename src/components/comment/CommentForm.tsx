@@ -10,7 +10,7 @@ interface CommentFormProps {
 const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps) => {
   const [reply, setReply] = useState("");
 
-  console.log(parentId)
+  console.log(parentId, postId)
   const handleSubmit = () => {
     if (reply.trim() === "") return;
     onSubmit(reply);
