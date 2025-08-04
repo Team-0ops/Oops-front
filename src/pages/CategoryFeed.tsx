@@ -284,6 +284,7 @@ const CategoryFeed = () => {
       <div className="flex flex-col gap-[12px] mt-[16px]">
         {filteredPosts.map((post) => (
           <PostCard
+            key={post.id}
             postId={post.id}
             title={post.title}
             content={post.content}

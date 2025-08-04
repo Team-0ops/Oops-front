@@ -60,7 +60,7 @@ const PostDetail = () => {
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
 
- // 슬라이드시에 url 변경   
+    // 슬라이드시에 url 변경
     const nextPostId = posts[index]?.postId;
     if (nextPostId) {
       navigate(`/post/${nextPostId}`, { replace: false });
@@ -103,7 +103,7 @@ const PostDetail = () => {
     try {
       await submitComment(Number(currentPostId), commentInput, null);
       // 성공하면 별도 동작 X useEffect에서 서버 데이터로 덮어쓰기
-      console.log("댓글 작성 성공!")
+      console.log("댓글 작성 성공!");
     } catch (e) {
       // 에러 시 localComments에서 제거
       setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
@@ -136,7 +136,7 @@ const PostDetail = () => {
         </div>
 
         {/* 첫번째 섹션 게시글 */}
-        <section className="w-full ">
+        <section className="w-screen -mx-[20px]  ">
           <Swiper
             slidesPerView="auto"
             centeredSlides={true}
@@ -170,15 +170,15 @@ const PostDetail = () => {
           <Swiper
             onSwiper={(swiper) => (contentSwiperRef.current = swiper)}
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
-            slidesPerView={1.2}
-            centeredSlides
-            spaceBetween={20}
+            slidesPerView={"auto"}
+            centeredSlides={true}
+            spaceBetween={10}
             className="w-full"
           >
             {posts.map((post, index) => (
               <SwiperSlide
                 key={SITUATION_ORDER[index]}
-                className="flex justify-center items-center w-full"
+                className="flex justify-center items-center !w-[335px]"
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
                   <div className="flex">

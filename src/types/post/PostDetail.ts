@@ -1,3 +1,5 @@
+import type { CommonResponse } from "../common";
+
 export interface Category {
   categoryId: number;
   name: string;
@@ -31,9 +33,4 @@ export interface DetailResultType {
   postOvercome: PostDetail | null;
 }
 
-export interface ServerResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: DetailResultType;
-}
+export type PostDetailResponse = CommonResponse<DetailResultType>;

@@ -83,6 +83,7 @@ const BestFeed = () => {
       <div className="flex flex-col gap-[12px]">
         {mockPosts.map((post) => (
           <PostCard
+           key={post.id}
             postId={post.id}
             title={post.title}
             content={post.content}
