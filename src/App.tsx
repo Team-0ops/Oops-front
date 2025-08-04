@@ -54,7 +54,7 @@ function App() {
         { index: true, element: <MainPage /> },
         { path: "category-feed/:categoryName", element: <CategoryFeed /> },
         { path: "favorite-feed", element: <FavoriteFeed /> },
-        { path: "random-feed", element: <RandomFeed /> },
+        { path: "random-feed/:topicId", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
         { path: "postsuccess", element: <PostSuccess /> },
