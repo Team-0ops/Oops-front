@@ -3,14 +3,17 @@ import LeftArrow from "../../assets/icons/left-point.svg?react";
 import CardFlip from "./CardFlip";
 import FullResultCard from "./FullResultCard";
 import { useNavigate } from "react-router-dom";
-import { requestLuckyDraw } from "./luckyDrawApi";
+import { requestLuckyDraw } from "../../apis/luckyDrawApi";
+import type { LuckyCard } from "../../types/lucky";
+import { AxiosError } from "axios";
+import type { CustomAxiosError } from "../../types/AxiosError";
 
 const LuckyDraw = () => {
   const [forceStop, setForceStop] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showFullCard, setShowFullCard] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [selectedCard, setSelectedCard] = useState<LuckyCard | null>(null);
   const navigate = useNavigate();
 
   const handleDrawClick = async () => {
@@ -31,13 +34,23 @@ const LuckyDraw = () => {
         setShowResult(true);
         setTimeout(() => {
           setShowFullCard(true);
-        }, 600);
+        }, 1500);
       }, 500);
-    } catch (e: any) {
-      console.error(" 오류 발생:", e.response?.data || e.message);
-      alert("부적 뽑기 실패!");
-      setForceStop(false);
-    }
+    } catch (e: unknown) {
+  if ((e as AxiosError).isAxiosError) {
+    const axiosError = e as CustomAxiosError;
+    const serverMessage = axiosError.response?.data?.message;
+
+    console.error("오류 발생:", serverMessage || axiosError.message);
+  } else if (e instanceof Error) {
+    console.error("오류 발생:", e.message);
+  } else {
+    console.error("알 수 없는 오류", e);
+  }
+
+  alert("부적 뽑기 실패!");
+  setForceStop(false);
+}
   };
 
   return (
@@ -45,7 +58,7 @@ const LuckyDraw = () => {
       {showFullCard && (
         <FullResultCard
           onClose={() => setShowFullCard(false)}
-          card={selectedCard}
+          card={selectedCard!}
         />
       )}
 

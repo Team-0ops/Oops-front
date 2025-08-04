@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import Octo from "../../assets/icons/LuckyDrawOcto.svg?react";
 import CloseBtn from "../../assets/icons/white_close.svg?react";
+import type { LuckyCard } from "../../types/lucky";
 
 interface FullResultCardProps {
   onClose: () => void;
+  card: LuckyCard;
 }
 
 const FullResultCard = ({ onClose }: FullResultCardProps) => {
