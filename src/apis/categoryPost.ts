@@ -8,13 +8,12 @@ import type { PostStatus } from "../components/FeedPage/PostStatusTab";
 
 //랜덤 카테고리 게시글 리스트 조회 
 export const getRandomTopicPosts = async (
-  topicId: number,
   situation: PostStatus,
   page = 0,
   limit = 10
 ) => {
   const response = await axiosInstance.get(
-    `/feeds/randomTopic/${topicId}/current/all`,
+    `/feeds/randomTopic/current/all`,
     {
       params: { situation, page, limit },
     }
