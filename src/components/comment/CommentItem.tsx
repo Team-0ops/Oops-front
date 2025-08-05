@@ -89,11 +89,13 @@ const CommentItem = ({
             </span>
           </div>
 
-          <div className="flex justify-between items-center mt-[12px] mr-[36px]">
+          <div
+            className={`flex items-center mt-[12px] ${isReply ? "" : "mr-[36px]"}`}
+          >
             <span className="caption3 text-[#b3b3b3]">
               {formatRelativeTime(comment.createdAt)}
             </span>
-            <div className="flex justify-center gap-[4px]">
+            <div className="flex gap-[4px] ml-auto">
               <button
                 className="flex items-center bg-none border-none p-0 cursor-pointer"
                 onClick={handleLikeClick}
@@ -109,12 +111,15 @@ const CommentItem = ({
               >
                 {likeCount > 0 ? likeCount : "공감"}
               </p>
-              <div className="flex justify-center gap-[4px] ml-[18px]">
-                <GrayComment className="w-[14px] h-[14px]" />
-                <button onClick={() => setShowReplyForm(!showReplyForm)}>
-                  <p className="caption3 text-[#b3b3b3]">대댓글 달기</p>
-                </button>
-              </div>
+              {/* 일반 댓글만 대댓글달기 버튼 */}
+              {!isReply && (
+                <div className="flex justify-center gap-[4px] ml-[18px]">
+                  <GrayComment className="w-[14px] h-[14px]" />
+                  <button onClick={() => setShowReplyForm(!showReplyForm)}>
+                    <p className="caption3 text-[#b3b3b3]">대댓글 달기</p>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

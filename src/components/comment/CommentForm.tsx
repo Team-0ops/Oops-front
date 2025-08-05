@@ -19,9 +19,11 @@ const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps)
 
   return (
     <div className="ml-[34px]">
-      <div className="w-full flex flex-col pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
+      <div className="w-full flex flex-col gap-[10px] pl-[32px] pr-[20px] py-[13px] bg-[#fbf3ec] border-[1px] border-[#f0e7e0]">
+        <div className="flex flex-col justify-start gap-[4px]">
+          <span className="body5 text-[#808080]">닉네임</span>
         <textarea
-          className="caption1 break-words w-full min-h-[30px] resize-none bg-transparent border-none outline-none whitespace-pre-wrap overflow-hidden"
+          className="body5 placeholder:text-[#1d1d1d] placeholder: text-[#1d1d1d] break-words w-full min-h-[20px] resize-none bg-transparent border-none outline-none whitespace-pre-wrap overflow-hidden"
           placeholder="답글을 입력하세요..."
           value={reply}
           onChange={(e) => {
@@ -31,15 +33,18 @@ const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps)
           }}
           rows={1}
         />
-        <div className="mt-[8px] flex gap-2">
+        </div>
+        <div className="flex justify-end gap-[8px]">
           <button
-            onClick={handleSubmit}
-            className="px-4 py-1 bg-black text-white rounded"
+            onClick={onCancel}
+            className="caption1 bg-[#999] px-2 flex justify-center items-center h-[30px] text-white rounded-[4px]"
           >
-            작성
+            작성 취소
           </button>
-          <button onClick={onCancel} className="px-4 py-1 bg-[#eee] rounded">
-            취소
+          <button 
+          onClick={handleSubmit} 
+          className="caption1 bg-[#1d1d1d] w-[50px] px-2 flex justify-center items-center h-[30px] text-white rounded-[4px]">
+            작성
           </button>
         </div>
       </div>

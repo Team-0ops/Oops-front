@@ -3,6 +3,7 @@ import LeftIcon from "../assets/icons/left-point.svg?react";
 import Like from "../assets/icons/majesticons_heart.svg?react";
 import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
+import RedLike from "../assets/icons/RedLike.svg?react";
 
 import CommentList from "../components/comment/CommentList";
 import FeedbackView from "../components/modals/FeedbackView";
@@ -86,7 +87,7 @@ const PostDetail = () => {
       parentId: comment.parentId,
     })) || [];
 
-    //작성된 교훈이 있는지 없는지 확인 
+  //작성된 교훈이 있는지 없는지 확인
   useEffect(() => {
     const checkLessonExists = async () => {
       if (!currentPostId) return;
@@ -205,7 +206,7 @@ const PostDetail = () => {
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
                   <div className="flex">
-                    <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
+                    <div className="w-[42px] h-[42px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
                     <div className="flex justify-between w-full items-center">
                       <div className="flex flex-col gap-[4px]">
                         <span className="body2 text-[#1d1d1d]">
@@ -247,26 +248,30 @@ const PostDetail = () => {
                     {post?.content}
                   </div>
                   <div className="flex justify-between items-center w-full">
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-[4px]">
                       <button
                         onClick={() =>
                           currentPostId && toggleCheer(Number(post?.postId))
                         }
                         className="cursor-pointer"
                       >
-                        <Like className="w-[24px] h-[24px] cursor-pointer" />
+                        {isCheered(Number(post.postId)) ? (
+                          <RedLike className="w-[24px] h-[24px] cursor-pointer" />
+                        ) : (
+                          <Like className="w-[24px] h-[24px] cursor-pointer" />
+                        )}
                       </button>
                       <span className="caption2 text-[#666]">
                         응원해요 {post?.likes}
                       </span>
                     </div>
-                    <div className="flex items-center ">
+                    <div className="flex items-center gap-[4px] ">
                       <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
                       <span className="caption2 text-[#666]">
                         댓글 {post?.comments.length}
                       </span>
                     </div>
-                    <div className="flex items-center ">
+                    <div className="flex items-center gap-[4px] ">
                       <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
                       <span className="caption2 text-[#666]">
                         조회수 {post?.watching}
@@ -296,7 +301,7 @@ const PostDetail = () => {
           <div className="body2 w-full flex justify-start items-start">
             댓글로 조언 남기기
           </div>
-          <div className="flex justify-between w-full items-center gap-[13px]">
+          <div className="flex w-full items-center justify-between gap-[13px]">
             <input
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
@@ -306,7 +311,7 @@ const PostDetail = () => {
               placeholder="[조언]을 입력해주세요!"
               className="
               body5 placeholder:body5 
-              p-[9px] w-[70%] 
+              p-[9px] w-[256px]
               border-[1px] border-[#8f8f8f] rounded-[4px]"
             />
 

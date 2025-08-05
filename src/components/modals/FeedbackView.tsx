@@ -7,26 +7,32 @@ interface FeedbackViewProps {
 
 const FeedbackView = ({ postId, onClose }: FeedbackViewProps) => {
   const { lesson } = useGetLesson(postId);
-  console.log(postId)
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={onClose}
     >
       <div
-        className="bg-white w-[320px] rounded-[10px] px-[20px] py-[16px] shadow"
+        className="absolute right-[70px] top-[220px] 
+        bg-[#b3e378] w-[165px] rounded-[4px] border-[1px] border-solid border-[#9bd654]
+        px-[13px] py-[10px]"
+        style={{
+          boxShadow: "inset 0px 0px 10.5px 0px rgba(162, 226, 86, 0.25)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="body2 mb-[8px]">📘 교훈 보기</div>
-        <div className="caption1 font-bold">{lesson?.title}</div>
-        <div className="caption2 mt-[4px]">{lesson?.content}</div>
-        <div className="flex gap-[6px] mt-[8px] flex-wrap">
+        <div className="flex flex-col gap-[6px] mr-[29px] mb-[4px]">
+          <span className="body4">{lesson?.title}</span>
+          <span className="caption1 text-[#4d4d4d] mt-[4px]">{lesson?.content}</span>
+        </div>
+        <div className="flex justify-end gap-[6px] flex-wrap">
           {lesson?.tagNames?.map((tag) => (
             <span
               key={tag}
-              className="caption3 bg-[#999] text-white px-[6px] py-[2px] rounded"
+              className="caption1 text-[#fff] h-[20px] bg-[#1d1d1d] rounded-[4px] py-[3px] px-[7px]"
             >
-              #{tag}
+              {tag}
             </span>
           ))}
         </div>

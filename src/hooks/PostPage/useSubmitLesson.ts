@@ -17,6 +17,7 @@ export async function submitLesson(
     return response.data;
   } catch (error) {
     console.log("에러발생")
+    console.error("에러",error);
     throw error;
   }
 }
