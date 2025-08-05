@@ -12,7 +12,9 @@ const CategoryList = ({ categoryPosts }: CategoryListProps) => {
           <h1 className="h2 flex">카테고리 목록</h1>
         </div>
         {categoryPosts?.map((post) => (
-          <EachCategoryCard post={post} />
+          <EachCategoryCard 
+          key={post.postId}
+          post={post} />
         ))}
       </div>
     </>

@@ -16,6 +16,7 @@ const BestFailerList = ({ bestPosts }: BestFailerListProps) => {
         <div className="flex flex-col w-full justify-center items-center gap-[16px]">
           {bestPosts?.map((post) => (
             <PostCard
+              key={post.postId}
               postId={post.postId}
               title={post.title}
               content={post.content}

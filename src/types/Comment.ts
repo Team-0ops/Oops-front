@@ -1,7 +1,8 @@
 export interface Comment {
-  type: "post" | "comment";
-  id: string;
-  author: string;
+  id: string;            // commentId를 string으로 변환
   content: string;
-  createdAt: string; // ISO 문자열 또는 '3월 1일 18:09' 형식
+  author: string;        // userId 대신 닉네임 등
+  likes: number;
+  createdAt: string;
+  parentId: string | null;
 }

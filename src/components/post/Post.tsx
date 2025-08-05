@@ -1,4 +1,4 @@
-import type { PreviousPost } from "../../hooks/usePreviousPosts";
+import type { PreviousPost } from "../../hooks/PostPage/usePreviousPosts";
 
 interface PostProps {
   post: PreviousPost

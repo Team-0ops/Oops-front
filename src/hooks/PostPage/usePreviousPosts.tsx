@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {axiosInstance} from "../apis/axios";
+import {axiosInstance} from "../../apis/axios";
 
 export interface PreviousPost {
   postId: number;
