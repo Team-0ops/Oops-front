@@ -24,7 +24,7 @@ const PostCard = ({
   const navigate = useNavigate();
   return (
     <div
-      onClick={(): void | Promise<void> => navigate(`post/${postId}`)}
+      onClick={(): void | Promise<void> => navigate(`/post/${postId}`)}
       className=" relative w-full lex px-[12px] py-[10px] bg-[#F0E7E0] rounded-[10px] h-[85px]"
     >
       <div>
