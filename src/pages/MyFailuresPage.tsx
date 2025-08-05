@@ -80,6 +80,7 @@ export default function MyFailuresPage() {
         {filtered.map((p) => (
           <PostCard
             key={p.id}
+            postId={p.id}
             title={p.title}
             content={p.content}
             likes={p.likes}

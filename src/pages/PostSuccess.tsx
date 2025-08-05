@@ -2,16 +2,24 @@ import Logo from "../assets/icons/newLogo.svg?react";
 
 import { useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const PostSuccess = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const postId = location.state?.postId;
+
+  const goToDetail = () => {
+    if (!postId) return alert("방금 작성한 게시글이 없습니다.");
+    navigate(`/post/${postId}`);
+  };
+  
   const handleMain = () => {
     navigate("/");
   };
 
   useEffect(() => {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }, []);
 
   return (
@@ -27,7 +35,10 @@ const PostSuccess = () => {
           </div>
           {/* 버튼 */}
           <div className="flex justify-center items-center mb-[10px] mt-[60px]">
-            <button className="body4 bg-[#B3E378] cursor-pointer w-[335px] h-[50px] rounded-[4px] ">
+            <button
+              onClick={goToDetail}
+              className="body4 bg-[#B3E378] cursor-pointer w-[335px] h-[50px] rounded-[4px] "
+            >
               방금 작성한 게시글 보러가기
             </button>
           </div>
@@ -44,8 +55,10 @@ const PostSuccess = () => {
 
         {/* 두번째 섹션 */}
         {/* 추천 글 */}
-        <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen
-         mb-[20px]">
+        <section
+          className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen
+         mb-[20px]"
+        >
           {/* 추천 글을 여기다 끌어오면 됨 */}
 
           {/* 주제 */}
