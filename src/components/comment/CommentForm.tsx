@@ -1,13 +1,16 @@
 import { useState } from "react";
 
 interface CommentFormProps {
+  postId: number;
+  parentId: string|null;
   onSubmit: (reply: string) => void;
   onCancel: () => void;
 }
 
-const CommentForm = ({ onSubmit, onCancel }: CommentFormProps) => {
+const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps) => {
   const [reply, setReply] = useState("");
 
+  console.log(parentId, postId)
   const handleSubmit = () => {
     if (reply.trim() === "") return;
     onSubmit(reply);

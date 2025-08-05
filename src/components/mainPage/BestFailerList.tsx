@@ -17,6 +17,7 @@ const BestFailerList = ({ bestPosts }: BestFailerListProps) => {
           {bestPosts?.map((post) => (
             <PostCard
               key={post.postId}
+              postId={post.postId}
               title={post.title}
               content={post.content}
               imageUrl={post.image ?? "null"} // null이면 기본 이미지

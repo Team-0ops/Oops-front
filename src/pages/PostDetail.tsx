@@ -5,68 +5,143 @@ import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
 
 import CommentList from "../components/comment/CommentList";
-import type { Comment } from "../types/Comment";
+import FeedbackView from "../components/modals/FeedbackView";
 import Report from "../components/modals/Report";
 import type { ReportTarget } from "../components/modals/Report";
+import { usePostDetail } from "../hooks/PostPage/usePostDetail";
+import { submitComment } from "../hooks/PostPage/useSubmitComment";
+import { useCheer } from "../hooks/PostPage/useCheer";
+import { getLesson } from "../hooks/PostPage/useGetLesson";
 
-import { useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useNavigate } from "react-router-dom";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/pagination";
 import Feedback from "../components/modals/Feedback";
 
+const SITUATION_ORDER = [
+  "postFailure",
+  "postOvercoming",
+  "postOvercome",
+] as const;
+
+const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
+  postFailure: "웁스 중",
+  postOvercoming: "극복 중",
+  postOvercome: "극복 완료",
+};
+
 const PostDetail = () => {
-  //교훈 작성 모달
+  const navigate = useNavigate();
+  const { postId } = useParams<{ postId: string }>();
+  //api 관련 훅
+  const { postDetail, loading, fetchPostDetail } = usePostDetail(
+    Number(postId)
+  );
+  const { toggleCheer, isCheered } = useCheer();
+  //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  //게시글 신고 모달
+  const [showLessonView, setShowLessonView] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  // swiper 상태관리
+  const [isLessonWritten, setIsLessonWritten] = useState(false);
+
+  // 슬라이드 관련 ref
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
+  // 슬라이드전환시 현재 동작중인 페이지 알려주기 위함
   const [activeIndex, setActiveIndex] = useState(0);
-
-  // 댓글 관리 로직
+  // 댓글 입력 상태
   const [commentInput, setCommentInput] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
 
-  const handleAddComment = () => {
-    if (!commentInput.trim()) return;
+  // 로컬 댓글 상태 (Optimistic UI)
+  const [localComments, setLocalComments] = useState<any[]>([]);
 
-    const newComment: Comment = {
-      type: "comment",
-      id: Date.now().toString(),
-      author: "닉네임",
-      content: commentInput,
-      createdAt: new Date().toISOString(), // ISO 문자열로 저장
-    };
-
-    setComments((prev) => [...prev, newComment]);
-    setCommentInput(""); // 입력창 비우기
-  };
-
-  // 슬라이드 관련 로직
-  const states = ["웁스 중", "극복 중", "극복 완료"];
-
+  // SITUATION_ORDER 순서대로 post 배열 만들기
+  const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
+    (p): p is NonNullable<typeof p> => !!p
+  );
+  // Swiper 이동 핸들러
   const handleSlideChange = (index: number) => {
     setActiveIndex(index);
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
+
+    // 슬라이드시에 url 변경
+    const nextPostId = validPosts[index]?.postId;
+    if (nextPostId) navigate(`/post/${nextPostId}`, { replace: false });
+  };
+  // 현재 활성화된 게시글 및 댓글
+  const currentPost = validPosts[activeIndex];
+  const currentPostId = currentPost?.postId;
+  const currentComments =
+    (currentPost?.comments ?? []).map((comment: any) => ({
+      id: comment.commentId?.toString() ?? "",
+      content: comment.content,
+      author: (comment.nickname || comment.userId?.toString()) ?? "",
+      likes: comment.likes,
+      createdAt: comment.createdAt,
+      parentId: comment.parentId,
+    })) || [];
+
+    //작성된 교훈이 있는지 없는지 확인 
+  useEffect(() => {
+    const checkLessonExists = async () => {
+      if (!currentPostId) return;
+      try {
+        const result = await getLesson(currentPostId);
+        if (result) setIsLessonWritten(true);
+      } catch (e) {
+        setIsLessonWritten(false);
+        console.log("교훈이 아직 없음");
+      }
+    };
+
+    checkLessonExists();
+  }, [currentPostId]);
+
+  // 슬라이드 변경시 localComments 동기화 (서버 데이터로 초기화)
+  useEffect(() => {
+    setLocalComments(currentComments);
+  }, [activeIndex, postDetail]);
+
+  // 댓글 추가
+  const handleAddComment = async () => {
+    if (!commentInput.trim() || !currentPostId) return;
+
+    // localComments에 바로 추가
+    const newComment = {
+      id: Date.now().toString(), // 임시 id
+      content: commentInput,
+      author: "나", // 실제 로그인 사용자명으로 교체
+      likes: 0,
+      createdAt: new Date().toISOString(),
+      parentId: null,
+    };
+    setLocalComments((prev) => [newComment, ...prev]);
+    setCommentInput("");
+
+    try {
+      await submitComment(Number(currentPostId), commentInput, null);
+      // 성공하면 별도 동작 X useEffect에서 서버 데이터로 덮어쓰기
+      console.log("댓글 작성 성공!");
+    } catch (e) {
+      // 에러 시 localComments에서 제거
+      setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
+      alert("댓글 작성 실패!");
+    }
   };
 
-  // 본문 목데이터
-  const post = {
-    id: "1",
-    author: "작성자1",
-    content: "본문 내용1",
-  };
-
-  const reportTarget: ReportTarget = {
-    type: "post",
-    id: post.id,
-    author: post.author,
-    content: post.content,
-  };
+  // const reportTarget: ReportTarget = {
+  //   type: "post",
+  //   id: post.id,
+  //   author: post.author,
+  //   content: post.content,
+  // };
+  if (loading) return <div>로딩 중...</div>;
+  if (!postDetail) return <div>데이터 없음</div>;
 
   return (
     <>
@@ -80,11 +155,11 @@ const PostDetail = () => {
             "
         >
           <LeftIcon className="w-[24px] h-[24px]" />
-          진로 / 취업 카테고리
+          {postDetail.category.name}
         </div>
 
         {/* 첫번째 섹션 게시글 */}
-        <section className="w-full ">
+        <section className="w-screen -mx-[20px]  ">
           <Swiper
             slidesPerView="auto"
             centeredSlides={true}
@@ -93,17 +168,14 @@ const PostDetail = () => {
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
             className="w-full h-[50px]"
           >
-            {states.map((state, index) => (
+            {validPosts.map((post, index) => (
               <SwiperSlide
-                key={index}
+                key={SITUATION_ORDER[index]}
                 className="!w-[80px] flex justify-center items-center"
                 style={{ flexShrink: 0 }}
               >
                 <button
-                  onClick={() => {
-                    setActiveIndex(index); // 상태 업데이트
-                    buttonSwiperRef.current?.slideTo(index); // 이걸로 가운데로 이동!
-                  }}
+                  onClick={() => handleSlideChange(index)}
                   className={`body4 w-full py-[6px] h-[30px] rounded-[20px] transition 
           ${
             activeIndex === index
@@ -111,7 +183,7 @@ const PostDetail = () => {
               : "bg-[#E6E6E6] text-[#393939] opacity-40"
           }`}
                 >
-                  {state}
+                  {SITUATION_LABEL[SITUATION_ORDER[index]]}
                 </button>
               </SwiperSlide>
             ))}
@@ -121,128 +193,93 @@ const PostDetail = () => {
           <Swiper
             onSwiper={(swiper) => (contentSwiperRef.current = swiper)}
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
-            slidesPerView={1.2}
+            slidesPerView={"auto"}
             centeredSlides={true}
-            spaceBetween={20}
+            spaceBetween={10}
             className="w-full"
           >
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div
-                className=" w-full
-              p-[14px] rounded-[10px]
-            bg-[#f0e7e0] flex flex-col"
+            {validPosts.map((post, index) => (
+              <SwiperSlide
+                key={SITUATION_ORDER[index]}
+                className="flex justify-center items-center !w-[335px]"
               >
-                <div className="flex">
-                  <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
-                    </div>
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
-                      >
-                        교훈 작성
-                      </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
+                <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
+                  <div className="flex">
+                    <div className="w-[40px] h-[40px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
+                    <div className="flex justify-between w-full items-center">
+                      <div className="flex flex-col gap-[4px]">
+                        <span className="body2 text-[#1d1d1d]">
+                          {post ? post.nickname : "닉네임 없음"}
+                        </span>
+                        <span className="body5 text-[#999999]">
+                          {/* {post?.created_at.getTime()} */}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-[4px]">
+                        {isLessonWritten ? (
+                          <button
+                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                            onClick={() => setShowLessonView(true)}
+                          >
+                            교훈 확인
+                          </button>
+                        ) : (
+                          <button
+                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                            onClick={() => setShowFeedbackModal(true)}
+                          >
+                            교훈 작성
+                          </button>
+                        )}
+                        <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
+                          <ReportIcon
+                            className="w-full h-full"
+                            onClick={() => setShowReportModal(true)}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="body1 w-full mt-[20px] mb-[16px]">제목</div>
-                <div className="body5 w-full mb-[22px] text-[#4d4d4d]">
-                  첫 직무 면접이어서 준비만 죽어라 했는데 막상 가서는 말
-                  한마디도 제대로 못 함;; <br />
-                  질문 나오니까 머리가 하얘지고, 준비했던 것도 다 말아먹 음.
-                  말하면서도 내가 무슨 말 하는지 모르겠고, 괜히 시간 낭비했나
-                  싶더라ㅋㅋ <br /> 면접 끝나고 진짜 집 오는 길에 현타 씨게 옴…{" "}
-                  <br />
-                  다들 첫 면접은 그럴수잇다는데 그냥 아쉽네. .........
-                </div>
-                <div className="flex justify-between items-center w-full">
-                  <div className="flex items-center">
-                    <Like className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">응원해요 10</span>
+                  <div className="body1 w-full mt-[20px] mb-[16px]">
+                    {post?.title}
                   </div>
-                  <div className="flex items-center ">
-                    <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">댓글 5</span>
+                  <div className="body5 w-full mb-[22px] text-[#4d4d4d] break-words">
+                    {post?.content}
                   </div>
-                  <div className="flex items-center ">
-                    <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
-                    <span className="caption2 text-[#666]">조회수 200</span>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div
-                className=" w-full
-             h-[339px] p-[14px] rounded-[10px]
-            bg-[#f0e7e0]"
-              >
-                <div className="flex gap-[6px]">
-                  <div className="w-[42px] h-[42px] rounded-[4px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
-                    </div>
-                    <div className="flex items-center gap-[4px]">
+                  <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center">
                       <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
+                        onClick={() =>
+                          currentPostId && toggleCheer(Number(post?.postId))
+                        }
+                        className="cursor-pointer"
                       >
-                        교훈 작성
+                        <Like className="w-[24px] h-[24px] cursor-pointer" />
                       </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
-                      </div>
+                      <span className="caption2 text-[#666]">
+                        응원해요 {post?.likes}
+                      </span>
+                    </div>
+                    <div className="flex items-center ">
+                      <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <span className="caption2 text-[#666]">
+                        댓글 {post?.comments.length}
+                      </span>
+                    </div>
+                    <div className="flex items-center ">
+                      <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <span className="caption2 text-[#666]">
+                        조회수 {post?.watching}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide className="flex justify-center items-center w-full">
-              <div className=" w-full h-[339px] p-[14px] rounded-[10px] bg-[#f0e7e0]">
-                <div className="flex gap-[6px]">
-                  <div className="w-[42px] rounded-[4px] h-[42px] bg-[#9a9a9a]" />
-                  <div className="flex justify-between w-full items-center">
-                    <div className="flex flex-col gap-[4px]">
-                      <span className="body2 text-[#1d1d1d]">닉네임</span>
-                      <span className="body5 text-[#999999]">3일전</span>
-                    </div>
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                        onClick={() => setShowFeedbackModal(true)}
-                      >
-                        교훈 작성
-                      </button>
-                      <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                        <ReportIcon
-                          className="w-full h-full"
-                          onClick={() => setShowReportModal(true)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
+              </SwiperSlide>
+            ))}
           </Swiper>
           {/* 인디케이터 */}
           <div className="flex justify-center gap-[20px] mt-[18px]">
-            {states.map((_, index) => (
+            {validPosts.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleSlideChange(index)}
@@ -285,7 +322,11 @@ const PostDetail = () => {
 
         {/* 댓글 목록 */}
         <section className="mt-[20px] -mx-[20px] flex flex-col w-screen">
-          <CommentList comments={comments} />
+          <CommentList
+            comments={localComments}
+            postId={Number(currentPostId)}
+            onReload={fetchPostDetail}
+          />
         </section>
 
         {/* 카테고리 추천 글 */}
@@ -357,7 +398,21 @@ const PostDetail = () => {
         />
       )}
       {showFeedbackModal && (
-        <Feedback onClose={() => setShowFeedbackModal(false)} />
+        <Feedback
+          postId={Number(currentPostId)}
+          onClose={() => setShowFeedbackModal(false)}
+          onSuccess={() => {
+            setIsLessonWritten(true);
+            setShowFeedbackModal(false);
+          }}
+        />
+      )}
+      {/* 교훈 확인 말풍선 */}
+      {showLessonView && currentPostId && (
+        <FeedbackView
+          postId={currentPostId}
+          onClose={() => setShowLessonView(false)}
+        />
       )}
     </>
   );

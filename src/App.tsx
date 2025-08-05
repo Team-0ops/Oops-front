@@ -58,9 +58,8 @@ function App() {
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
         { path: "postsuccess", element: <PostSuccess /> },
-        { path: "postdetail", element: <PostDetail /> },
+        { path: "post/:postId", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
-        { path: "post", element: <PostWrite /> },
         { path: "fail-wiki", element: <FailWiki /> },
         {
           path: "/lucky-draw",

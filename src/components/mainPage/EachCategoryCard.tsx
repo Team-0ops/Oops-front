@@ -1,3 +1,4 @@
+import { categoryMap } from "../../types/common";
 import type { Post } from "../../types/post";
 import PostCard from "../common/PostCard";
 import ToSeeButton from "./ToSeeButton";
@@ -6,6 +7,10 @@ interface EachCategoryCardProps {
 }
 
 const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
+  const navKey = Object.keys(categoryMap).find(
+    (key) => categoryMap[key] === post.categoryName
+  );
+
   return (
     <>
       <div className="flex flex-col w-full gap-[8px]">
@@ -15,12 +20,13 @@ const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
             <span className="body4 text-[#1D1D1D]">{post?.categoryName}</span>
           </div>
 
-          {/* 카테고리 이름을 Props로 받아서 link 추가 예정 */}
-          <ToSeeButton nav="category-feed" />
+          <ToSeeButton
+            nav={navKey ? `category-feed/${navKey}` : "category-feed"}
+          />
         </div>
         <div className="flex justify-center items-center">
           <PostCard
-            key={post.postId}
+            postId={post.postId}
             title={post.title}
             content={post.content}
             imageUrl={post.image ?? "null"} // null이면 기본 이미지
