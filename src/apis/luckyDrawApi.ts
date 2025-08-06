@@ -1,6 +1,5 @@
-// luckyDrawApi.ts
-import axios from "axios";
-import { axiosInstance } from "../../apis/axios";
+
+import { axiosInstance } from "./axios";
 
 export const requestLuckyDraw = async () => {
 

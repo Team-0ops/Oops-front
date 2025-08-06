@@ -17,8 +17,8 @@ const PostStats = ({ likes, comments, views }: PostStatsProps) => {
       <span className="flex items-center gap-[4px]">
         <CommentIcon className="w-[14px] h-[14px]" /> {comments}
       </span>
-      <span className="flex items-center gap-[4px]">
-        <ViewIcon className="w-[14px] h-[14px]" /> {views}
+      <span className="flex items-center gap-[4px] text-[#4D4D4D]">
+        <ViewIcon className="w-[14px] h-[14px] " /> {views}
       </span>
     </div>
   );
