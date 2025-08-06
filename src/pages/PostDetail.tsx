@@ -155,7 +155,9 @@ const PostDetail = () => {
             my-[20px]
             "
         >
-          <LeftIcon className="w-[24px] h-[24px]" />
+          <button className="cursor-pointer" onClick={() => navigate(-1)}>
+            <LeftIcon className="w-[24px] h-[24px]" />
+          </button>
           {postDetail.category.name}
         </div>
 
