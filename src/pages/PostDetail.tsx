@@ -97,7 +97,7 @@ const PostDetail = () => {
       } catch (e) {
         setIsLessonWritten(false);
         console.log("교훈이 아직 없음");
-        throw (e)
+        throw e;
       }
     };
 
@@ -133,7 +133,7 @@ const PostDetail = () => {
       // 에러 시 localComments에서 제거
       setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
       alert("댓글 작성 실패!");
-      throw(e)
+      throw e;
     }
   };
 
@@ -407,7 +407,7 @@ const PostDetail = () => {
           comment={reportTarget}
         />
       )}
-      {showFeedbackModal && (
+      {showFeedbackModal && currentPost && (
         <Feedback
           postId={Number(currentPostId)}
           onClose={() => setShowFeedbackModal(false)}
@@ -415,6 +415,10 @@ const PostDetail = () => {
             setIsLessonWritten(true);
             setShowFeedbackModal(false);
           }}
+          category={postDetail?.category?.name || ""}
+          author={currentPost?.nickname || ""}
+          title={currentPost?.title || ""}
+          content={currentPost?.content || ""}
         />
       )}
       {/* 교훈 확인 말풍선 */}
