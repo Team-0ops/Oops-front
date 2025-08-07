@@ -63,9 +63,9 @@ export default function MyFailuresPage() {
   );
 
   return (
-    <section className="space-y-3 p-4">
+    <section className="space-y-2 px-4 pt-2 pb-4">
       {/* 상태 탭 */}
-      <div className="flex items-center gap-[10px]">
+      <div className="flex items-center gap-[6px]">
         <MyStatusTab value={tabStatus} onChange={setTabStatus} />
         {/* 카테고리 */}
         <CategoryDropdown

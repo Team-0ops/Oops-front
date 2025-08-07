@@ -76,10 +76,7 @@ export default function MyLessonsPage() {
         filteredLessons.length > 0 ? (
           <div className="flex flex-col gap-[12px] items-center">
             {filteredLessons.map((lesson) => (
-              <div
-                key={lesson.id}
-                className="flex flex-col items-center gap-[8px]"
-              >
+              <div key={lesson.id} className="flex flex-col items-center">
                 <div className="w-[335px] rounded-[10px] bg-[#F0E7E0] p-[10px_14px] flex justify-between items-start">
                   <div>
                     <h4 className="text-[14px] font-bold text-[#1D1D1D]">
@@ -95,7 +92,7 @@ export default function MyLessonsPage() {
                 </div>
 
                 {lesson.bestComment && (
-                  <div className="mt-[6px] ml-[16px] w-[297px] flex flex-col gap-[10px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[12px]">
+                  <div className="ml-[16px] w-[297px] flex flex-col gap-[10px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[12px]">
                     <div className="flex items-start justify-between">
                       <div className="flex gap-[8px]">
                         <span className="text-[16px]">↳</span>
