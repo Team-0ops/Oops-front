@@ -42,7 +42,9 @@ const RandomFeed = () => {
         <h2 className="text-[20px] font-semibold">{topicName}</h2>
         <button
           className="absolute right-[10px] text-[12px] text-[#B3E378] bg-[#262626] rounded-[8px] px-[9px] py-[8px]"
-          onClick={() => navigate("/post")}
+          onClick={() =>navigate("/post", {state: { topicName }, 
+  })
+}
         >
           '{topicName}' 주제로 글 작성하기
         </button>
