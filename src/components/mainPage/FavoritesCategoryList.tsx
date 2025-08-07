@@ -19,20 +19,29 @@ const FavoritesCategoryList = ({
           </div>
           <ToSeeButton nav="favorite-feed" />
         </div>
-        <div className="flex flex-col w-full justify-center items-center gap-[16px]">
-          {favoritesPosts?.map((post) => (
-            <PostCard
-              postId={post.postId}
-              title={post.title}
-              content={post.content}
-              imageUrl={post.image ?? "null"} // null이면 기본 이미지
-              likes={post.likes}
-              comments={post.comments}
-              views={post.views}
-              category={post.categoryName}
-            />
-          ))}
-        </div>
+        {favoritesPosts.length === 0 ? (
+          <div className="flex flex-col gap-[20px]">
+            <div></div>
+            <div className="body4 text-[#999]">
+              즐겨찾기한 카테고리가 없습니다.
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col w-full justify-center items-center gap-[12px]">
+            {favoritesPosts?.map((post) => (
+              <PostCard
+                postId={post.postId}
+                title={post.title}
+                content={post.content}
+                imageUrl={post.image ?? "null"} // null이면 기본 이미지
+                likes={post.likes}
+                comments={post.comments}
+                views={post.views}
+                category={post.categoryName}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

@@ -3,7 +3,8 @@ import WikiCategoryCard from "../components/FailWiki/WikiCategoryCard";
 import WikiHead from "../components/FailWiki/WikiHead";
 import WikiInput from "../components/FailWiki/WikiInput";
 import WikiKeyword from "../components/FailWiki/WikiKeyword";
-import WikiResult from "../components/FailWiki/WikiResult";
+import WikiBestFailerList from "../components/FailWiki/WikiBestFailerList";
+import WikiResultCard from "../components/FailWiki/WIkiResultCard";
 
 const FailWiki = () => {
   const [inputValue, setInputValue] = useState("");
@@ -25,9 +26,15 @@ const FailWiki = () => {
           </div>
           {inputValue ? (
             <>
-              <div>
-                <div>{/*빈 공간*/}</div>
-                <WikiResult />
+              <div>{/*빈 공간*/}</div>
+              <div className="flex flex-col w-full gap-[50px]">
+                <div className="flex flex-col w-full items-center justify-center gap-[20px]">
+                  <WikiResultCard />
+                  <div className="body5 text-[#999] px-[13px] py-[3px] rounded-[20px] border-[1px] border-[#B3B3B3] itmes-center ">
+                    관련 실패담 보러가기
+                  </div>
+                </div>
+                <WikiBestFailerList />
               </div>
             </>
           ) : (

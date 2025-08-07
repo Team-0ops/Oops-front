@@ -1,5 +1,6 @@
 //import axios from "axios";
 import instance from "../instance";
+import Cookies from "js-cookie";
 
 export const postSignup = async ({
   email,
@@ -32,6 +33,11 @@ export const postLogin = async ({
 
   const token = res.data.result;
   localStorage.setItem("accessToken", token);
+
+  Cookies.set("AccessToken", `Bearer+${token}`, {
+    path: "/",
+  });
+
   return res.data;
 };
 
