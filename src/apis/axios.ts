@@ -8,6 +8,7 @@ baseURL: "/api", // 프록시 경로 사용
 // 요청 전에 매번 토큰을 넣어주도록 인터셉터 설정
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
+ console.log(token)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

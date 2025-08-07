@@ -1,4 +1,7 @@
 import X from "../../assets/icons/X.svg?react";
+import { useEffect, useState } from "react";
+import { useReportPost } from "../../hooks/PostPage/useReportPost";
+import { useReportComment } from "../../hooks/PostPage/useReportComment";
 
 export type ReportTarget = {
   type: "post" | "comment" | "reComment";
@@ -13,6 +16,43 @@ interface ReportProps {
 }
 
 const Report = ({ onClose, comment }: ReportProps) => {
+  const [reason, setReson] = useState("");
+
+  const postId = comment.id;
+  const commentId = comment.id;
+
+  const {
+    reportPost,
+    success: postSuccess,
+  } = useReportPost(postId);
+
+  const {
+    reportComment,
+    success: commentSuccess,
+  } = useReportComment(commentId);
+
+  // type별로 함수/상태 분기
+  const handleReport = async () => {
+    if (!reason.trim()) return alert("신고 사유를 입력해주세요!");
+    if (comment.type === "post") {
+      await reportPost(reason);
+    } else {
+      await reportComment(reason);
+    }
+  };
+
+  // 신고 성공시 모달 닫기
+  useEffect(() => {
+    if (
+      (comment.type === "post" && postSuccess) ||
+      ((comment.type === "comment" || comment.type === "reComment") && commentSuccess)
+    ) {
+      alert("신고가 완료되었습니다.");
+      onClose();
+    }
+  }, [postSuccess, commentSuccess, comment.type, onClose]);
+
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
@@ -52,8 +92,8 @@ const Report = ({ onClose, comment }: ReportProps) => {
             {comment.type === "post"
               ? "게시글"
               : comment.type === "comment"
-              ? "댓글"
-              : "대댓글"}
+                ? "댓글"
+                : "대댓글"}
           </div>
           <div className="caption2 text-[#666666]">"{comment.content}"</div>
         </section>
@@ -76,6 +116,8 @@ const Report = ({ onClose, comment }: ReportProps) => {
               [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)]
               px-[10px] py-[14px]
               "
+            value={reason}
+            onChange={(e) => setReson(e.target.value)}
           />
         </section>
 
@@ -100,6 +142,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
         py-[14px]
         bg-[#b3e378]
        "
+          onClick={handleReport}
         >
           신고하기
         </button>

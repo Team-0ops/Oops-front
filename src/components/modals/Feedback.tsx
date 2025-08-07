@@ -2,8 +2,27 @@ import X from "../../assets/icons/X.svg?react";
 import Arrow from "../../assets/icons/Arrow.svg?react";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { submitLesson } from "../../hooks/PostPage/useSubmitLesson";
 
-const Feedback = ({ onClose }: { onClose: () => void }) => {
+interface FeedbackProps {
+  postId: number;
+  onClose: () => void;
+  onSuccess?: () => void;
+  category: string;
+  author: string;
+  title: string;
+  content: string;
+}
+
+const Feedback = ({
+  postId,
+  onClose,
+  onSuccess,
+  category,
+  author,
+  title: postTitle,
+  content: postContent,
+}: FeedbackProps) => {
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [title, setTitle] = useState("");
@@ -32,18 +51,20 @@ const Feedback = ({ onClose }: { onClose: () => void }) => {
   // 태그 선택/해제
   const handleTagClick = (tag: string) => {
     setSelectedTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
-  // 등록하기 클릭 시
-  const handleSubmit = () => {
-    // 전달할 데이터: title, content, selectedTags
-    // 예시: props.onSubmit({ title, content, tags: selectedTags });
-    // 실제 구현은 부모 컴포넌트와 연결 필요
-    console.log({ title, content, tags: selectedTags });
+  const handleSubmit = async () => {
+    try {
+      await submitLesson(postId, title, content, selectedTags);
+      alert("교훈이 등록되었습니다!");
+      onSuccess?.();
+      onClose();
+    } catch (e) {
+      alert("교훈 등록에 실패했습니다.");
+      throw e;
+    }
   };
 
   return (
@@ -61,21 +82,25 @@ const Feedback = ({ onClose }: { onClose: () => void }) => {
         </div>
         {/* 카테고리는 props로 가져와야할 듯 */}
         <div className="caption2 flex justify-center mt-[8px] items-center text-[#666666]">
-          카테고리
+          {category}
         </div>
 
         {/* 다 props로 가져와야할 것들 */}
         <section className="mt-[20px] mb-[18px] w-full">
           <h6 className="caption1 flex w-full h-[14px] justify-start">
-            ~~님의 게시 글
+            {author}님의 게시글
           </h6>
           {/* 게시글 들어올곳 */}
           <div className="flex flex-col bg-[#f0e7e0] px-[14px] py-[10px] mt-[10px] rounded-[10px] gap-[4px] font-['Pretendard'] w-full">
             <div className="w-full flex justify-between ">
-              <span className="body4">제목</span>
-              <span className="caption2 text-[#999999]">카테고리</span>
+              <span className="body4">{postTitle}</span>
+              <span className="caption2 text-[#999999]">{category}</span>
             </div>
-            <span className="caption3 text-[#262626]">본문</span>
+            <span className="caption3 text-[#262626]">
+              {postContent.length > 20
+                ? `${postContent.slice(0, 20)}...`
+                : postContent}
+            </span>
           </div>
 
           <div className="flex justify-center gap-[10px] ml-[36px] mt-[8px]">
@@ -131,9 +156,7 @@ const Feedback = ({ onClose }: { onClose: () => void }) => {
                 key={tag}
                 className={`caption1 h-[20px] rounded-[4px] px-[7px] py-[3px] cursor-pointer
       ${
-        selectedTags.includes(tag)
-          ? "bg-[#1d1d1d]"
-          : "bg-[#999999]"
+        selectedTags.includes(tag) ? "bg-[#1d1d1d]" : "bg-[#999999]"
       } text-[#ffffff]`}
                 onClick={() => handleTagClick(tag)}
               >
@@ -146,19 +169,21 @@ const Feedback = ({ onClose }: { onClose: () => void }) => {
               <div key={index} className="relative">
                 {/* 너비 계산용 span */}
                 <span
-                  ref={(el) => {spanRefs.current[index] = el}}
+                  ref={(el) => {
+                    spanRefs.current[index] = el;
+                  }}
                   className="absolute invisible whitespace-pre caption1"
                 >
                   {tag || "새 태그"}
                 </span>
 
                 <input
-                  ref={(el) => {inputRefs.current[index] = el}}
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
                   className={`caption1 h-[20px] rounded-[4px] px-[7px] outline-none appearance-none
         ${
-          selectedTags.includes(tag)
-            ? "bg-[#1d1d1d]"
-            : "bg-[#999999]"
+          selectedTags.includes(tag) ? "bg-[#1d1d1d]" : "bg-[#999999]"
         } text-white flex items-center leading-none`}
                   value={tag}
                   placeholder="새 태그"

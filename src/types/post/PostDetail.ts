@@ -1,3 +1,5 @@
+import type { CommonResponse } from "../common";
+
 export interface Category {
   categoryId: number;
   name: string;
@@ -5,7 +7,7 @@ export interface Category {
 } 
 
 export interface PostDetail {
-  writer: number;
+  nickname: string;
   postId: number;
   title: string;
   content: string;
@@ -20,6 +22,7 @@ export interface PostDetail {
     childCommentCount: number;
   }[];
   wantedCommentTypes: ("ADVICE" | "EMPATHY")[];
+  created_at: Date;
 }
 
 export interface DetailResultType {
@@ -30,9 +33,4 @@ export interface DetailResultType {
   postOvercome: PostDetail | null;
 }
 
-export interface ServerResponse {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: DetailResultType;
-}
+export type PostDetailResponse = CommonResponse<DetailResultType>;
