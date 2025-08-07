@@ -6,6 +6,25 @@ import type { Post } from "../types/post/post";
 import type { PostStatus } from "../components/FeedPage/PostStatusTab";
 
 
+//저번주 랜덤주제 리스트 조회
+
+interface LastWeekRandomTopicResponse {
+  name: string;
+  posts: Post[];
+}
+
+export const getLastWeekRandomTopicPosts = async (
+  situation: PostStatus,
+  page: number = 0,
+  limit: number = 10
+): Promise<LastWeekRandomTopicResponse> => {
+  const { data } = await axiosInstance.get("/feeds/randomTopic/last/all", {
+    params: { situation, page, limit },
+  });
+  return data.result;
+};
+
+
 //랜덤 카테고리 게시글 리스트 조회 
 export const getRandomTopicPosts = async (
   situation: PostStatus,
