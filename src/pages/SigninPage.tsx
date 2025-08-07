@@ -26,18 +26,35 @@ const SigninPage = () => {
 
       console.log("로그인 성공:", res);
 
-      const token = res.result;
-      localStorage.setItem("accessToken", token);
-      console.log("토큰:", token);
+      const tokenObj = res.result;
+      // 기존의 로그인에서 token이 객체값이여서 object Object로 헤더 입력되었기에 오류발생
+      // 로컬스토리지 확인결과 accessToken과 refreshToken이 있었는데 두개를 동시에 token 변수에 저장하다보니
+      // obj obj와 같이 두개의 객체형태가 Bearer 헤더값에 들어가서 오류 발생했음
+      // 지피티의 도움으로 아래와같이 accessToken과 refreshToken으로 나누어서 토큰값 전달.
+      // accessToken, refreshToken 구조 분리 저장!
+      if (tokenObj && typeof tokenObj === "object") {
+        if (tokenObj.accessToken) {
+          localStorage.setItem("accessToken", tokenObj.accessToken);
+          console.log("accessToken:", tokenObj.accessToken);
+        }
+        if (tokenObj.refreshToken) {
+          localStorage.setItem("refreshToken", tokenObj.refreshToken);
+          console.log("refreshToken:", tokenObj.refreshToken);
+        }
+      } else if (typeof tokenObj === "string") {
+        localStorage.setItem("accessToken", tokenObj);
+        console.log("accessToken:", tokenObj);
+      } else {
+        // 예외 처리
+        console.warn("서버 응답에 토큰 정보가 없습니다.", tokenObj);
+        setAlertMsg("서버 응답에 토큰 정보가 없습니다.");
+        setShowAlert(true);
+        return;
+      }
 
-      //alert("로그인에 성공했습니다!");
-      // setAlertMsg("로그인에 성공했습니다!");
-      // setShowAlert(true);
-      navigate("/"); // 로그인 후 메인페이지도 이동
+      navigate("/"); // 로그인 후 메인페이지로 이동
     } catch (error: any) {
       console.error("로그인 실패:", error);
-      //alert("이메일 또는 비밀번호가 올바르지 않습니다.");
-      // 실패 시
       setAlertMsg("이메일 또는 비밀번호가 올바르지 않습니다.");
       setShowAlert(true);
     }
