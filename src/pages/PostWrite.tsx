@@ -29,7 +29,8 @@ const PostWrite = () => {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [category, setCategory] = useState<number | null>(null);
   const [commentType, setCommentType] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -60,10 +61,11 @@ const PostWrite = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const newImages = Array.from(files);
       setImages((prev) => [...prev, ...newImages]);
+      //프리뷰
+      const newPreviews = newImages.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
@@ -80,14 +82,24 @@ const PostWrite = () => {
       categoryId: category!,
       topicId: null,
       previousPostId: situation !== "OOPS" ? selectedPostId : null,
-      imageUrls: images,
       wantedCommentTypes: commentType.map((type) =>
         type === "조언" ? "ADVICE" : "EMPATHY"
       ),
     };
 
+    // FormData 객체 생성
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(data)); // JSON 문자열로 추가
+    images.forEach((file) => {
+      formData.append("images", file); // 여러 장 전송시 이름을 똑같이 반복!
+    });
+
     try {
-      const res = await axiosInstance.post("/posts", data);
+      const res = await axiosInstance.post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       const postId = res.data.result?.postId;
       await fetchPreviousPosts();
       if (situation === "OOPS") {
@@ -263,12 +275,13 @@ const PostWrite = () => {
               onChange={handleImageChange}
             />
             <div className="flex gap-[12px] items-start overflow-x-scroll max-w-[185px]">
-              {images.map((src, idx) => (
+              {imagePreviews.map((src, idx) => (
                 <div
                   key={idx}
                   className="w-[80px] h-[80px] border border-black flex items-center justify-center cursor-pointer flex-shrink-0"
                   onClick={() => {
                     setImages(images.filter((_, i) => i !== idx));
+                    setImagePreviews(imagePreviews.filter((_, i) => i !== idx));
                   }}
                   title="이미지 삭제"
                 >

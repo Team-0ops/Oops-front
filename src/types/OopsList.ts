@@ -5,6 +5,5 @@ export type OopsPost = {
   categoryId: number;
   topicId: number | null;
   previousPostId?: number | null;
-  imageUrls: string[];
   wantedCommentTypes?: ("ADVICE" | "EMPATHY")[];
 };
