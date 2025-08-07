@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LeftArrow from "../../assets/icons/left-point.svg?react";
 import CardFlip from "./CardFlip";
 import FullResultCard from "./FullResultCard";
 import { useNavigate } from "react-router-dom";
-import { requestLuckyDraw } from "../../apis/luckyDrawApi";
+import { requestLuckyDraw, getUserProfile } from "../../apis/luckyDrawApi";
 import type { LuckyCard } from "../../types/lucky";
 import { AxiosError } from "axios";
 import type { CustomAxiosError } from "../../types/AxiosError";
@@ -22,9 +22,22 @@ const LuckyDraw = () => {
   const [showResult, setShowResult] = useState(false);
   const [showFullCard, setShowFullCard] = useState(false);
   const [selectedCard, setSelectedCard] = useState<LuckyCard & { FrontComponent: React.FC } | null>(null);
+  const [userPoint, setUserPoint] = useState<number>(0); // 초기값 0으로
   const navigate = useNavigate();
 
   const cardList = [Octo, Bunny, Whale, Octo, Octo, Octo, Octo, Octo, Octo];
+
+  useEffect(() => {
+    const fetchPoint = async () => {
+      try {
+        const res = await getUserProfile();
+        setUserPoint(res.result.point);
+      } catch (e) {
+        console.error("포인트 조회 실패", e);
+      }
+    };
+    fetchPoint();
+  }, []);
 
   const getIndexFromName = (name: string): number => {
     if (name.includes("문어")) return 0;
@@ -42,13 +55,13 @@ const LuckyDraw = () => {
   const handleCloseResult = () => {
     setShowFullCard(false);
     setShowResult(false);
-    setForceStop(false); // 카드 회전 다시 시작
+    setForceStop(false);
     setSelectedIndex(null);
     setSelectedCard(null);
   };
 
   const handleDrawClick = async () => {
-    setForceStop(true); // 카드 회전 멈춤
+    setForceStop(true);
 
     try {
       const result = await requestLuckyDraw();
@@ -68,7 +81,7 @@ const LuckyDraw = () => {
         }, 1500);
       }, 500);
     } catch (e: unknown) {
-      console.error("🔥 API 오류:", e);
+      console.error("API 오류:", e);
 
       if ((e as AxiosError).isAxiosError) {
         const axiosError = e as CustomAxiosError;
@@ -84,6 +97,8 @@ const LuckyDraw = () => {
       setForceStop(false);
     }
   };
+
+  const isDrawDisabled = userPoint < 150 || forceStop;
 
   return (
     <div className="w-full flex flex-col items-center relative bg-[#FFFBF8] min-h-screen px-[20px]">
@@ -101,7 +116,7 @@ const LuckyDraw = () => {
       <div className="flex flex-col items-center z-30">
         <h1 className="text-[24px] font-bold mt-[21px] mb-[12px]">행운 부적 추첨</h1>
         <p className="text-[14px] text-[#4D4D4D]">나에게 행운을 가져다줄 행운 부적을</p>
-        <p className="text-[14px] text-[#4D4D4D] mb-[34px]">뽑아보세요!</p>
+        <p className="text-[14px] text-[#4D4D4D] mb-[12px]">뽑아보세요!</p>
       </div>
 
       <div className="grid grid-cols-3 gap-[18px] mb-[65px] justify-items-center z-30">
@@ -116,13 +131,21 @@ const LuckyDraw = () => {
         ))}
       </div>
 
+
       <button
-        onClick={handleDrawClick}
-        disabled={forceStop}
-        className="h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30 bg-[#B3E378] text-black disabled:opacity-50"
-      >
-        행운 부적 뽑으러 가기
-      </button>
+  onClick={handleDrawClick}
+  disabled={isDrawDisabled}
+  className={`h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30
+    ${isDrawDisabled
+      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+      : "bg-[#B3E378] text-black"
+    }`}
+>
+  {userPoint < 150
+    ? "150포인트가 모이면 뽑을 수 있어요!"
+    : "행운 부적 뽑으러 가기"}
+</button>
+
     </div>
   );
 };

@@ -7,7 +7,7 @@ import LeftArrow from "../assets/icons/left-point.svg?react";
 
 import { getLastWeekRandomTopicPosts } from "../apis/categoryPost";
 import type { Post } from "../types/post";
-import type { PostStatus } from "../components/FeedPage/PostStatusTab"; // ❗️경로 절대 변경 금지
+import type { PostStatus } from "../components/FeedPage/PostStatusTab"; 
 
 const ExRandomFeed = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const ExRandomFeed = () => {
 
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
-      {/* 🔙 뒤로가기 + 주제명 + 주차 정보 */}
+      {/*  뒤로가기 + 주제명 + 주차 정보 */}
       <div className="flex gap-[8px] relative items-center mb-[10px]">
         <button onClick={() => navigate("/")}>
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
@@ -50,10 +50,10 @@ const ExRandomFeed = () => {
         </div>
       </div>
 
-      {/* 🔘 상태 탭 */}
+      {/*  상태 탭 */}
       <PostStatusTab selected={selectedStatus} onSelect={setSelectedStatus} />
 
-      {/* 🔺 Top3 */}
+      {/*  Top3 */}
       <div className="flex">
         <div className="bg-[#B3E378] h-[20px] w-[8px] mr-[8px]"></div>
         <h2 className="text-[14px] font-semibold mb-[10px]">
@@ -76,7 +76,7 @@ const ExRandomFeed = () => {
         ))}
       </div>
 
-      {/* 🔽 나머지 피드 */}
+
       <div className="flex">
         <div className="bg-[#B3E378] h-[20px] w-[8px] mr-[8px]"></div>
         <h2 className="text-[14px] font-semibold mb-[10px]">
