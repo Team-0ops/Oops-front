@@ -55,57 +55,59 @@ export default function MyProfilePage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center rounded-lg bg-[#B3E378] p-4 text-[#1D1D1D]">
-        <span className="mr-[6px] font-pretendard text-[12px] font-semibold text-[#4D4D4D]">
-          내 포인트 :
-        </span>
-        <span className="text-[24px] font-semibold text-[#1D1D1D]">
-          {profile.point} P
-        </span>
-      </div>
-
-      {/* ───── 신고 영역 ───── */}
-      <div className="space-y-[10px]">
-        {/* 댓글 신고 수 */}
-        <div className="w-[335px] space-y-2 p-5">
-          <div className="flex items-center gap-[10px]">
-            <Warning className="h-5 w-5 shrink-0" />
-            <p className="text-base font-semibold text-[#1D1D1D]">
-              댓글 신고 수
-            </p>
-          </div>
-          <p className="text-sm text-[#666666] leading-snug">
-            {profile.nickname}님의 댓글 신고 수가{" "}
-            <span className="font-bold">50개</span> 이상입니다.
-            <br />
-            80개 이상이 될 경우 계정이 정지될 수 있습니다.
-          </p>
-          <p className="text-sm text-[#666666] leading-snug">
-            해당 댓글 : 아진짜이렇게말도안되는
-          </p>
+      {/* ✅ 공통 wrapper: 포인트 + 신고 박스들 포함 */}
+      <div className="w-[335px] mx-auto space-y-6">
+        {/* 내 포인트 박스 */}
+        <div className="flex items-center justify-center rounded-lg bg-[#B3E378] p-4 text-[#1D1D1D]">
+          <span className="mr-[6px] font-pretendard text-[12px] font-semibold text-[#4D4D4D]">
+            내 포인트 :
+          </span>
+          <span className="text-[24px] font-semibold text-[#1D1D1D]">
+            {profile.point} P
+          </span>
         </div>
 
-        {/* 게시물 신고 수 카드 */}
-        <div className="w-[335px] space-y-2 p-5">
-          <div className="flex items-center gap-[10px]">
-            <Warning className="h-5 w-5 shrink-0" />
-            <p className="text-base font-semibold text-[#1D1D1D]">
-              게시물 신고 수
+        {/* ───── 신고 영역 ───── */}
+        <div className="space-y-[10px]">
+          {/* 댓글 신고 수 */}
+          <div className="space-y-2 p-5">
+            <div className="flex items-center gap-[10px]">
+              <Warning className="h-5 w-5 shrink-0" />
+              <p className="text-base font-semibold text-[#1D1D1D]">
+                댓글 신고 수
+              </p>
+            </div>
+            <p className="text-sm text-[#666666] leading-snug">
+              {profile.nickname}님의 댓글 신고 수가{" "}
+              <span className="font-bold">50개</span> 이상입니다.
+              <br />
+              80개 이상이 될 경우 계정이 정지될 수 있습니다.
+            </p>
+            <p className="text-sm text-[#666666] leading-snug">
+              해당 댓글 : 아진짜이렇게말도안되는
             </p>
           </div>
 
-          <p className="text-sm text-[#666666] leading-snug">
-            닉네임님의 게시물 신고 수가 <span className="font-bold">50개</span>{" "}
-            이상입니다.
-            <br />
-            80개 이상이 될 경우 계정이 정지될 수 있습니다.
-          </p>
-          <p className="text-sm text-[#666666] leading-snug">
-            해당 게시물 제목 : 아진짜이렇게말도안되는
-          </p>
+          {/* 게시물 신고 수 */}
+          <div className="space-y-2 p-5">
+            <div className="flex items-center gap-[10px]">
+              <Warning className="h-5 w-5 shrink-0" />
+              <p className="text-base font-semibold text-[#1D1D1D]">
+                게시물 신고 수
+              </p>
+            </div>
+            <p className="text-sm text-[#666666] leading-snug">
+              닉네임님의 게시물 신고 수가{" "}
+              <span className="font-bold">50개</span> 이상입니다.
+              <br />
+              80개 이상이 될 경우 계정이 정지될 수 있습니다.
+            </p>
+            <p className="text-sm text-[#666666] leading-snug">
+              해당 게시물 제목 : 아진짜이렇게말도안되는
+            </p>
+          </div>
         </div>
       </div>
-
       <div className="flex justify-center">
         <button
           onClick={() => {
