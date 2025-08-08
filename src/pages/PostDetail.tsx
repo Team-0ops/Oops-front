@@ -13,6 +13,7 @@ import { usePostDetail } from "../hooks/PostPage/usePostDetail";
 import { submitComment } from "../hooks/PostPage/useSubmitComment";
 import { useCheer } from "../hooks/PostPage/useCheer";
 import { getLesson } from "../hooks/PostPage/useGetLesson";
+import { categoryData } from "./CategoryFeed";
 
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -42,7 +43,7 @@ const PostDetail = () => {
   const { postDetail, loading, fetchPostDetail } = usePostDetail(
     Number(postId)
   );
-  const { toggleCheer, isCheered } = useCheer();
+  const { toggleCheer } = useCheer();
   //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLessonView, setShowLessonView] = useState(false);
@@ -144,6 +145,13 @@ const PostDetail = () => {
     content: currentPost?.content ?? "",
   };
 
+  const getCategoryKeyByLabel = (label: string) => {
+    const entry = Object.entries(categoryData).find(
+      ([, value]) => value.label === label
+    );
+    return entry ? entry[0] : null;
+  };
+
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
 
@@ -158,7 +166,19 @@ const PostDetail = () => {
             my-[20px]
             "
         >
-          <button className="cursor-pointer" onClick={() => navigate(-1)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => {
+              const categoryKey = getCategoryKeyByLabel(
+                postDetail.category.name
+              );
+              if (categoryKey) {
+                navigate(`/category-feed/${categoryKey}`);
+              } else {
+                alert("카테고리 정보를 찾을 수 없습니다.");
+              }
+            }}
+          >
             <LeftIcon className="w-[24px] h-[24px]" />
           </button>
           {postDetail.category.name}
@@ -260,7 +280,7 @@ const PostDetail = () => {
                         }
                         className="cursor-pointer"
                       >
-                        {isCheered(Number(post.postId)) ? (
+                        {post.liked ? (
                           <RedLike className="w-[24px] h-[24px] cursor-pointer" />
                         ) : (
                           <Like className="w-[24px] h-[24px] cursor-pointer" />
@@ -283,6 +303,7 @@ const PostDetail = () => {
                       </span>
                     </div>
                   </div>
+                  <div>{/* 이미지 들어올 자리 */}</div>
                 </div>
               </SwiperSlide>
             ))}

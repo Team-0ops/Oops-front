@@ -7,7 +7,7 @@ import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
 import type { PostStatus } from "../components/FeedPage/PostStatusTab";
 
-const categoryData: Record<string, { id: number; label: string }> = {
+export const categoryData: Record<string, { id: number; label: string }> = {
   daily: { id: 1, label: "일상" },
   love: { id: 2, label: "연애" },
   relationship: { id: 3, label: "인간관계" },

@@ -23,6 +23,7 @@ export interface PostDetail {
   }[];
   wantedCommentTypes: ("ADVICE" | "EMPATHY")[];
   created_at: Date;
+  liked: boolean;
 }
 
 export interface DetailResultType {

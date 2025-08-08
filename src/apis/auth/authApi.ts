@@ -15,7 +15,7 @@ export const postSignup = async ({
     email,
     userName,
     password,
-  });
+  })
   return res.data;
 };
 
