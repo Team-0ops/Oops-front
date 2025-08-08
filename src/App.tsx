@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUserId } from "./store/slices/userSlice";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
@@ -45,6 +48,17 @@ import PostWriteLayout from "./layout/PostWriteLayout";
 import FailWiki from "./pages/FailWiki";
 
 function App() {
+  //userId가 필요해서 꺼내 쓰기 위해 최상위 폴더에서 useEffect활용
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const savedUserId = localStorage.getItem("userId");
+    if (savedUserId) {
+      dispatch(setUserId(savedUserId));
+    }
+  }, [dispatch]);
+
+  // 라우팅
   const publicRoutes: RouteObject[] = [
     {
       path: "/",
