@@ -4,10 +4,10 @@ import CommentItem from "./CommentItem";
 interface CommentListProps {
   comments: Comment[];
   postId: number;
-  onReload: () => void;
+  // onReload: () => void;
 }
 
-const CommentList = ({ comments, postId, onReload }: CommentListProps) => {
+const CommentList = ({ comments, postId }: CommentListProps) => {
   if (comments.length === 0) {
     return (
       <div className="text-center text-[#999999] caption3 py-[20px]">

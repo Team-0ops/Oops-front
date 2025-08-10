@@ -1,6 +1,6 @@
 import ReportIcon from "../assets/icons/ReportIcon.svg?react";
 import LeftIcon from "../assets/icons/left-point.svg?react";
-import Like from "../assets/icons/majesticons_heart.svg?react";
+import Like from "../assets/icons/GrayLike.svg?react";
 import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
 import RedLike from "../assets/icons/RedLike.svg?react";
@@ -13,10 +13,15 @@ import { usePostDetail } from "../hooks/PostPage/usePostDetail";
 import { submitComment } from "../hooks/PostPage/useSubmitComment";
 import { useCheer } from "../hooks/PostPage/useCheer";
 import { getLesson } from "../hooks/PostPage/useGetLesson";
+import { categoryData } from "./CategoryFeed";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store/store";
+import { useDeletePost } from "../hooks/PostPage/useDeletePost";
 
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
 import SwiperCore from "swiper";
 import "swiper/css";
@@ -37,12 +42,18 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
 
 const PostDetail = () => {
   const navigate = useNavigate();
-  const { postId } = useParams<{ postId: string }>();
+  const { postId } = useParams<{
+    postId: string;
+  }>();
+
   //api 관련 훅
-  const { postDetail, loading, fetchPostDetail } = usePostDetail(
-    Number(postId)
-  );
-  const { toggleCheer, isCheered } = useCheer();
+  const { postDetail, loading } = usePostDetail(Number(postId));
+  const { toggleCheer } = useCheer();
+  const { deletePost, success } = useDeletePost();
+
+  //userId 뽑아오기 (내 게시글인지 인식표)
+  const userId = useSelector((state: RootState) => state.user.userId);
+
   //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLessonView, setShowLessonView] = useState(false);
@@ -81,12 +92,13 @@ const PostDetail = () => {
     (currentPost?.comments ?? []).map((comment: any) => ({
       id: comment.commentId?.toString() ?? "",
       content: comment.content,
-      author: (comment.nickname || comment.userId?.toString()) ?? "",
+      author: currentPost.nickname,
       likes: comment.likes,
       createdAt: comment.createdAt,
       parentId: comment.parentId,
+      liked: comment.liked,
+      userId: comment.userId,
     })) || [];
-
   //작성된 교훈이 있는지 없는지 확인
   useEffect(() => {
     const checkLessonExists = async () => {
@@ -144,6 +156,33 @@ const PostDetail = () => {
     content: currentPost?.content ?? "",
   };
 
+  const getCategoryKeyByLabel = (label: string) => {
+    const entry = Object.entries(categoryData).find(
+      ([, value]) => value.label === label
+    );
+    return entry ? entry[0] : null;
+  };
+
+  // 시간표현 ~~시간 전과 같이 표현하기
+  const formatRelativeTime = (createdAt: string) => {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffMs = now.getTime() - createdDate.getTime();
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSeconds < 60) return "방금 전";
+    if (diffMinutes < 60) return `${diffMinutes}분 전`;
+    if (diffHours < 24) return `${diffHours}시간 전`;
+    if (diffDays < 4) return `${diffDays}일 전`;
+
+    // 4일 이상이면 날짜로 표시
+    return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
+  };
+
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
 
@@ -158,7 +197,19 @@ const PostDetail = () => {
             my-[20px]
             "
         >
-          <button className="cursor-pointer" onClick={() => navigate(-1)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => {
+              const categoryKey = getCategoryKeyByLabel(
+                postDetail.category.name
+              );
+              if (categoryKey) {
+                navigate(`/category-feed/${categoryKey}`);
+              } else {
+                alert("카테고리 정보를 찾을 수 없습니다.");
+              }
+            }}
+          >
             <LeftIcon className="w-[24px] h-[24px]" />
           </button>
           {postDetail.category.name}
@@ -210,47 +261,90 @@ const PostDetail = () => {
                 className="flex justify-center items-center !w-[335px]"
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
-                  <div className="flex">
-                    <div className="w-[42px] h-[42px] mr-[6px] rounded-[4px] bg-[#9a9a9a]" />
+                  <div className="flex gap-[6px]">
+                    <div className="w-[42px] h-[42px] aspect-square object-cover rounded-[4px] bg-[#9a9a9a]" />
                     <div className="flex justify-between w-full items-center">
                       <div className="flex flex-col gap-[4px]">
                         <span className="body2 text-[#1d1d1d]">
                           {post ? post.nickname : "닉네임 없음"}
                         </span>
                         <span className="body5 text-[#999999]">
-                          {/* {post?.created_at.getTime()} */}
+                          {formatRelativeTime(String(post?.created_at))}
                         </span>
                       </div>
                       <div className="flex items-center gap-[4px]">
-                        {isLessonWritten ? (
-                          <button
-                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                            onClick={() => setShowLessonView(true)}
-                          >
-                            교훈 확인
-                          </button>
+                        {Number(userId) === currentPost?.userId ? (
+                          <>
+                            <button
+                              className="body2 text-[#ffffff] h-[30px] bg-[#262626] px-[12px] py-[5px] rounded-[4px]"
+                              onClick={() => {
+                                deletePost(Number(currentPostId));
+                                {
+                                  if (success) navigate("/");
+                                }
+                              }}
+                            >
+                              삭제
+                            </button>
+                          </>
                         ) : (
-                          <button
-                            className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
-                            onClick={() => setShowFeedbackModal(true)}
-                          >
-                            교훈 작성
-                          </button>
+                          <>
+                            {isLessonWritten ? (
+                              <button
+                                className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                                onClick={() => setShowLessonView(true)}
+                              >
+                                교훈 확인
+                              </button>
+                            ) : (
+                              <button
+                                className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                                onClick={() => setShowFeedbackModal(true)}
+                              >
+                                교훈 작성
+                              </button>
+                            )}
+                            <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
+                              <ReportIcon
+                                className="w-full h-full"
+                                onClick={() => setShowReportModal(true)}
+                              />
+                            </div>
+                          </>
                         )}
-                        <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
-                          <ReportIcon
-                            className="w-full h-full"
-                            onClick={() => setShowReportModal(true)}
-                          />
-                        </div>
                       </div>
                     </div>
                   </div>
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
-                  <div className="body5 w-full mb-[22px] text-[#4d4d4d] break-words">
+                  <div className="body5 w-full mb-[16px] text-[#4d4d4d] break-words">
                     {post?.content}
+                  </div>
+                  <div>
+                    {Array.isArray(post.images) && post.images.length > 0 && (
+                      <Swiper
+                        modules={[Pagination]}
+                        slidesPerView={1}
+                        spaceBetween={8}
+                        pagination={{ clickable: true, el: null }}
+                        className="mb-[22px] w-[307px] h-[220px]"
+                      >
+                        {post.images.map((src, i) => (
+                          <SwiperSlide key={`${post.postId}-img-${i}`}>
+                            <div className="w-full rounded-[4px] aspect-[4/3] overflow-hidden ">
+                              <img
+                                src={src}
+                                alt={`post image ${i + 1}`}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    )}
                   </div>
                   <div className="flex justify-between items-center w-full">
                     <div className="flex items-center gap-[4px]">
@@ -260,10 +354,10 @@ const PostDetail = () => {
                         }
                         className="cursor-pointer"
                       >
-                        {isCheered(Number(post.postId)) ? (
-                          <RedLike className="w-[24px] h-[24px] cursor-pointer" />
+                        {post.liked ? (
+                          <RedLike className=" cursor-pointer" />
                         ) : (
-                          <Like className="w-[24px] h-[24px] cursor-pointer" />
+                          <Like className=" cursor-pointer" />
                         )}
                       </button>
                       <span className="caption2 text-[#666]">
@@ -271,13 +365,13 @@ const PostDetail = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-[4px] ">
-                      <CommentIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <CommentIcon className="cursor-pointer" />
                       <span className="caption2 text-[#666]">
                         댓글 {post?.comments.length}
                       </span>
                     </div>
                     <div className="flex items-center gap-[4px] ">
-                      <EyeIcon className="w-[24px] h-[24px] cursor-pointer" />
+                      <EyeIcon className=" cursor-pointer" />
                       <span className="caption2 text-[#666]">
                         조회수 {post?.watching}
                       </span>
@@ -335,7 +429,6 @@ const PostDetail = () => {
           <CommentList
             comments={localComments}
             postId={Number(currentPostId)}
-            onReload={fetchPostDetail}
           />
         </section>
 

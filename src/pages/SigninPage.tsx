@@ -7,7 +7,12 @@ import TextInput from "../components/auth/TextInput";
 import { postLogin } from "../apis/auth/authApi";
 import AlertModal from "../components/auth/AlertModal";
 
+import { useDispatch } from "react-redux";
+import { setUserId } from "../store/slices/userSlice";
+
 const SigninPage = () => {
+  const dispatch = useDispatch();
+
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
 
@@ -23,8 +28,11 @@ const SigninPage = () => {
         email: id,
         password: pw,
       });
+      // 외부에서 게시글 작성자와 비교하기위해서 로그인할때 userId 전역으로
+      dispatch(setUserId(res.result.userId));
+      localStorage.setItem("userId", res.result.userId);
 
-      console.log("로그인 성공:", res);
+      console.log("로그인 성공:", res.result);
 
       const tokenObj = res.result;
       // 기존의 로그인에서 token이 객체값이여서 object Object로 헤더 입력되었기에 오류발생

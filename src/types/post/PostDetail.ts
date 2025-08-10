@@ -1,4 +1,5 @@
 import type { CommonResponse } from "../common";
+import type { Comment } from "../Comment";
 
 export interface Category {
   categoryId: number;
@@ -14,15 +15,12 @@ export interface PostDetail {
   likes: number;
   watching: number;
   images: string[];
-  comments: {
-    commentId: number;
-    content: string;
-    createdAt: string;
-    likes: number;
-    childCommentCount: number;
-  }[];
+  comments: Comment[];
   wantedCommentTypes: ("ADVICE" | "EMPATHY")[];
   created_at: Date;
+  liked: boolean;
+  profileImage: string;
+  userId: number;
 }
 
 export interface DetailResultType {

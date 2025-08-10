@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { Comment } from "../../types/Comment";
 import Report from "../modals/Report";
 import CommentForm from "./CommentForm";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 
 import NoColorReport from "../../assets/icons/NoColorReport.svg?react";
 import NoColorLike from "../../assets/icons/gray_heart.svg?react";
@@ -9,23 +11,34 @@ import GrayComment from "../../assets/icons/gray_comment.svg?react";
 import ColorLike from "../../assets/icons/ColorHeart.svg?react";
 
 import { submitComment } from "../../hooks/PostPage/useSubmitComment";
+import { useCheerComment } from "../../hooks/PostPage/useCheerComment";
+import { useDeleteComment } from "../../hooks/PostPage/useDeleteComment";
+import { useNavigate } from "react-router-dom";
 
 interface CommentProps {
   comment: Comment;
   postId: number;
   isReply?: boolean;
-  // onReload: () => void
+  // onReload: () => void;
 }
 
 const CommentItem = ({
   comment,
   postId,
   isReply = false,
-  // onReload
+  // onReload,
 }: CommentProps) => {
+  const navigate = useNavigate();
+  //userId 뽑아오기 (내 게시글인지 인식표)
+  const userId = useSelector((state: RootState) => state.user.userId);
+
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
+
+  const [liked, setLiked] = useState(comment.liked);
+  const [likes, setLikes] = useState(comment.likes);
+  const { cheerComment } = useCheerComment();
+
+  const { deleteComment, success } = useDeleteComment();
 
   const [selectedReply, setSelectedReply] = useState<Comment | null>(null);
 
@@ -50,10 +63,17 @@ const CommentItem = ({
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
 
-  const handleLikeClick = () => {
-    if (!isLiked) {
-      setLikeCount(likeCount + 1);
-      setIsLiked(true);
+  const handleLikeClick = async () => {
+    try {
+      await cheerComment(Number(comment.id));
+      setLiked(comment.liked);
+      setLikes(comment.likes);
+
+      // 서버 데이터 동기화가 필요하다면
+      // if (onReload) onReload();
+    } catch (e) {
+      alert("공감 실패!");
+      throw e;
     }
   };
 
@@ -69,6 +89,7 @@ const CommentItem = ({
       throw e;
     }
   };
+  console.log("코멘트 정보", comment);
 
   return (
     <>
@@ -76,11 +97,29 @@ const CommentItem = ({
       <div className={`flex flex-col ${isReply ? "ml-[34px]" : ""}`}>
         <div className="flex flex-col w-full pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
           <div className="mb-[4px] flex justify-between items-center">
-            <span className="body5 text-[#808080]">{comment.author}</span>
-            <NoColorReport
-              className="w-[24px] h-[24px] cursor-pointer"
-              onClick={() => setIsReportOpen(true)}
-            />
+            <span className="body5 text-[#808080]">
+              {Number(userId) === comment.userId ? "나" : comment.author}
+            </span>
+            {Number(userId) === comment.userId ? (
+              <>
+                <button
+                  className="caption2 text-[#808080] h-[24px] bg-[#f0e7e0] p-[4px] rounded-[4px]"
+                  onClick={() => {
+                    deleteComment(Number(postId), Number(comment.id));
+                    {
+                      if (success) navigate("/");
+                    }
+                  }}
+                >
+                  삭제하기
+                </button>
+              </>
+            ) : (
+              <NoColorReport
+                className="w-[24px] h-[24px] cursor-pointer"
+                onClick={() => setIsReportOpen(true)}
+              />
+            )}
           </div>
 
           <div className="flex justify-start">
@@ -100,16 +139,16 @@ const CommentItem = ({
                 className="flex items-center bg-none border-none p-0 cursor-pointer"
                 onClick={handleLikeClick}
               >
-                {isLiked ? (
+                {liked ? (
                   <ColorLike className="w-[14px] h-[14px]" />
                 ) : (
                   <NoColorLike className="w-[14px] h-[14px]" />
                 )}
               </button>
               <p
-                className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
+                className={`caption3 ${liked ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
               >
-                {likeCount > 0 ? likeCount : "공감"}
+                {likes > 0 ? likes : "공감"}
               </p>
               {/* 일반 댓글만 대댓글달기 버튼 */}
               {!isReply && (
@@ -171,42 +210,3 @@ const CommentItem = ({
 };
 
 export default CommentItem;
-
-// 대댓글용 공감 버튼 분리
-const ReplyLike = () => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-
-  const handleLike = () => {
-    if (!isLiked) {
-      setLikeCount((prev) => prev + 1);
-      setIsLiked(true);
-    }
-  };
-
-  return (
-    <div className="flex justify-center gap-[4px]">
-      <button
-        onClick={handleLike}
-        className="flex items-center"
-        style={{
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
-        }}
-      >
-        {isLiked ? (
-          <ColorLike className="w-[14px] h-[14px]" />
-        ) : (
-          <NoColorLike className="w-[14px] h-[14px]" />
-        )}
-      </button>
-      <p
-        className={`caption3 ${likeCount > 0 ? "text-[#ff8080]" : "text-[#b3b3b3]"}`}
-      >
-        {likeCount > 0 ? likeCount : "공감"}
-      </p>
-    </div>
-  );
-};
