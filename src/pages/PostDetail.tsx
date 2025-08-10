@@ -42,7 +42,9 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
 
 const PostDetail = () => {
   const navigate = useNavigate();
-  const { postId } = useParams<{ postId: string }>();
+  const { postId } = useParams<{
+    postId: string;
+  }>();
 
   //api 관련 훅
   const { postDetail, loading } = usePostDetail(Number(postId));
@@ -325,7 +327,7 @@ const PostDetail = () => {
                         modules={[Pagination]}
                         slidesPerView={1}
                         spaceBetween={8}
-                        pagination={{ clickable: true, el:null }}
+                        pagination={{ clickable: true, el: null }}
                         className="mb-[22px] w-[307px] h-[220px]"
                       >
                         {post.images.map((src, i) => (
