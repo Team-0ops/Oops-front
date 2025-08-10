@@ -24,3 +24,9 @@ export type ResponseCategoryPostListDTO = CommonResponse<{
   posts: Post[];
   last: boolean;
 }>;
+
+export type BestFailers = {
+  postId: number;
+  title: string;
+  situation: string;
+};
