@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
 import type { RootState } from "../store/store";
@@ -14,6 +14,8 @@ import { usePreviousPosts } from "../hooks/PostPage/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
+  const location = useLocation();
+  const topicNameFromState = location.state?.topicName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedStep = useSelector(
@@ -39,7 +41,7 @@ const PostWrite = () => {
 
   const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
-  const categories = [
+  const [categories, setCategories] = useState<string[]>([
     "일상",
     "연애",
     "인간관계",
@@ -55,7 +57,7 @@ const PostWrite = () => {
     "부동산",
     "정신 건강",
     "자유",
-  ];
+  ]);
 
   // 이미지 업로드 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,12 +141,30 @@ const PostWrite = () => {
     };
   }, []);
 
+  // 카테고리 자동선택 (random -> post로 갈때)
+  useEffect(() => {
+    if (!topicNameFromState) return;
+
+    const normalized = topicNameFromState.trim().toLowerCase();
+    const idx = categories.findIndex(
+      (cat) => cat.trim().toLowerCase() === normalized
+    );
+
+    if (idx === -1) {
+      // 기존에 없으면 동적으로 추가
+      setCategories((prev) => [...prev, topicNameFromState]);
+      setCategory(categories.length + 1); // 마지막 항목이 선택되도록
+    } else {
+      // 기존에 있으면 해당 항목 선택
+      setCategory(idx + 1);
+    }
+  }, [topicNameFromState, categories]);
+
   // button 스타일
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   // 버튼 비활성화 및 자동 포커스
-
   const isFormValid = !!title.trim() && !!content.trim() && !!category;
 
   const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {

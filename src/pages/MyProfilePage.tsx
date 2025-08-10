@@ -110,6 +110,7 @@ export default function MyProfilePage() {
         <button
           onClick={() => {
             localStorage.removeItem("accessToken");
+            localStorage.removeItem("userId");
             window.location.href = "/";
           }}
           className="h-[30px] w-[84px] rounded-[20px] border border-[#B3B3B3] px-[13px] py-[3px] text-[14px] font-semibold text-[#1D1D1D] flex items-center justify-center"

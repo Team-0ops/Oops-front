@@ -38,7 +38,7 @@ const CommentItem = ({
   const [likes, setLikes] = useState(comment.likes);
   const { cheerComment } = useCheerComment();
 
-  const {deleteComment, success} = useDeleteComment();
+  const { deleteComment, success } = useDeleteComment();
 
   const [selectedReply, setSelectedReply] = useState<Comment | null>(null);
 
@@ -89,7 +89,7 @@ const CommentItem = ({
       throw e;
     }
   };
-  console.log("코멘트 정보", comment)
+  console.log("코멘트 정보", comment);
 
   return (
     <>
@@ -97,7 +97,9 @@ const CommentItem = ({
       <div className={`flex flex-col ${isReply ? "ml-[34px]" : ""}`}>
         <div className="flex flex-col w-full pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
           <div className="mb-[4px] flex justify-between items-center">
-            <span className="body5 text-[#808080]">{comment.author}</span>
+            <span className="body5 text-[#808080]">
+              {Number(userId) === comment.userId ? "나" : comment.author}
+            </span>
             {Number(userId) === comment.userId ? (
               <>
                 <button
