@@ -41,6 +41,7 @@ const PostWrite = () => {
 
   const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
+  const normalize = (s = "") => s.replace(/\s+/g, "").toLowerCase();
   const [categories, setCategories] = useState<string[]>([
     "일상",
     "연애",
@@ -145,20 +146,58 @@ const PostWrite = () => {
   useEffect(() => {
     if (!topicNameFromState) return;
 
-    const normalized = topicNameFromState.trim().toLowerCase();
-    const idx = categories.findIndex(
-      (cat) => cat.trim().toLowerCase() === normalized
-    );
+    const n = normalize(topicNameFromState);
 
-    if (idx === -1) {
-      // 기존에 없으면 동적으로 추가
-      setCategories((prev) => [...prev, topicNameFromState]);
-      setCategory(categories.length + 1); // 마지막 항목이 선택되도록
-    } else {
-      // 기존에 있으면 해당 항목 선택
-      setCategory(idx + 1);
+    setCategories((prev) => {
+      const idx = prev.findIndex((c) => normalize(c) === n);
+      if (idx !== -1) {
+        setCategory(idx + 1); // 이미 있으면 바로 선택
+        return prev;
+      }
+      const next = [...prev, topicNameFromState]; // 없으면 동적 추가
+      setCategory(next.length); // 방금 추가한 항목 선택(1-based)
+      return next;
+    });
+  }, [topicNameFromState]);
+
+  // OopsList에서 클릭했을때 해당하는 카테고리 고정
+  useEffect(() => {
+    if (!selectedPostId) return;
+
+    // 현재 단계 기준 "이전 단계"를 결정
+    const sourceSituation =
+      selectedStep === 1 ? "OOPS" : selectedStep === 2 ? "OVERCOMING" : null;
+
+    if (!sourceSituation) return;
+
+    // 이전 단계에서 선택된 글 찾기
+    const selectedPrev = previousPosts
+      .filter((p) => p.situation === sourceSituation)
+      .find((p) => p.postId === selectedPostId);
+
+    if (!selectedPrev) return;
+
+    // categoryId가 있으면 그대로 사용
+    if (typeof (selectedPrev as any).categoryId === "number") {
+      setCategory((selectedPrev as any).categoryId);
+      return;
     }
-  }, [topicNameFromState, categories]);
+
+    // categoryName만 있는 경우: 문자열 매칭/동적 추가
+    const name = (selectedPrev as any).categoryName as string | undefined;
+    if (!name) return;
+
+    setCategories((prev) => {
+      const idx = prev.findIndex((c) => normalize(c) === normalize(name));
+      if (idx !== -1) {
+        setCategory(idx + 1);
+        return prev;
+      }
+      const next = [...prev, name];
+      setCategory(next.length);
+      return next;
+    });
+  }, [selectedStep, selectedPostId, previousPosts]);
 
   // button 스타일
   const buttonStyle =
