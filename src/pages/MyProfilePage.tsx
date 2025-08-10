@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Warning from "../assets/icons/warning.svg?react";
 import MyProfileIcon from "../assets/icons/myprofile.svg?react";
 import { getMyProfile } from "../apis/mypageApi";
+import { postLogout } from "../apis/auth/authApi";
 import type { MyProfileRes } from "../types/mypage";
 
 export default function MyProfilePage() {
   const [profile, setProfile] = useState<MyProfileRes | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -37,6 +41,23 @@ export default function MyProfilePage() {
     fetchProfile();
   }, []);
 
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await postLogout();
+    } catch (e) {
+      console.warn("logout 호출 실패, 로컬만 초기화합니다.", e);
+    } finally {
+      // 클라이언트 상태 정리
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userId");
+      setLoggingOut(false);
+      navigate("/", { replace: true });
+    }
+  };
+
   if (loading) return <div className="p-4">불러오는 중...</div>;
   if (err) return <div className="p-4 text-red-500">{err}</div>;
   if (!profile) return null;
@@ -53,9 +74,7 @@ export default function MyProfilePage() {
 
   return (
     <section className="space-y-6 p-4">
-      {/* 프로필 카드 */}
       <div className="flex items-center gap-4">
-        {/* 서버 이미지가 있으면 <img>, 없으면 기본 아이콘 */}
         {profileImageUrl ? (
           <img
             src={profileImageUrl}
@@ -129,15 +148,11 @@ export default function MyProfilePage() {
 
       <div className="flex justify-center">
         <button
-          onClick={() => {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            localStorage.removeItem("userId");
-            window.location.href = "/";
-          }}
-          className="h-[30px] w-[84px] rounded-[20px] border border-[#B3B3B3] px-[13px] py-[3px] text-[14px] font-semibold text-[#1D1D1D] flex items-center justify-center"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="h-[30px] w-[84px] rounded-[20px] border border-[#B3B3B3] px-[13px] py-[3px] text-[14px] font-semibold text-[#1D1D1D] flex items-center justify-center disabled:opacity-60"
         >
-          로그아웃
+          {loggingOut ? "로그아웃 중..." : "로그아웃"}
         </button>
       </div>
     </section>
