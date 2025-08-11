@@ -8,7 +8,7 @@ interface EachCategoryCardProps {
 
 const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
   const navKey = Object.keys(categoryMap).find(
-    (key) => categoryMap[key] === post.categoryName
+    (key) => categoryMap[key] === post.categoryOrTopicName
   );
 
   return (
@@ -17,7 +17,9 @@ const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
         <div className="flex justify-between itmes-center w-full">
           <div className="flex gap-[6px] items-center">
             <div className="w-[8px] h-[20px] bg-[#B3E378]"></div>
-            <span className="body4 text-[#1D1D1D]">{post?.categoryName}</span>
+            <span className="body4 text-[#1D1D1D]">
+              {post?.categoryOrTopicName}
+            </span>
           </div>
 
           <ToSeeButton
@@ -33,7 +35,7 @@ const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
             likes={post.likes}
             comments={post.comments}
             views={post.views}
-            category={post.categoryName}
+            category={post.categoryOrTopicName}
           />
         </div>
       </div>

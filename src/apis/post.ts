@@ -212,7 +212,7 @@ export const dummyPostList: Post[] = [
 
 export const getPostListInMainPage =
   async (): Promise<ResponseMainPostListDTO> => {
-    const { data } = await axiosInstance.get("/feeds/home/first-guest");
+    const { data } = await axiosInstance.get("/feeds/home/first-auth");
     console.log(data);
     return data;
   };
