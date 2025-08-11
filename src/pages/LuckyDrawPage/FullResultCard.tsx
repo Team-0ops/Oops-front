@@ -10,14 +10,14 @@ interface FullResultCardProps {
 
 // public 폴더 이미지 index 매핑
 const imageFiles = [
-  "/octo.jpg",     // 0: 문어
-  "/bunny.jpg",    // 1: 토끼
-  "/whale.jpg",    // 2: 고래
-  "/penguin.jpg",  // 3: 펭귄
+  "/octo.png",     // 0: 문어
+  "/bunny.png",    // 1: 토끼
+  "/whale.png",    // 2: 고래
+  "/penguin.png",  // 3: 펭귄
   "/cat.png",      // 4: 고양이
-  "/puppy.webp",   // 5: 강아지
-  "/sloth.jpg",    // 6: 늘보
-  "/bear.jpg",     // 7: 곰
+  "/puppy.png",   // 5: 강아지
+  "/turtle.png",    // 6: 거북이
+  "/bear.png",     // 7: 곰
   "/croco.png"     // 8: 악어
 ];
 
@@ -25,10 +25,10 @@ const FullResultCard = ({ onClose, card, selectedIndex }: FullResultCardProps) =
   const { name, content, FrontComponent } = card;
 
   const handleDownload = () => {
-    const imageUrl = imageFiles[selectedIndex] || "/octo.jpg";
+    const imageUrl = imageFiles[selectedIndex];
     const link = document.createElement("a");
     link.href = imageUrl;
-    link.download = `${name}.jpg`;
+    link.download = `${name}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
