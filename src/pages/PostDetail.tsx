@@ -99,6 +99,7 @@ const PostDetail = () => {
       liked: comment.liked,
       userId: comment.userId,
     })) || [];
+    
   //작성된 교훈이 있는지 없는지 확인
   useEffect(() => {
     const checkLessonExists = async () => {
