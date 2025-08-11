@@ -181,6 +181,18 @@ const PostDetail = () => {
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
 
+  // 작성자 프로필 이동 핸들러 (아바타&닉네임 클릭)
+  const goAuthor = (authorId?: number | string) => (e: any) => {
+    e.stopPropagation();
+    if (authorId == null) return;
+    // 본인이면 마이페이지로
+    if (String(userId) === String(authorId)) {
+      navigate("/mypage");
+    } else {
+      navigate(`/users/${authorId}`);
+    }
+  };
+
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
 
@@ -260,12 +272,38 @@ const PostDetail = () => {
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
                   <div className="flex gap-[6px]">
-                    <div className="w-[42px] h-[42px] aspect-square object-cover rounded-[4px] bg-[#9a9a9a]" />
+                    {/* <div className="w-[42px] h-[42px] aspect-square object-cover rounded-[4px] bg-[#9a9a9a]" /> */}
+                    {/* 아바타(클릭 시 프로필 이동) */}
+                    <button
+                      onClick={() =>
+                        post?.userId && navigate(`/users/${post.userId}`)
+                      }
+                      className="w-[42px] h-[42px] rounded-[4px] overflow-hidden bg-[#9a9a9a] shrink-0"
+                      aria-label="작성자 프로필로 이동"
+                    >
+                      {(post as any)?.profileImage && (
+                        <img
+                          src={(post as any).profileImage}
+                          alt="" // alt 텍스트 노출 방지
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </button>
                     <div className="flex justify-between w-full items-center">
                       <div className="flex flex-col gap-[4px]">
-                        <span className="body2 text-[#1d1d1d]">
+                        {/* 닉네임도 클릭 시 이동 */}
+                        <button
+                          className="body2 text-left text-[#1d1d1d] hover:underline"
+                          onClick={() =>
+                            post?.userId && navigate(`/users/${post.userId}`)
+                          }
+                          aria-label="작성자 프로필로 이동"
+                        >
+                          {post?.nickname ?? "닉네임 없음"}
+                        </button>
+                        {/* <span className="body2 text-[#1d1d1d]">
                           {post ? post.nickname : "닉네임 없음"}
-                        </span>
+                        </span> */}
                         <span className="body5 text-[#999999]">
                           {formatRelativeTime(String(post?.created_at))}
                         </span>
@@ -325,7 +363,7 @@ const PostDetail = () => {
                         modules={[Pagination]}
                         slidesPerView={1}
                         spaceBetween={8}
-                        pagination={{ clickable: true, el:null }}
+                        pagination={{ clickable: true, el: null }}
                         className="mb-[22px] w-[307px] h-[220px]"
                       >
                         {post.images.map((src, i) => (
