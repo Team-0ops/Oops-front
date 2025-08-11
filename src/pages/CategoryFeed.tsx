@@ -100,7 +100,7 @@ const CategoryFeed = () => {
               likes={post.likes}
               comments={post.comments}
               views={post.views}
-              category={post.categoryName}
+              category={post.categoryOrTopicName}
             />
           ))
         )}
