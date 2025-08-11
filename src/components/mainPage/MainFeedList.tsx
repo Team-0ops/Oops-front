@@ -1,4 +1,4 @@
-import useGetPostListInMain from "../../hooks/MainPage/useGetPostList";
+import useGetPostListInMain from "../../hooks/MainPage/UseGetPostList";
 import useGetPostLIstCategory from "../../hooks/MainPage/useGetPostListCategory";
 import BestFailerList from "./BestFailerList";
 import CategoryList from "./CategoryList";
