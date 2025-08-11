@@ -104,8 +104,8 @@ export default function MyFailuresPage() {
   };
 
   return (
-    <section className="space-y-3 p-4">
-      <div className="flex items-center gap-[10px]">
+    <section className="space-y-2 px-4 pt-2 pb-4">
+      <div className="flex items-center gap-[6px]">
         <MyStatusTab value={tabStatus} onChange={setTabStatus} />
 
         <CategoryDropdown

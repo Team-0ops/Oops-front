@@ -85,9 +85,9 @@ export default function TermsGroup({ value, onChange }: Props) {
         <span
           className="mx-auto flex h-[16px] w-[16px]
                        items-center justify-center rounded-[3px]
-                       border border-[#1D1D1D] bg-[#FFFFFF]"
+                       bg-[#FFFFFF]"
         >
-          {/* ✔︎ 표시 */}
+          {/* 체크 표시 */}
           <span
             className={`block h-[10px] w-[6px] rotate-45 
                       border-b-[2px] border-r-[2px] border-[#1D1D1D]
