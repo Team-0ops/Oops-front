@@ -1,15 +1,10 @@
+import type { BestFailers } from "../../types/post";
 import WikiBestFailerCard from "./WikiBestFailerCard";
+interface WikiBestFailerListProps {
+  bestFailers: BestFailers[];
+}
 
-const WikiBestFailerList = () => {
-  const bestFailers = [
-    { id: 1, title: "실패 1" },
-    { id: 2, title: "실패 2" },
-    { id: 3, title: "실패 3" },
-    { id: 4, title: "실패 4" },
-    { id: 5, title: "실패 5" },
-    { id: 6, title: "실패 6" },
-  ];
-
+const WikiBestFailerList = ({ bestFailers }: WikiBestFailerListProps) => {
   return (
     <div className="-mx-[38px]">
       {/* 타이틀 */}
@@ -21,8 +16,8 @@ const WikiBestFailerList = () => {
       <div className="flex flex-col">
         {bestFailers.map((failer) => (
           <WikiBestFailerCard
-            key={failer.id}
-            postId={failer.id}
+            key={failer.postId}
+            postId={failer.postId}
             text={failer.title}
           />
         ))}
