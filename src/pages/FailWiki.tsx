@@ -6,7 +6,7 @@ import WikiKeyword from "../components/FailWiki/WikiKeyword";
 import WikiBestFailerList from "../components/FailWiki/WikiBestFailerList";
 import WikiResultCard from "../components/FailWiki/WIkiResultCard";
 import { getFailWikiResult } from "../apis/wiki";
-import type { ResponseWikiSearch } from "../types/wkik";
+import type { wikiTips } from "../types/wkik";
 import { categoryMap } from "../types/common";
 import { Link } from "react-router-dom";
 import useGetFailWiki from "../hooks/WikiPage/useGetFailWiki";
@@ -14,7 +14,7 @@ import useGetFailWiki from "../hooks/WikiPage/useGetFailWiki";
 const FailWiki = () => {
   const { wiki, loading, error } = useGetFailWiki();
   const [inputValue, setInputValue] = useState("");
-  const [resultList, setResultList] = useState<ResponseWikiSearch | null>(null);
+  const [resultList, setResultList] = useState<wikiTips | null>(null);
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>에러남.</div>;
@@ -24,7 +24,7 @@ const FailWiki = () => {
     try {
       if (value.trim() !== "") {
         const data = await getFailWikiResult({ keyword: value });
-        setResultList(data);
+        setResultList(data.result);
       }
     } catch (error) {
       console.log("실패위키 검색 실패", error);
@@ -80,7 +80,7 @@ const FailWiki = () => {
                 />
               </div>
               <div className="grid grid-cols-2 justify-items-start gap-y-[10px]">
-                {wiki?.slice(0, 4).map((item, idx) => (
+                {wiki?.result.slice(0, 4).map((item, idx) => (
                   <div
                     key={idx}
                     className={
