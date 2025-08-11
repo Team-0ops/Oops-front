@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface SearchInputProps {
   onSubmit: (value: string) => void;

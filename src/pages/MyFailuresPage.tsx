@@ -31,6 +31,7 @@ export default function MyFailuresPage() {
   const [catLoading, setCatLoading] = useState(false);
   const [catErr, setCatErr] = useState<string | null>(null);
 
+  console.log(hasNext)
   useEffect(() => {
     const loadCategories = async () => {
       try {
