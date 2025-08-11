@@ -185,16 +185,16 @@ const PostDetail = () => {
   };
 
   // 작성자 프로필 이동 핸들러 (아바타&닉네임 클릭)
-  const goAuthor = (authorId?: number | string) => (e: any) => {
-    e.stopPropagation();
-    if (authorId == null) return;
-    // 본인이면 마이페이지로
-    if (String(userId) === String(authorId)) {
-      navigate("/mypage");
-    } else {
-      navigate(`/users/${authorId}`);
-    }
-  };
+  // const goAuthor = (authorId?: number | string) => (e: any) => {
+  //   e.stopPropagation();
+  //   if (authorId == null) return;
+  //   // 본인이면 마이페이지로
+  //   if (String(userId) === String(authorId)) {
+  //     navigate("/mypage");
+  //   } else {
+  //     navigate(`/users/${authorId}`);
+  //   }
+  // };
 
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
@@ -238,7 +238,7 @@ const PostDetail = () => {
             onSlideChange={(swiper) => handleSlideChange(swiper.activeIndex)}
             className="w-full h-[50px]"
           >
-            {validPosts.map((post, index) => (
+            {validPosts.map((_post, index) => (
               <SwiperSlide
                 key={SITUATION_ORDER[index]}
                 className="!w-[80px] flex justify-center items-center"
