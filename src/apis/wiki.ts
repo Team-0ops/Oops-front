@@ -1,7 +1,7 @@
-import type { ResponseWikiSearch } from "../types/wkik";
+import type { ResponseCurrentWiki, ResponseWikiSearch } from "../types/wkik";
 import { axiosInstance } from "./axios";
 
-export const getCurrentWikis = async () => {
+export const getCurrentWikis = async (): Promise<ResponseCurrentWiki> => {
   const { data } = await axiosInstance.get("/failwiki/all");
   console.log(data);
   return data;

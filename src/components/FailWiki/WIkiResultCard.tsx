@@ -4,12 +4,25 @@ interface WikiResultProps {
   aiTip: string | null;
 }
 const WikiResultCard = ({ keyword, summary, aiTip }: WikiResultProps) => {
-  const result = (aiTip ?? summary ?? "")
-    .split(/(?<=[.,?!])\s+/) // 문장부호 뒤 공백 기준으로 split
-    .map((s) => s.trim()) // 앞뒤 공백 제거
-    .filter(Boolean);
+  const result = (summary ?? aiTip ?? "")
+    // 1차: . , 뒤 공백 기준 split
+    .split(/(?<=[.,])\s+/)
+    .flatMap((part) => {
+      // 2차: 길이 제한 적용
+      if (part.length <= 25) {
+        return part.trim();
+      }
 
-  console.log(result);
+      const chunks: string[] = [];
+      let start = 0;
+      while (start < part.length) {
+        chunks.push(part.slice(start, start + 25).trim());
+        start += 25;
+      }
+      return chunks;
+    })
+    .filter(Boolean); // 빈 문자열 제거
+
   return (
     <>
       <div className="flex flex-col w-full justify-center items-center">
@@ -29,9 +42,15 @@ const WikiResultCard = ({ keyword, summary, aiTip }: WikiResultProps) => {
               <span className="border-b-2 border-[#B3E378]">극복 팁 요약</span>
             </div>
             <div className="flex flex-col body4 gap-[22px] justify-center itmes-center text-center">
-              {result.map((sentence, idx) => (
-                <p key={idx}>{sentence}</p>
-              ))}
+              {result.length == 0 ? (
+                <>
+                  <p>극복 팁을 모으기에</p>
+                  <p>아직 {keyword} 관련 실패담이 더 필요해요!</p>
+                  <p>실패를 공유하며 다함께 성장해요!</p>
+                </>
+              ) : (
+                result.map((sentence, idx) => <p key={idx}>{sentence}</p>)
+              )}
             </div>
           </div>
         </div>

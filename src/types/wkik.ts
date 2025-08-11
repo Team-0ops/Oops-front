@@ -7,3 +7,13 @@ export type ResponseWikiSearch = {
   postCount: number;
   bestFailers: BestFailers[];
 };
+
+type wiki = {
+  keyword: string;
+  summary: string;
+  aiTip: string;
+  postCount: number;
+  modifiedAt: string;
+};
+
+export type ResponseCurrentWiki = wiki[];
