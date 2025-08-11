@@ -42,7 +42,9 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
 
 const PostDetail = () => {
   const navigate = useNavigate();
-  const { postId } = useParams<{ postId: string }>();
+  const { postId } = useParams<{
+    postId: string;
+  }>();
 
   //api 관련 훅
   const { postDetail, loading } = usePostDetail(Number(postId));
