@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect} from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
 import type { RootState } from "../store/store";
@@ -14,6 +14,8 @@ import { usePreviousPosts } from "../hooks/PostPage/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
 
 const PostWrite = () => {
+  const location = useLocation();
+  const topicNameFromState = location.state?.topicName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedStep = useSelector(
@@ -39,7 +41,8 @@ const PostWrite = () => {
 
   const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
-  const categories = [
+  const normalize = (s = "") => s.replace(/\s+/g, "").toLowerCase();
+  const [categories, setCategories] = useState<string[]>([
     "일상",
     "연애",
     "인간관계",
@@ -55,7 +58,7 @@ const PostWrite = () => {
     "부동산",
     "정신 건강",
     "자유",
-  ];
+  ]);
 
   // 이미지 업로드 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,12 +142,68 @@ const PostWrite = () => {
     };
   }, []);
 
+  // 카테고리 자동선택 (random -> post로 갈때)
+  useEffect(() => {
+    if (!topicNameFromState) return;
+
+    const n = normalize(topicNameFromState);
+
+    setCategories((prev) => {
+      const idx = prev.findIndex((c) => normalize(c) === n);
+      if (idx !== -1) {
+        setCategory(idx + 1); // 이미 있으면 바로 선택
+        return prev;
+      }
+      const next = [...prev, topicNameFromState]; // 없으면 동적 추가
+      setCategory(next.length); // 방금 추가한 항목 선택(1-based)
+      return next;
+    });
+  }, [topicNameFromState]);
+
+  // OopsList에서 클릭했을때 해당하는 카테고리 고정
+  useEffect(() => {
+    if (!selectedPostId) return;
+
+    // 현재 단계 기준 "이전 단계"를 결정
+    const sourceSituation =
+      selectedStep === 1 ? "OOPS" : selectedStep === 2 ? "OVERCOMING" : null;
+
+    if (!sourceSituation) return;
+
+    // 이전 단계에서 선택된 글 찾기
+    const selectedPrev = previousPosts
+      .filter((p) => p.situation === sourceSituation)
+      .find((p) => p.postId === selectedPostId);
+
+    if (!selectedPrev) return;
+
+    // categoryId가 있으면 그대로 사용
+    if (typeof (selectedPrev as any).categoryId === "number") {
+      setCategory((selectedPrev as any).categoryId);
+      return;
+    }
+
+    // categoryName만 있는 경우: 문자열 매칭/동적 추가
+    const name = (selectedPrev as any).categoryName as string | undefined;
+    if (!name) return;
+
+    setCategories((prev) => {
+      const idx = prev.findIndex((c) => normalize(c) === normalize(name));
+      if (idx !== -1) {
+        setCategory(idx + 1);
+        return prev;
+      }
+      const next = [...prev, name];
+      setCategory(next.length);
+      return next;
+    });
+  }, [selectedStep, selectedPostId, previousPosts]);
+
   // button 스타일
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   // 버튼 비활성화 및 자동 포커스
-
   const isFormValid = !!title.trim() && !!content.trim() && !!category;
 
   const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {

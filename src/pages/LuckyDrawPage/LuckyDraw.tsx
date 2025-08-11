@@ -22,7 +22,7 @@ const LuckyDraw = () => {
   const [showResult, setShowResult] = useState(false);
   const [showFullCard, setShowFullCard] = useState(false);
   const [selectedCard, setSelectedCard] = useState<LuckyCard & { FrontComponent: React.FC } | null>(null);
-  const [userPoint, setUserPoint] = useState<number>(0); // 초기값 0으로
+  const [userPoint, setUserPoint] = useState<number>(0);
   const navigate = useNavigate();
 
   const cardList = [Octo, Bunny, Whale, Octo, Octo, Octo, Octo, Octo, Octo];
@@ -102,8 +102,12 @@ const LuckyDraw = () => {
 
   return (
     <div className="w-full flex flex-col items-center relative bg-[#FFFBF8] min-h-screen px-[20px]">
-      {showFullCard && selectedCard && (
-        <FullResultCard onClose={handleCloseResult} card={selectedCard} />
+      {showFullCard && selectedCard && selectedIndex !== null && (
+        <FullResultCard
+          onClose={handleCloseResult}
+          card={selectedCard}
+          selectedIndex={selectedIndex}
+        />
       )}
 
       <button
@@ -131,21 +135,19 @@ const LuckyDraw = () => {
         ))}
       </div>
 
-
       <button
-  onClick={handleDrawClick}
-  disabled={isDrawDisabled}
-  className={`h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30
-    ${isDrawDisabled
-      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-      : "bg-[#B3E378] text-black"
-    }`}
->
-  {userPoint < 150
-    ? "150포인트가 모이면 뽑을 수 있어요!"
-    : "행운 부적 뽑으러 가기"}
-</button>
-
+        onClick={handleDrawClick}
+        disabled={isDrawDisabled}
+        className={`h-[63px] w-[335px] rounded-[4px] text-[16px] font-semibold mb-[20px] z-30
+          ${isDrawDisabled
+            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+            : "bg-[#B3E378] text-black"
+          }`}
+      >
+        {userPoint < 150
+          ? "150포인트가 모이면 뽑을 수 있어요!"
+          : "행운 부적 뽑으러 가기"}
+      </button>
     </div>
   );
 };
