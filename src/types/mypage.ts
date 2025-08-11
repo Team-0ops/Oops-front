@@ -50,3 +50,55 @@ export interface MyPostCardVM {
   views: number;
   category: string;
 }
+
+export type LessonDto = {
+  id: number;
+  title: string;
+  content: string;
+  tag: string;
+  thumbnailUrl?: string | null;
+  bestComment?: string;
+  bestCommentWriter?: string;
+};
+
+export type LessonWithPostDto = {
+  // lesson(교훈)
+  lessonId: number;
+  lessonTitle: string;
+  lessonContent: string;
+  tag: string;
+  bestComment?: string;
+  bestCommentWriter?: string;
+
+  // 원본 실패담(post)
+  postId: number;
+  postTitle: string;
+  postContent?: string;
+  postCategoryName?: string;
+  postThumbnailUrl?: string | null;
+
+  createdAt?: string;
+};
+
+export type OthersProfile = {
+  userId?: number | string;
+  nickname: string;
+  profileImageUrl: string | null;
+};
+
+export type OthersPost = {
+  id: number;
+  title: string;
+  contentPreview?: string;
+  imageUrl?: string | null;
+  likes?: number;
+  comments?: number;
+  views?: number;
+  categoryName?: string;
+};
+
+export type OthersProfileResult = {
+  profile: OthersProfile;
+  posts: OthersPost[]; // 최근 글 목록(백엔드 응답에 따라 없으면 빈 배열)
+  bestTitles?: string[]; // "베스트 failures" 제목 리스트(있으면 표시)
+};
