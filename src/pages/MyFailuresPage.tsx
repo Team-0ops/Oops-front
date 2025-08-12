@@ -42,6 +42,7 @@ export default function MyFailuresPage() {
     setTabStatus(next);
     setPage(0);
     setCards([]);
+    setHasNext(true);
   };
 
   useEffect(() => {
@@ -68,6 +69,9 @@ export default function MyFailuresPage() {
 
   useEffect(() => {
     const controller = new AbortController();
+    if (page > 0 && !hasNext) {
+      return () => controller.abort();
+    }
     const fetchList = async (reset: boolean) => {
       try {
         setLoading(true);
@@ -82,7 +86,11 @@ export default function MyFailuresPage() {
         const { result, pageInfo }: any = await getMyPosts(params);
 
         console.log("[MyPosts] request params:", params);
-        setHasNext(result.length >= size);
+        let next = Array.isArray(result) && result.length >= size;
+        if (pageInfo && typeof pageInfo.hasNext === "boolean") {
+          next = pageInfo.hasNext;
+        }
+        setHasNext(next);
 
         if (pageInfo && typeof pageInfo.hasNext === "boolean") {
           setHasNext(pageInfo.hasNext);
@@ -111,7 +119,7 @@ export default function MyFailuresPage() {
 
     fetchList(page === 0);
     return () => controller.abort();
-  }, [page, categoryId, tabStatus, size]);
+  }, [page, categoryId, tabStatus, size, hasNext]);
 
   const categoryNames = useMemo(
     () => [
@@ -144,6 +152,7 @@ export default function MyFailuresPage() {
     }
     setPage(0);
     setCards([]);
+    setHasNext(true);
   };
 
   return (
@@ -180,6 +189,24 @@ export default function MyFailuresPage() {
 
         {loading && <div className="text-center py-4">불러오는 중...</div>}
       </div>
+
+      {!loading && hasNext && (
+        <div className="flex justify-center py-4">
+          <button
+            type="button"
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded border px-4 py-2 text-sm"
+          >
+            더 보기
+          </button>
+        </div>
+      )}
+
+      {!loading && !hasNext && displayCards.length > 0 && (
+        <div className="text-center text-gray-400 py-4">
+          {/* 마지막 페이지입니다. */}
+        </div>
+      )}
 
       {/* 결과 없음 */}
       {!loading && displayCards.length === 0 && !err && (
