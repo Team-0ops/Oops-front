@@ -1,36 +1,31 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LeftArrow from "../assets/icons/left-point.svg?react";
 import Button from "../components/common/Button";
-import rawTerms from "../assets/terms/terms.md?raw";
 import { getTerms, type TermItem } from "../apis/termsApi";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function TermsPage() {
   const navigate = useNavigate();
-  const [search] = useSearchParams(); // 특정 약관 섹션으로 스크롤하려고
+  const [search] = useSearchParams();
   const [terms, setTerms] = useState<TermItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
   const location = useLocation();
 
-  const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  const getTitle = (t: TermItem | any): string =>
+    (t?.title as string | undefined) ?? (t?.name as string | undefined) ?? "";
 
+  const refs = useRef<Record<number, HTMLDivElement | null>>({});
   useEffect(() => {
     void (async () => {
       try {
-        setLoading(true);
-        setErr(null);
-        const list = await getTerms();
-        setTerms(list);
-      } catch (e: unknown) {
-        setErr(
-          e instanceof Error ? e.message : "이용약관을 불러오지 못했어요."
-        );
-      } finally {
-        setLoading(false);
+        const res = await getTerms();
+        const list = (Array.isArray(res) ? res : (res as any)?.result) ?? [];
+        setTerms(list as TermItem[]);
+      } catch (e) {
+        console.error("약관 로드 실패:", e);
       }
     })();
   }, []);
+
   const anchor = useMemo(() => {
     const idParam = search.get("id");
     const keyParam = search.get("key");
@@ -38,24 +33,12 @@ export default function TermsPage() {
     return { id: Number.isFinite(id) ? (id as number) : null, key: keyParam };
   }, [search]);
 
-  useEffect(() => {
-    if (!terms.length) return;
-    const target =
-      terms.find((t) => (anchor.id ? t.id === anchor.id : false)) ??
-      terms.find((t) => (anchor.key ? t.name === anchor.key : false));
-    if (target && refs.current[target.id]) {
-      refs.current[target.id]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [terms, anchor]);
-
   const targetId = useMemo(() => {
     if (anchor.id != null) return anchor.id;
     const s = (location.state as any)?.termId;
     return typeof s === "number" ? s : null;
   }, [anchor, location.state]);
+
   const keyFromName = (name: string) => {
     if (!name) return "service";
     if (name.includes("개인정보")) return "privacy";
@@ -63,10 +46,39 @@ export default function TermsPage() {
     return "service";
   };
 
-  // 동의 후 돌아가기 시 현재 약관 선택값을 저장
+  useEffect(() => {
+    if (!terms.length) return;
+
+    const byId =
+      anchor.id != null ? terms.find((t: any) => t.id === anchor.id) : null;
+
+    const byKey =
+      !byId && anchor.key
+        ? terms.find((t) => {
+            const title = getTitle(t);
+            return anchor.key === "privacy"
+              ? title.includes("개인정보")
+              : anchor.key === "marketing"
+                ? title.includes("마케팅") || title.includes("광고")
+                : true;
+          })
+        : null;
+
+    const target = byId ?? byKey ?? null;
+
+    if (target && refs.current[(target as any).id]) {
+      refs.current[(target as any).id]?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [terms, anchor]);
+
   const handleAgree = () => {
     const stored = sessionStorage.getItem("signupTerms");
-    const currentTerm = targetId ? terms.find((t) => t.id === targetId) : null;
+    const currentTerm = targetId
+      ? (terms as any).find((t: any) => t.id === targetId)
+      : null;
 
     if (stored) {
       try {
@@ -89,18 +101,16 @@ export default function TermsPage() {
             marketing?: boolean;
           };
           if (currentTerm) {
-            const k = keyFromName(currentTerm.name);
-            obj[k as "service" | "privacy" | "marketing"] = true;
+            const k = keyFromName(getTitle(currentTerm)); // ✅ title/name 호환
+            (obj as any)[k] = true;
             obj.all = !!(obj.service && obj.privacy && obj.marketing);
           }
           sessionStorage.setItem("signupTerms", JSON.stringify(obj));
-        } else {
-          if (targetId != null) {
-            sessionStorage.setItem(
-              "signupTerms",
-              JSON.stringify([{ termId: targetId, agreed: true }])
-            );
-          }
+        } else if (targetId != null) {
+          sessionStorage.setItem(
+            "signupTerms",
+            JSON.stringify([{ termId: targetId, agreed: true }])
+          );
         }
       } catch {
         if (targetId != null) {
@@ -110,13 +120,11 @@ export default function TermsPage() {
           );
         }
       }
-    } else {
-      if (targetId != null) {
-        sessionStorage.setItem(
-          "signupTerms",
-          JSON.stringify([{ termId: targetId, agreed: true }])
-        );
-      }
+    } else if (targetId != null) {
+      sessionStorage.setItem(
+        "signupTerms",
+        JSON.stringify([{ termId: targetId, agreed: true }])
+      );
     }
 
     navigate("/signup", { state: { fromTerms: true } });
@@ -134,8 +142,32 @@ export default function TermsPage() {
       </div>
 
       <div className="mt-[18px] flex w-[335px] flex-col gap-[18px]">
-        <div className="h-[600px] overflow-y-auto p-[12px] text-[12px] whitespace-pre-line leading-[18px] text-[#4D4D4D]">
-          {rawTerms}
+        {/* 약관 내용 (API 데이터에서 받아옴) */}
+        <div className="h-[600px] overflow-y-auto space-y-[24px]">
+          {terms.map((t) => (
+            <div
+              key={(t as any).id}
+              ref={(el) => {
+                refs.current[(t as any).id] = el;
+              }}
+              className="p-[12px] rounded-[8px] bg-white/0"
+            >
+              <div className="mb-[8px] flex items-center gap-[8px]">
+                <h3 className="text-[14px] font-semibold text-[#1D1D1D]">
+                  {getTitle(t)}
+                </h3>
+                {(t as any).required === "REQUIRED" && (
+                  <span className="text-[11px] text-[#808080]">(필수)</span>
+                )}
+                {(t as any).required === "OPTIONAL" && (
+                  <span className="text-[11px] text-[#808080]">(선택)</span>
+                )}
+              </div>
+              <div className="text-[12px] whitespace-pre-line leading-[18px] text-[#4D4D4D]">
+                {(t as any).content}
+              </div>
+            </div>
+          ))}
         </div>
 
         <Button variant="primary" size="lg" onClick={handleAgree}>
