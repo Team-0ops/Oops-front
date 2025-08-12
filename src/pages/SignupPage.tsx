@@ -55,6 +55,10 @@ const SignupPage = () => {
     (key: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
       const nextForm = { ...form, [key]: e.target.value };
       setFormAndSave(nextForm);
+      if (key === "email") {
+        setEmailChecked(null);
+        sessionStorage.removeItem("emailChecked");
+      }
     };
 
   //약관 값 불러오기
@@ -90,6 +94,9 @@ const SignupPage = () => {
 
       const storedForm = sessionStorage.getItem("signupForm");
       if (storedForm) setForm(JSON.parse(storedForm));
+
+      const storedEmailChecked = sessionStorage.getItem("emailChecked");
+      if (storedEmailChecked === "true") setEmailChecked(true);
     }
   }, [location.state]);
 
@@ -97,6 +104,7 @@ const SignupPage = () => {
   const handleEmailCheck = () => {
     // api없음
     setEmailChecked(true); // '확인됨' 상태로 강제
+    sessionStorage.setItem("emailChecked", "true");
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -128,6 +136,7 @@ const SignupPage = () => {
       // 가입 완료 시 세션 정리
       sessionStorage.removeItem("signupTerms");
       sessionStorage.removeItem("signupForm");
+      sessionStorage.removeItem("emailChecked");
     } catch (error: any) {
       console.error("회원가입 실패:", error);
       console.error("서버 응답:", error.response?.data);
