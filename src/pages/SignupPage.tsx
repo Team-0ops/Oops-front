@@ -69,23 +69,23 @@ const SignupPage = () => {
       if (storedTerms) {
         try {
           const parsed = JSON.parse(storedTerms);
+
           if (Array.isArray(parsed)) {
-            const next: Terms = {
-              all: parsed.every((x: any) => x?.agreed === true),
-              service: parsed.some(
-                (x: any) => x?.termId === TERM_ID.service && x?.agreed === true
-              ),
-              privacy: parsed.some(
-                (x: any) => x?.termId === TERM_ID.privacy && x?.agreed === true
-              ),
-              marketing: parsed.some(
-                (x: any) =>
-                  x?.termId === TERM_ID.marketing && x?.agreed === true
-              ),
-            };
-            setTerms(next);
+            const byId = new Map<number, boolean>(
+              parsed.map((x: any) => [x.termId, !!x.agreed])
+            );
+            const service = byId.get(TERM_ID.service) === true;
+            const privacy = byId.get(TERM_ID.privacy) === true;
+            const marketing = byId.get(TERM_ID.marketing) === true;
+            const all = service && privacy && marketing;
+            setTerms({ all, service, privacy, marketing });
           } else {
-            setTerms(parsed as Terms);
+            const obj = parsed as Partial<Terms>;
+            const service = !!obj.service;
+            const privacy = !!obj.privacy;
+            const marketing = !!obj.marketing;
+            const all = service && privacy && marketing;
+            setTerms({ all, service, privacy, marketing });
           }
         } catch {
           // 무시
