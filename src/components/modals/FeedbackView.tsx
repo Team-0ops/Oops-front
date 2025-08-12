@@ -27,7 +27,7 @@ const FeedbackView = ({ postId, onClose }: FeedbackViewProps) => {
           <span className="caption1 text-[#4d4d4d] mt-[4px]">{lesson?.content}</span>
         </div>
         <div className="flex justify-end gap-[6px] flex-wrap">
-          {lesson?.tagNames?.map((tag) => (
+          {lesson?.tagNames?.map((tag:string) => (
             <span
               key={tag}
               className="caption1 text-[#fff] h-[20px] bg-[#1d1d1d] rounded-[4px] py-[3px] px-[7px]"

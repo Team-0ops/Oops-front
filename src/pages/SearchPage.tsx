@@ -2,7 +2,6 @@ import { useState } from "react";
 import PostCard from "../components/common/PostCard";
 import SearchHeader from "../components/SearchPage/SearchHeader";
 import SearchInput from "../components/SearchPage/SearchInput";
-import useGetSearchedPostList from "../hooks/SearchPage/useGeSearchedPostList";
 import type { Post, ResponseCategoryPostListDTO } from "../types/post";
 import { getSearchedPostList } from "../apis/post";
 

@@ -45,6 +45,8 @@ export default function MyFailuresPage() {
     setHasNext(true);
   };
 
+  console.log(hasNext);
+
   useEffect(() => {
     const loadCategories = async () => {
       try {
