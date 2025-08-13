@@ -1,4 +1,3 @@
-//import axios from "axios";
 import instance from "../instance";
 import Cookies from "js-cookie";
 
@@ -6,21 +5,20 @@ type LoginResult =
   | { accessToken: string; refreshToken?: string; userId?: string | number }
   | string;
 
-//회원가입
-export const postSignup = async ({
-  email,
-  userName,
-  password,
-}: {
+export type TermsAgreementItem = {
+  termId: number;
+  agreed: boolean;
+};
+
+export interface SignupBody {
   email: string;
   userName: string;
   password: string;
-}) => {
-  const res = await instance.post("/auth/join", {
-    email,
-    userName,
-    password,
-  });
+  termsAgreement: TermsAgreementItem[];
+}
+
+export const postSignup = async (body: SignupBody) => {
+  const res = await instance.post("/auth/join", body);
   return res.data;
 };
 

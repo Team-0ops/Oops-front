@@ -8,21 +8,8 @@ import othersProfile from "../assets/icons/othersprofile.svg";
 
 import type { OthersProfileResult } from "../types/mypage";
 import { getOthersProfile } from "../apis/othersApi";
+import BestFailerTitleList from "../components/common/BestFailerTitleList"; // 경로 확인
 
-// function pickPostId(x: any) {
-//   return (
-//     x.postId ??
-//     x.id ??
-//     x.post?.postId ??
-//     x.post?.id ??
-//     x.failureId ??
-//     x.failure?.id ??
-//     x.failure?.postId ??
-//     0
-//   );
-// }
-
-// 서버 post → PostCard 프롭으로 매핑
 function toCard(p: any) {
   return {
     postId: p.postId ?? p.id ?? null,
@@ -70,9 +57,6 @@ export default function OthersProfilePage() {
 
   console.log("[others] raw posts", data?.posts);
 
-  const bestFails: string[] =
-    ((data as any)?.bestFails as string[] | undefined) ?? [];
-
   return (
     <div className="min-h-screen bg-[#FFFBF8] flex flex-col">
       <Navbar />
@@ -102,7 +86,6 @@ export default function OthersProfilePage() {
               {nickname}
             </p>
           </div>
-
           {/* 게시물 카드 */}
           <div className="mt-[20px] flex flex-col gap-[12px] px-[20px]">
             {cards.map((p) => (
@@ -116,11 +99,6 @@ export default function OthersProfilePage() {
                 comments={p.comments}
                 views={p.views}
                 category={p.category}
-                // author={{
-                //   id: p.authorId,
-                //   name: p.authorName,
-                //   avatar: p.authorAvatar,
-                // }}
               />
             ))}
             {cards.length === 0 && (
@@ -129,33 +107,10 @@ export default function OthersProfilePage() {
               </p>
             )}
           </div>
-
-          {/* 베스트 failures 있을 때만 표시함 */}
-          <div className="mt-[32px] px-[20px]">
-            <h3 className="mb-[12px] text-[16px] font-semibold">
-              베스트 failers
-            </h3>
-            <ul className="divide-y divide-[#E6E6E6] rounded-[4px] bg-[#F9F5F1]">
-              {bestFails.length > 0 ? (
-                bestFails.map((title, i) => (
-                  <li
-                    key={`${title}-${i}`}
-                    className="px-[14px] py-[10px] text-[14px]"
-                  >
-                    {title}
-                  </li>
-                ))
-              ) : (
-                <li className="px-[14px] py-[10px] text-[14px] text-[#808080]">
-                  아직 베스트 실패담이 없어요.
-                </li>
-              )}
-            </ul>
-          </div>
+          <BestFailerTitleList />
+          <div className="h-[50px]" />
         </>
       )}
-
-      <div className="flex-grow" />
       <Footer />
     </div>
   );
