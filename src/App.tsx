@@ -47,6 +47,7 @@ import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
 import PostWriteLayout from "./layout/PostWriteLayout";
 import FailWiki from "./pages/FailWiki";
 import { AuthProvider } from "./context/AuthContext";
+import ProtectedLayout from "./layout/ProtectedLayout";
 
 function App() {
   //userId가 필요해서 꺼내 쓰기 위해 최상위 폴더에서 useEffect활용
@@ -72,6 +73,65 @@ function App() {
         { path: "random-feed", element: <RandomFeed /> },
         { path: "best-feed", element: <BestFeed /> },
         { path: "exrandom-feed", element: <ExRandomFeed /> },
+        // { path: "postsuccess", element: <PostSuccess /> },
+        // { path: "post/:postId", element: <PostDetail /> },
+        // { path: "drawer", element: <CategoryDrawerTest /> },
+        // { path: "fail-wiki", element: <FailWiki /> },
+        // {
+        //   path: "/lucky-draw",
+        //   element: (
+        //     <ProtectedRoute>
+        //       <LuckyDraw />
+        //     </ProtectedRoute>
+        //   ),
+        // },
+      ],
+    },
+
+    {
+      path: "/mypage",
+      element: (
+        <ProtectedRoute>
+          <MyPageLayout />
+        </ProtectedRoute>
+      ),
+      children: [
+        { index: true, element: <Navigate to="failures" replace /> },
+        { path: "failures", element: <MyFailuresPage /> },
+        { path: "lessons", element: <MyLessonsPage /> },
+        { path: "profile", element: <MyProfilePage /> },
+      ],
+    },
+
+    // {
+    //   path: "/post",
+    //   element: (
+    //     <ProtectedRoute>
+    //       <PostWriteLayout />
+    //     </ProtectedRoute>
+    //   ),
+    //   children: [{ index: true, element: <PostWrite /> }],
+    // },
+
+    // {
+    //   path: "/users/:userId",
+    //   element: <OthersProfilePage />,
+    // },
+
+    { path: "/signin", element: <SigninPage /> },
+    { path: "/signup", element: <SignupPage /> },
+    { path: "/find-idpw", element: <FindIdPwPage /> },
+    { path: "/terms", element: <TermsPage /> },
+    { path: "/search", element: <SearchPage /> },
+  ];
+
+  //여기에 portextedroute로 넣어주시면 됩니당...
+  const protectedRoutes: RouteObject[] = [
+    {
+      path: "/",
+      element: <ProtectedLayout />,
+      errorElement: <div>Not Found</div>,
+      children: [
         { path: "postsuccess", element: <PostSuccess /> },
         { path: "post/:postId", element: <PostDetail /> },
         // { path: "drawer", element: <CategoryDrawerTest /> },
@@ -116,15 +176,9 @@ function App() {
       path: "/users/:userId",
       element: <OthersProfilePage />,
     },
-
-    { path: "/signin", element: <SigninPage /> },
-    { path: "/signup", element: <SignupPage /> },
-    { path: "/find-idpw", element: <FindIdPwPage /> },
-    { path: "/terms", element: <TermsPage /> },
-    { path: "/search", element: <SearchPage /> },
   ];
 
-  const router = createBrowserRouter([...publicRoutes]);
+  const router = createBrowserRouter([...publicRoutes, ...protectedRoutes]);
 
   return (
     <AuthProvider>

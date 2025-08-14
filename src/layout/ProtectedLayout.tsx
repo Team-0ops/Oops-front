@@ -1,8 +1,14 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import { useAuth } from "../context/AuthContext";
 
-const HomeLayout = () => {
+const ProtectedLayout = () => {
+  const { accessToken } = useAuth();
+
+  if (!accessToken) {
+    return <Navigate to={"/signin"} replace />;
+  }
   const location = useLocation();
   const isFooterHidden = location.pathname === "/lucky-draw";
 
@@ -19,4 +25,4 @@ const HomeLayout = () => {
   );
 };
 
-export default HomeLayout;
+export default ProtectedLayout;

@@ -5,11 +5,16 @@ import type {
 } from "../types/post";
 import { axiosInstance } from "./axios";
 
-
-
 export const getPostListInMainPage =
   async (): Promise<ResponseMainPostListDTO> => {
     const { data } = await axiosInstance.get("/feeds/home/first-auth");
+    console.log(data);
+    return data;
+  };
+
+export const getPostListInMainPagetoGuest =
+  async (): Promise<ResponseMainPostListDTO> => {
+    const { data } = await axiosInstance.get("/feeds/home/first-guest");
     console.log(data);
     return data;
   };
