@@ -2,7 +2,7 @@ import { useState } from "react";
 import PostCard from "../components/common/PostCard";
 import SearchHeader from "../components/SearchPage/SearchHeader";
 import SearchInput from "../components/SearchPage/SearchInput";
-import type { Post, ResponseCategoryPostListDTO } from "../types/post";
+import type { ResponseCategoryPostListDTO } from "../types/post";
 import { getSearchedPostList } from "../apis/post";
 
 const SearchPage = () => {
@@ -52,7 +52,7 @@ const SearchPage = () => {
                     likes={post.likes}
                     comments={post.comments}
                     views={post.views}
-                    category={post.categoryName}
+                    category={post.categoryOrTopicName}
                   />
                 ))
               ) : (

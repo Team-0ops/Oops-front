@@ -14,7 +14,7 @@ const BestFeed = () => {
       try {
         const data = await getBestFailersFeed(0, 10); 
         console.log("응답 posts:", data);
-        setPosts(data ?? []);
+        setPosts(data);
       } catch (err) {
         console.error("베스트 피드 조회 실패:", err);
         setPosts([]);
