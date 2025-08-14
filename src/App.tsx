@@ -46,6 +46,7 @@ import OthersProfilePage from "./pages/OthersProfilePage";
 import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";
 import PostWriteLayout from "./layout/PostWriteLayout";
 import FailWiki from "./pages/FailWiki";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   //userId가 필요해서 꺼내 쓰기 위해 최상위 폴더에서 useEffect활용
@@ -126,9 +127,11 @@ function App() {
   const router = createBrowserRouter([...publicRoutes]);
 
   return (
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
+    <AuthProvider>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
+    </AuthProvider>
   );
 }
 
