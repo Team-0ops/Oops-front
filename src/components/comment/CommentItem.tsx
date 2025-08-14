@@ -12,7 +12,7 @@ import ColorLike from "../../assets/icons/ColorHeart.svg?react";
 
 import { useCheerComment } from "../../hooks/PostPage/useCheerComment";
 import { useDeleteComment } from "../../hooks/PostPage/useDeleteComment";
-import { useNavigate } from "react-router-dom";
+import { useCommentLikeOptimistic } from "../../hooks/Mutation/useCommentLikeOptimistic";
 
 interface CommentProps {
   comment: Comment;
@@ -27,15 +27,10 @@ const CommentItem = ({
   isReply = false,
   onReplySubmit
 }: CommentProps) => {
-  const navigate = useNavigate();
   //userId 뽑아오기 (내 게시글인지 인식표)
   const userId = useSelector((state: RootState) => state.user.userId);
 
   const [isReportOpen, setIsReportOpen] = useState(false);
-
-  const [liked, setLiked] = useState(comment.liked);
-  const [likes, setLikes] = useState(comment.likes);
-  const { cheerComment } = useCheerComment();
 
   const { deleteComment, success } = useDeleteComment();
 
@@ -62,18 +57,22 @@ const CommentItem = ({
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
 
-  const handleLikeClick = async () => {
-    try {
-      await cheerComment(Number(comment.id));
-      setLiked(comment.liked);
-      setLikes(comment.likes);
-
-      // 서버 데이터 동기화가 필요하다면
-      // if (onReload) onReload();
-    } catch (e) {
-      alert("공감 실패!");
-      throw e;
-    }
+  const {
+    liked,
+    likes,
+    toggle: toggleCommentLike,
+  } = useCommentLikeOptimistic({
+    postId,
+    commentId: comment.id,           // 문자열/숫자 모두 허용
+    initialLiked: comment.liked,
+    initialLikes: comment.likes,
+    // extraInvalidateKeys: [["feed"]], // 필요 시 목록 캐시도 무효화
+  });
+  
+  // 클릭 핸들러
+  const handleLikeClick = () => {
+    if (!comment.id) return; // 방어
+    toggleCommentLike();
   };
 
   const handleReplySubmit = async (text: string) => {
@@ -82,7 +81,7 @@ const CommentItem = ({
     onReplySubmit?.(String(comment.id), text);
     setShowReplyForm(false);
   };
- console.log("코멘트 아이디", comment.id)
+
   return (
     <>
       {/* 댓글 본문 */}
@@ -99,7 +98,7 @@ const CommentItem = ({
                   onClick={() => {
                     deleteComment(Number(postId), Number(comment.id));
                     {
-                      if (success) navigate("/");
+                      if (success) alert("삭제되었습니다.");
                     }
                   }}
                 >
