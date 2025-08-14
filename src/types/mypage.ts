@@ -28,6 +28,8 @@ export interface PostsSection<T> {
   last: boolean;
 }
 
+export type MyPostStatus = "OOPS" | "OVERCOMING" | "OVERCOME";
+
 export interface MyPostDto {
   postId: number;
   title: string;
@@ -38,6 +40,8 @@ export interface MyPostDto {
   views?: number;
   categoryName?: string;
   createdAt?: string;
+  status?: MyPostStatus;
+  situation?: MyPostStatus;
 }
 
 export interface MyPostCardVM {
@@ -49,6 +53,7 @@ export interface MyPostCardVM {
   comments: number;
   views: number;
   category: string;
+  status?: MyPostStatus;
 }
 
 export type LessonDto = {

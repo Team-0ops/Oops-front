@@ -6,7 +6,7 @@ import Button from "../components/common/Button";
 import PasswordInput from "../components/auth/PasswordInput";
 import TermsGroup from "../components/auth/TermsGroup";
 import TextInput from "../components/auth/TextInput";
-import { postSignup } from "../apis/auth/authApi";
+import { postSignup, type TermsAgreementItem } from "../apis/auth/authApi";
 import AlertModal from "../components/auth/AlertModal";
 
 interface Terms {
@@ -15,6 +15,12 @@ interface Terms {
   privacy: boolean;
   marketing: boolean;
 }
+
+const TERM_ID = {
+  service: 1,
+  privacy: 2,
+  marketing: 3,
+} as const;
 
 const SignupPage = () => {
   //폼 상태
@@ -38,7 +44,7 @@ const SignupPage = () => {
     marketing: false,
   });
 
-  const location = useLocation(); // location 훅 사용
+  const location = useLocation();
   const setFormAndSave = (next: typeof form) => {
     setForm(next);
     sessionStorage.setItem("signupForm", JSON.stringify(next));
@@ -49,52 +55,94 @@ const SignupPage = () => {
     (key: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
       const nextForm = { ...form, [key]: e.target.value };
       setFormAndSave(nextForm);
+      if (key === "email") {
+        setEmailChecked(null);
+        sessionStorage.removeItem("emailChecked");
+      }
     };
 
-  //세션 스토리지에서 약관 값 불러오기
+  //약관 값 불러오기
   useEffect(() => {
     if (location.state?.fromTerms) {
       const storedTerms = sessionStorage.getItem("signupTerms");
+
       if (storedTerms) {
-        setTerms(JSON.parse(storedTerms));
+        try {
+          const parsed = JSON.parse(storedTerms);
+
+          if (Array.isArray(parsed)) {
+            const byId = new Map<number, boolean>(
+              parsed.map((x: any) => [x.termId, !!x.agreed])
+            );
+            const service = byId.get(TERM_ID.service) === true;
+            const privacy = byId.get(TERM_ID.privacy) === true;
+            const marketing = byId.get(TERM_ID.marketing) === true;
+            const all = service && privacy && marketing;
+            setTerms({ all, service, privacy, marketing });
+          } else {
+            const obj = parsed as Partial<Terms>;
+            const service = !!obj.service;
+            const privacy = !!obj.privacy;
+            const marketing = !!obj.marketing;
+            const all = service && privacy && marketing;
+            setTerms({ all, service, privacy, marketing });
+          }
+        } catch {
+          // 무시
+        }
       }
 
       const storedForm = sessionStorage.getItem("signupForm");
       if (storedForm) setForm(JSON.parse(storedForm));
+
+      const storedEmailChecked = sessionStorage.getItem("emailChecked");
+      if (storedEmailChecked === "true") setEmailChecked(true);
     }
   }, [location.state]);
 
   //중복확인
   const handleEmailCheck = () => {
-    // api연동
-    setEmailChecked(true); // 일단은 “확인됨” 상태로 강제
+    // api없음
+    setEmailChecked(true); // '확인됨' 상태로 강제
+    sessionStorage.setItem("emailChecked", "true");
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("form값 확인:", form);
-    // API 연동
+    if (!terms.service || !terms.privacy) {
+      setAlertMsg("필수 약관(서비스, 개인정보)에 동의해 주세요.");
+      setShowAlert(true);
+      return;
+    }
+
+    const termsAgreement: TermsAgreementItem[] = [
+      { termId: TERM_ID.service, agreed: terms.service },
+      { termId: TERM_ID.privacy, agreed: terms.privacy },
+      { termId: TERM_ID.marketing, agreed: terms.marketing },
+    ];
+
     try {
       const res = await postSignup({
         email: form.email,
         userName: form.userName,
         password: form.password,
+        termsAgreement,
       });
 
       console.log("회원가입 성공:", res);
-      //alert("회원가입이 완료되었습니다!");
       setAlertMsg("회원가입이 완료되었습니다!");
       setShowAlert(true);
-      // 로그인 페이지로 이동
-      //navigate("/signin");
 
+      // 가입 완료 시 세션 정리
       sessionStorage.removeItem("signupTerms");
       sessionStorage.removeItem("signupForm");
+      sessionStorage.removeItem("emailChecked");
     } catch (error: any) {
       console.error("회원가입 실패:", error);
       console.error("서버 응답:", error.response?.data);
-      //alert("회원가입 중 오류가 발생했습니다.");
-      setAlertMsg("회원가입 중 오류가 발생했습니다.");
+      setAlertMsg(
+        error?.response?.data?.message ?? "회원가입 중 오류가 발생했습니다."
+      );
       setShowAlert(true);
     }
   };
@@ -106,7 +154,6 @@ const SignupPage = () => {
     !terms.service ||
     !terms.privacy;
 
-  //JSX
   return (
     <>
       {showAlert && (
@@ -203,7 +250,7 @@ const SignupPage = () => {
             type="submit"
             disabled={isSubmitDisabled}
             className="mt-[32px] h-[50px] w-full rounded-[4px] bg-[#B3E378] text-[14px] font-semibold text-[#1D1D1D]
-+              hover:opacity-90 disabled:opacity-50"
+             hover:opacity-90 disabled:opacity-50"
           >
             회원가입
           </Button>
