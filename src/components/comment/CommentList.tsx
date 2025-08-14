@@ -4,10 +4,10 @@ import CommentItem from "./CommentItem";
 interface CommentListProps {
   comments: Comment[];
   postId: number;
-  // onReload: () => void;
+  onReplySubmit?: (parentId: string, text: string) => void;
 }
 
-const CommentList = ({ comments, postId }: CommentListProps) => {
+const CommentList = ({ comments, postId, onReplySubmit }: CommentListProps) => {
   if (comments.length === 0) {
     return (
       <div className="text-center text-[#999999] caption3 py-[20px]">
@@ -30,7 +30,7 @@ const CommentList = ({ comments, postId }: CommentListProps) => {
           <CommentItem
             comment={comment}
             postId={postId}
-            // onReload={onReload}
+            onReplySubmit={onReplySubmit}
           />
 
           {/* 대댓글 */}
@@ -39,8 +39,8 @@ const CommentList = ({ comments, postId }: CommentListProps) => {
               key={reply.id}
               comment={reply}
               postId={postId}
-              // onReload={onReload}
               isReply // 대댓글임을 표시
+              onReplySubmit={onReplySubmit}
             />
           ))}
         </div>

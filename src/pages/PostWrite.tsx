@@ -120,9 +120,9 @@ const PostWrite = () => {
       setContent("");
       setImages([]);
       setCommentType([]);
-      alert("성공");
+      console.log("성공");
     } catch (error) {
-      alert("글 작성에 실패했습니다. 다시 시도해주세요.");
+      console.log("글 작성에 실패했습니다. 다시 시도해주세요.");
       console.error(error);
     }
   };
