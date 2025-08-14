@@ -5,22 +5,19 @@ import { getMyLessons } from "../apis/mypageApi";
 const tags = ["인생 교훈", "회사", "친구", "먹을 거", "위로"];
 
 export default function MyLessonsPage() {
-  const [tag, setTag] = useState<string>(tags[0]);
+  const [tag, setTag] = useState<string | null>(null);
   const [lessons, setLessons] = useState<LessonDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!tag) {
-      setLessons([]);
-      setErr(null);
-      return;
-    }
     (async () => {
       try {
         setLoading(true);
         setErr(null);
-        //API 연동
-        const { items } = await getMyLessons({ tag, page: 0, size: 10 });
+        const params: any = { page: 0, size: 10 };
+        if (tag) params.tag = tag;
+        const { items } = await getMyLessons(params);
         setLessons(items);
       } catch (e: any) {
         setErr(
@@ -31,7 +28,6 @@ export default function MyLessonsPage() {
       }
     })();
   }, [tag]);
-
   return (
     <section className="p-4">
       {/* 태그 필터 */}
@@ -50,25 +46,16 @@ export default function MyLessonsPage() {
           </button>
         ))}
       </div>
-
       {/* 상태 표시 */}
-      {!tag && (
-        <p className="mt-20 text-center text-[#808080]">
-          보고 싶은 교훈 태그를 선택해 주세요.
-        </p>
-      )}
-      {tag && loading && <p className="p-4">불러오는 중...</p>}
-      {tag && err && <p className="p-4 text-red-500">{err}</p>}
-
+      {loading && <p className="p-4">불러오는 중...</p>}
+      {err && <p className="p-4 text-red-500">{err}</p>}
       {/* 리스트 */}
-      {tag &&
-        !loading &&
+      {!loading &&
         !err &&
         (lessons.length > 0 ? (
           <div className="flex flex-col items-center gap-[12px]">
             {lessons.map((lesson) => (
               <div key={lesson.id} className="w-full flex justify-center">
-                {/* 카드 컨테이너에 relative 필수 */}
                 <div className="relative w-[335px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[12px]">
                   {/* 제목 */}
                   <h4 className="max-w-[240px] truncate text-[14px] font-bold text-[#1D1D1D]">
@@ -79,7 +66,6 @@ export default function MyLessonsPage() {
                     {lesson.content}
                   </p>
 
-                  {/* ✅ 교훈 태그 배지 (피그마 스타일) */}
                   <span
                     className="
                       absolute right-[14px] bottom-[7px]
@@ -96,7 +82,9 @@ export default function MyLessonsPage() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-[#808080]">{tag} 교훈이 없습니다.</p>
+          <p className="text-center text-[#808080]">
+            {tag ? `${tag} 교훈이 없습니다.` : "작성한 모든 교훈이 없습니다."}
+          </p>
         ))}
     </section>
   );

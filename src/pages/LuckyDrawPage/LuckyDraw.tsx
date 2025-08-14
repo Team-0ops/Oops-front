@@ -59,7 +59,7 @@ const LuckyDraw = () => {
     if (name.includes("펭")) return 3;
     if (name.includes("냥")) return 4;
     if (name.includes("강아지") || name.includes("멍")) return 5;
-    if (name.includes("느려") || name.includes("늘보")) return 6;
+    if (name.includes("꾸준") || name.includes("거북이")) return 6;
     if (name.includes("곰")) return 7;
     if (name.includes("악어") || name.includes("아거")) return 8;
     return 0;
