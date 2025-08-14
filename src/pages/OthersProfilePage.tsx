@@ -11,8 +11,12 @@ import { getOthersProfile } from "../apis/othersApi";
 import BestFailerTitleList from "../components/common/BestFailerTitleList"; // 경로 확인
 
 function toCard(p: any) {
+  const rawId =
+    p.postId ?? p.id ?? p.post?.id ?? p.post_id ?? p.postID ?? undefined;
+  const n = typeof rawId === "number" ? rawId : Number(rawId);
+  const safeId = Number.isFinite(n) && n > 0 ? n : undefined;
   return {
-    postId: p.postId ?? p.id ?? null,
+    postId: safeId,
     title: p.title ?? "",
     content: p.content ?? p.contentPreview ?? "",
     imageUrl: p.thumbnailUrl ?? p.imageUrl ?? undefined,
