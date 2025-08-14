@@ -1,4 +1,3 @@
-//import { type ChangeEvent, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 export interface Terms {
@@ -15,16 +14,35 @@ interface Props {
 
 export default function TermsGroup({ value, onChange }: Props) {
   const navigate = useNavigate();
+  const TERM_ID = { service: 1, privacy: 2, marketing: 3 } as const;
+
+  const goToTerms = (k: keyof Terms) => {
+    const id =
+      k === "service"
+        ? TERM_ID.service
+        : k === "privacy"
+          ? TERM_ID.privacy
+          : k === "marketing"
+            ? TERM_ID.marketing
+            : undefined;
+    if (id) {
+      navigate(`/terms?id=${id}`, { state: { termId: id, fromTerms: true } });
+    } else {
+      navigate("/terms", { state: { fromTerms: true } });
+    }
+  };
+
   const toggle = (key: keyof Terms) => {
-    //이용약관만 단독 클릭한 경우
     if (
-      key === "service" &&
-      !value.service && // 현재는 체크 안되어 있고
-      !value.privacy &&
-      !value.marketing &&
-      !value.all
+      (key === "service" || key === "privacy" || key === "marketing") &&
+      !value[key] &&
+      !value.all &&
+      Object.entries(value)
+        .filter(([k]) => k !== "all")
+        .every(([, v]) => v === false)
     ) {
-      navigate("/terms"); // 약관 페이지로 이동
+      goToTerms(key);
+      return;
     }
 
     // 전체선택 토글
@@ -36,7 +54,7 @@ export default function TermsGroup({ value, onChange }: Props) {
         privacy: next,
         marketing: next,
       };
-      sessionStorage.setItem("signupTerms", JSON.stringify(updated)); // 저장
+      sessionStorage.setItem("signupTerms", JSON.stringify(updated));
       onChange(updated);
       return;
     }
@@ -46,15 +64,9 @@ export default function TermsGroup({ value, onChange }: Props) {
     nextState.all =
       nextState.service && nextState.privacy && nextState.marketing;
 
-    sessionStorage.setItem("signupTerms", JSON.stringify(nextState)); // 저장
+    sessionStorage.setItem("signupTerms", JSON.stringify(nextState));
     onChange(nextState);
   };
-
-  // /* 공통 스타일 함수 → 배경색 결정 */
-  // const bg = (k: keyof Terms, highlight?: boolean) => {
-  //   if (value[k]) return "bg-[#B3E378]";
-  //   return highlight ? "bg-[#B3B3B3]" : "bg-[#E6E6E6]";
-  // };
 
   const Row = ({
     label,
@@ -81,13 +93,12 @@ export default function TermsGroup({ value, onChange }: Props) {
           onChange={() => toggle(k)}
           className="peer sr-only"
         />
-        {/* 체크 아이콘 : pseudo 대신 별도 span 으로 */}
         <span
           className="mx-auto flex h-[16px] w-[16px]
                        items-center justify-center rounded-[3px]
-                       border border-[#1D1D1D] bg-[#FFFFFF]"
+                       bg-[#FFFFFF]"
         >
-          {/* ✔︎ 표시 */}
+          {/* 체크 표시 */}
           <span
             className={`block h-[10px] w-[6px] rotate-45 
                       border-b-[2px] border-r-[2px] border-[#1D1D1D]

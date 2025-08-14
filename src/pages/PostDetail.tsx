@@ -10,13 +10,15 @@ import FeedbackView from "../components/modals/FeedbackView";
 import Report from "../components/modals/Report";
 import type { ReportTarget } from "../components/modals/Report";
 import { usePostDetail } from "../hooks/PostPage/usePostDetail";
-import { submitComment } from "../hooks/PostPage/useSubmitComment";
 import { useCheer } from "../hooks/PostPage/useCheer";
 import { getLesson } from "../hooks/PostPage/useGetLesson";
 import { categoryData } from "./CategoryFeed";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { useDeletePost } from "../hooks/PostPage/useDeletePost";
+import { useGetRecommendations } from "../hooks/PostPage/useGetRecommendations";
+import { SituationRow } from "../components/common/Row";
+import { useCommentOptimistic } from "../hooks/Mutation/useCommentOptimistic";
 
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -48,8 +50,22 @@ const PostDetail = () => {
 
   //api 관련 훅
   const { postDetail, loading } = usePostDetail(Number(postId));
-  const { toggleCheer } = useCheer();
   const { deletePost, success } = useDeletePost();
+  const { data, loadingRecommendation, error } = useGetRecommendations(
+    Number(postId)
+  );
+
+  // 좋아요 기능 optimistic ui 적용
+  const { toggleCheer, isCheered } = useCheer();
+
+  const likedOptimistic = (post: any) =>
+    isCheered(post.postId) ? !post.liked : post.liked;
+
+  const likesOptimistic = (post: any) =>
+    post.likes + (isCheered(post.postId) ? (post.liked ? -1 : 1) : 0);
+  
+  //추천글 게시글로 보내기
+  const goToPost = (id: number) => navigate(`/post/${id}`);
 
   //userId 뽑아오기 (내 게시글인지 인식표)
   const userId = useSelector((state: RootState) => state.user.userId);
@@ -65,11 +81,24 @@ const PostDetail = () => {
   const contentSwiperRef = useRef<SwiperCore | null>(null);
   // 슬라이드전환시 현재 동작중인 페이지 알려주기 위함
   const [activeIndex, setActiveIndex] = useState(0);
-  // 댓글 입력 상태
-  const [commentInput, setCommentInput] = useState("");
 
-  // 로컬 댓글 상태 (Optimistic UI)
+  // 댓글 입력과 optimistic ui적용
+  const [commentInput, setCommentInput] = useState("");
   const [localComments, setLocalComments] = useState<any[]>([]);
+  const { addComment } = useCommentOptimistic({
+    userId,
+    setLocalComments,
+    setInput: setCommentInput, // 일반 댓글 입력창 비우기용
+  });
+   // 댓글 추가
+   const handleAddComment = () => {
+    if (!commentInput.trim() || !currentPostId) return;
+    addComment({
+      postId: Number(currentPostId),
+      content: commentInput,
+      parentId: null, // 일반 댓글
+    });
+  };
 
   // SITUATION_ORDER 순서대로 post 배열 만들기
   const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
@@ -90,16 +119,16 @@ const PostDetail = () => {
   const currentPostId = currentPost?.postId;
   const currentComments =
     (currentPost?.comments ?? []).map((comment: any) => ({
-      id: comment.commentId?.toString() ?? "",
+      id: comment.commentId,
       content: comment.content,
-      author: currentPost.nickname,
+      userName: comment.userName,
       likes: comment.likes,
       createdAt: comment.createdAt,
       parentId: comment.parentId,
       liked: comment.liked,
       userId: comment.userId,
     })) || [];
-    
+
   //작성된 교훈이 있는지 없는지 확인
   useEffect(() => {
     const checkLessonExists = async () => {
@@ -122,34 +151,7 @@ const PostDetail = () => {
     setLocalComments(currentComments);
   }, [activeIndex, postDetail]);
 
-  // 댓글 추가
-  const handleAddComment = async () => {
-    if (!commentInput.trim() || !currentPostId) return;
-
-    // localComments에 바로 추가
-    const newComment = {
-      id: Date.now().toString(), // 임시 id
-      content: commentInput,
-      author: "나", // 실제 로그인 사용자명으로 교체
-      likes: 0,
-      createdAt: new Date().toISOString(),
-      parentId: null,
-    };
-    setLocalComments((prev) => [newComment, ...prev]);
-    setCommentInput("");
-
-    try {
-      await submitComment(Number(currentPostId), commentInput, null);
-      // 성공하면 별도 동작 X useEffect에서 서버 데이터로 덮어쓰기
-      console.log("댓글 작성 성공!");
-    } catch (e) {
-      // 에러 시 localComments에서 제거
-      setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
-      alert("댓글 작성 실패!");
-      throw e;
-    }
-  };
-
+ 
   const reportTarget: ReportTarget = {
     type: "post",
     id: String(currentPost?.postId),
@@ -183,18 +185,6 @@ const PostDetail = () => {
     // 4일 이상이면 날짜로 표시
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
-
-  // 작성자 프로필 이동 핸들러 (아바타&닉네임 클릭)
-  // const goAuthor = (authorId?: number | string) => (e: any) => {
-  //   e.stopPropagation();
-  //   if (authorId == null) return;
-  //   // 본인이면 마이페이지로
-  //   if (String(userId) === String(authorId)) {
-  //     navigate("/mypage");
-  //   } else {
-  //     navigate(`/users/${authorId}`);
-  //   }
-  // };
 
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
@@ -275,7 +265,6 @@ const PostDetail = () => {
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
                   <div className="flex gap-[6px]">
-                    {/* <div className="w-[42px] h-[42px] aspect-square object-cover rounded-[4px] bg-[#9a9a9a]" /> */}
                     {/* 아바타(클릭 시 프로필 이동) */}
                     <button
                       onClick={() =>
@@ -284,9 +273,9 @@ const PostDetail = () => {
                       className="w-[42px] h-[42px] rounded-[4px] overflow-hidden bg-[#9a9a9a] shrink-0"
                       aria-label="작성자 프로필로 이동"
                     >
-                      {(post as any)?.profileImage && (
+                      {post?.profileImage && (
                         <img
-                          src={(post as any).profileImage}
+                          src={post.profileImage}
                           alt="" // alt 텍스트 노출 방지
                           className="w-full h-full object-cover"
                         />
@@ -330,7 +319,7 @@ const PostDetail = () => {
                           <>
                             {isLessonWritten ? (
                               <button
-                                className="body2 text-[#ffffff] h-[30px] px-[12px] py-[5px] bg-black rounded-[4px]"
+                                className="body2 bg-[#b3e378] text-black h-[30px] px-[12px] py-[5px] rounded-[4px]"
                                 onClick={() => setShowLessonView(true)}
                               >
                                 교훈 확인
@@ -393,14 +382,14 @@ const PostDetail = () => {
                         }
                         className="cursor-pointer"
                       >
-                        {post.liked ? (
+                        {likedOptimistic(post) ? (
                           <RedLike className=" cursor-pointer" />
                         ) : (
                           <Like className=" cursor-pointer" />
                         )}
                       </button>
                       <span className="caption2 text-[#666]">
-                        응원해요 {post?.likes}
+                        응원해요 {likesOptimistic(post)}
                       </span>
                     </div>
                     <div className="flex items-center gap-[4px] ">
@@ -464,74 +453,79 @@ const PostDetail = () => {
         </section>
 
         {/* 댓글 목록 */}
-        <section className="mt-[20px] -mx-[20px] flex flex-col w-screen">
+        <section className="mt-[20px] -mx-[20px] mb-[40px] flex flex-col w-screen">
           <CommentList
             comments={localComments}
             postId={Number(currentPostId)}
+            onReplySubmit={(parentId: string, text: string) =>
+              addComment({
+                postId: Number(currentPostId),
+                content: text,
+                parentId,
+              })
+            }
           />
         </section>
 
-        {/* 카테고리 추천 글 */}
-        <section className="mt-[40px] -mx-[20px] flex flex-col">
-          <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-            인간관계 추천 글
+        {/* 로딩/에러 */}
+        {loadingRecommendation && (
+          <div className="-mx-[20px] w-screen bg-[#FFFBF8] py-[20px] text-center text-[#666]">
+            추천 글을 불러오는 중...
           </div>
+        )}
+        {error && (
+          <div className="-mx-[20px] w-screen bg-[#FFFBF8] py-[20px] text-center text-red-500">
+            추천 글을 불러오는 데 실패했습니다.
+          </div>
+        )}
 
-          <div className="caption2 py-[10px] pl-[38px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px ">
-            내가 있잖아?
-          </div>
+        {/* 두번째 섹션 — 추천 글 */}
+        {!loading && !error && (
+          <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mb-[20px]">
+            <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
+              {`${postDetail.category.name} 추천 글`}
+            </div>
 
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            지금 너무너무 졸린데...
-          </div>
+            {data?.similarPosts?.length ? (
+              data.similarPosts.map((p) => (
+                <SituationRow
+                  key={p.postId}
+                  title={p.title}
+                  situation={p.situation}
+                  onClick={() => goToPost(p.postId)}
+                />
+              ))
+            ) : (
+              <div className="caption2 text-[#999] w-full pl-[38px] py-[12px] border-b-[1px] border-[#e9e5e2]">
+                추천 글이 아직 없습니다.
+              </div>
+            )}
+          </section>
+        )}
 
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바 출근하기 싫을 때
-          </div>
+        {/* 세번째 섹션 — 베스트 글 */}
+        {!loading && !error && (
+          <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen ">
+            <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
+              베스트 Failers
+            </div>
 
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            꿀팁 전수해줄게
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            그냥 안가면 돼 ...
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바같이 하는 애한테 너무 미안하네
-          </div>
-        </section>
-
-        {/* 베스트 피드 */}
-        <section className="mt-[32px] -mx-[20px] mb-[26px] flex flex-col">
-          <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-            인간관계 추천 글
-          </div>
-
-          <div className="caption2 py-[10px] pl-[38px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px ">
-            내가 있잖아?
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            지금 너무너무 졸린데...
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바 출근하기 싫을 때
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            꿀팁 전수해줄게
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            그냥 안가면 돼 ...
-          </div>
-
-          <div className="caption2 py-[10px] text-[#666] border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바같이 하는 애한테 너무 미안하네
-          </div>
-        </section>
+            {data?.bestFailers?.length ? (
+              data.bestFailers.map((p) => (
+                <SituationRow
+                  key={p.postId}
+                  title={p.title}
+                  situation={p.situation}
+                  onClick={() => goToPost(p.postId)}
+                />
+              ))
+            ) : (
+              <div className="caption2 text-[#999] w-full pl-[38px] py-[12px] border-b-[1px] border-[#e9e5e2]">
+                베스트 글이 아직 없습니다.
+              </div>
+            )}
+          </section>
+        )}
       </div>
       {showReportModal && (
         <Report

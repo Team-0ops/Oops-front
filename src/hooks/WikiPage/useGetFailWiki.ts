@@ -10,7 +10,8 @@ function useGetFailWiki() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getCurrentWikis(); // data.data 반환
+        const data = await getCurrentWikis();
+        console.log(data);
         setWikis(data);
       } catch (err) {
         setError("위키 불러오기 실패");

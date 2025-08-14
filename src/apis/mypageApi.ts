@@ -36,14 +36,37 @@ function isPostArray(x: unknown): x is MyPostDto[] {
   return Array.isArray(x) && (x.length === 0 || "postId" in (x[0] as any));
 }
 
+export type MyPostStatus = "OOPS" | "OVERCOMING" | "OVERCOME";
+function sanitizeParams(input?: {
+  page?: number;
+  size?: number;
+  categoryId?: number;
+  situation?: MyPostStatus;
+}) {
+  const out: Record<string, any> = {};
+  if (typeof input?.page === "number") out.page = input!.page;
+  if (typeof input?.size === "number") out.size = input!.size;
+  if (
+    input?.categoryId !== undefined &&
+    Number.isFinite(Number(input.categoryId))
+  ) {
+    out.categoryId = Number(input.categoryId);
+  }
+
+  if (input?.situation) out.situation = input.situation;
+  return out;
+}
+
 export const getMyPosts = async (params?: {
   page?: number;
   size?: number;
   categoryId?: number;
+  situation?: MyPostStatus;
 }) => {
+  const query = sanitizeParams(params);
   const { data } = await instance.get<ApiResponse<RawMyPosts>>(
     "/my-page/posts",
-    { params }
+    { params: query }
   );
 
   return {
@@ -51,13 +74,14 @@ export const getMyPosts = async (params?: {
     code: data.code,
     message: data.message,
     result: normalizeMyPosts(data.result),
+    pageInfo: (data as any).pageInfo ?? undefined,
   };
 };
 
 function normalizeMyPosts(result: RawMyPosts): MyPostDto[] {
-  if (isPostArray(result)) return result; // 이미 포스트 배열이면 그대로
-  if (isSectionArray(result)) return result.flatMap((sec) => sec.posts ?? []); // 섹션 배열 → 평탄화
-  if (isSection(result)) return result.posts ?? []; // 단일 섹션
+  if (isPostArray(result)) return result;
+  if (isSectionArray(result)) return result.flatMap((sec) => sec.posts ?? []);
+  if (isSection(result)) return result.posts ?? [];
   return [];
 }
 
