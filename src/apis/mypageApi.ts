@@ -12,6 +12,7 @@ import type {
 export const getMyProfile = async (): Promise<MyProfileRes> => {
   const { data } =
     await instance.get<ApiResponse<MyProfileRes>>("/my-page/profile");
+    console.log("내정보", data.result)
   return data.result;
 };
 

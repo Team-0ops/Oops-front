@@ -71,7 +71,7 @@ export default function MyProfilePage() {
     postReportCount,
     profileImageUrl,
   } = profile;
-
+  console.log("프로파일", profile)
   return (
     <section className="space-y-6 p-4">
       <div className="flex items-center gap-4">
