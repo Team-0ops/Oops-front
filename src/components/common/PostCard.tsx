@@ -4,7 +4,7 @@ import type React from "react";
 import { useState } from "react";
 
 interface PostCardProps {
-  postId: number;
+  postId: number | undefined;
   title: string;
   content: string;
   imageUrl?: string | null;

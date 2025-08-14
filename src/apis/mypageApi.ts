@@ -1,18 +1,111 @@
 import instance from "./instance";
 import type { ApiResponse } from "../types/api";
 import type {
-  LessonDto,
-  //LessonWithPostDto,
+  LessonWithPostDto,
   MyPostDto,
   MyProfileRes,
   PostsSection,
 } from "../types/mypage";
 
-// 내 프로필
+function normalizeUrl(u?: string | null) {
+  if (!u) return u ?? null;
+
+  // 절대 URL이면 그대로
+  if (/^https?:\/\//i.test(u)) return u;
+  if (u.startsWith("user_profile/")) {
+    return `${location.origin}/${u}`;
+  }
+
+  if (u.startsWith("/")) return `${location.origin}${u}`;
+
+  return `${location.origin}/${u}`;
+}
+
+function addBust(u?: string | null) {
+  if (!u) return u ?? null;
+  const sep = u.includes("?") ? "&" : "?";
+  return `${u}${sep}v=${Date.now()}`;
+}
 export const getMyProfile = async (): Promise<MyProfileRes> => {
   const { data } =
     await instance.get<ApiResponse<MyProfileRes>>("/my-page/profile");
-  return data.result;
+
+  const raw: any = data.result;
+
+  raw.profileImageUrl =
+    raw.profileImageUrl ?? raw.profileImage ?? raw.imageUrl ?? null;
+
+  if (raw.profileImageUrl) {
+    raw.profileImageUrl = normalizeUrl(addBust(raw.profileImageUrl));
+  }
+  return raw as MyProfileRes;
+};
+
+export const patchMyProfile = async ({
+  userName,
+  file,
+}: {
+  userName?: string | null;
+  file?: File | null;
+}): Promise<MyProfileRes | null> => {
+  const form = new FormData();
+
+  if (userName === undefined || userName === null || userName === "") {
+    form.append("data", "null");
+  } else {
+    form.append("data", JSON.stringify({ userName }));
+  }
+
+  if (file) form.append("profileImage", file);
+
+  const res = await instance.patch<ApiResponse<any>>("/my-page/profile", form, {
+    __req_src: "PATCH_PROFILE",
+  } as any);
+  const bodyResult = (res.data as any)?.result ?? null;
+
+  const locationHeader =
+    (res.headers as any)?.location || (res.headers as any)?.Location || null;
+
+  if (locationHeader) {
+    const { data: freshData } = await instance.get<ApiResponse<MyProfileRes>>(
+      "/my-page/profile",
+      { __req_src: "AFTER_PATCH_REFETCH" } as any
+    );
+    const fresh: any = freshData.result ?? null;
+    if (fresh) {
+      fresh.profileImageUrl =
+        fresh.profileImageUrl ?? fresh.profileImage ?? fresh.imageUrl ?? null;
+
+      if (!fresh.profileImageUrl) {
+        fresh.profileImageUrl = locationHeader;
+      }
+      fresh.profileImageUrl = normalizeUrl(addBust(fresh.profileImageUrl));
+      return fresh as MyProfileRes;
+    }
+    return null;
+  }
+
+  if (bodyResult) {
+    const r: any = bodyResult;
+    r.profileImageUrl =
+      r.profileImageUrl ?? r.profileImage ?? r.imageUrl ?? null;
+    if (r.profileImageUrl) {
+      r.profileImageUrl = normalizeUrl(addBust(r.profileImageUrl));
+    }
+    return r as MyProfileRes;
+  }
+
+  const { data: freshData } = await instance.get<ApiResponse<MyProfileRes>>(
+    "/my-page/profile",
+    { __req_src: "AFTER_PATCH_REFETCH" } as any
+  );
+  const fresh: any = freshData.result ?? null;
+  if (fresh?.profileImageUrl || fresh?.profileImage || fresh?.imageUrl) {
+    fresh.profileImageUrl =
+      fresh.profileImageUrl ?? fresh.profileImage ?? fresh.imageUrl ?? null;
+    fresh.profileImageUrl = normalizeUrl(addBust(fresh.profileImageUrl));
+  }
+  return (fresh as MyProfileRes) ?? null;
 };
 
 type RawMyPosts =
@@ -90,17 +183,7 @@ function pickList(result: any): any[] {
   if (result?.lessons && Array.isArray(result.lessons)) return result.lessons;
   return [];
 }
-function normalizeLesson(x: any): LessonDto {
-  return {
-    id: x.id ?? x.lessonId ?? 0,
-    title: x.title ?? x.name ?? "",
-    content: x.content ?? x.body ?? "",
-    tag: Array.isArray(x.tags) ? (x.tags[0] ?? "") : (x.tag ?? ""),
-    thumbnailUrl: x.thumbnailUrl ?? x.imageUrl ?? x.thumbnail ?? null,
-    bestComment: x.bestComment ?? undefined,
-    bestCommentWriter: x.bestCommentWriter ?? undefined,
-  };
-}
+
 export async function getMyLessons(params?: {
   tag?: string;
   page?: number;
@@ -119,8 +202,27 @@ export async function getMyLessons(params?: {
       );
     }
 
+    const mapped = list.map(
+      (x: any): LessonWithPostDto => ({
+        lessonId: x.lessonId ?? 0,
+        lessonTitle: x.title ?? "",
+        lessonContent: x.content ?? "",
+        tag: Array.isArray(x.tags) ? (x.tags[0] ?? "") : (x.tag ?? ""),
+
+        postId: x.postId ?? 0,
+        postTitle: x.postTitle ?? "",
+        postContent: x.postContent ?? "",
+        postCategoryName: x.categoryName ?? "",
+        postThumbnailUrl: x.postThumbnailUrl ?? null,
+
+        bestComment: x.bestComment ?? undefined,
+        bestCommentWriter: x.bestCommentWriter ?? undefined,
+        createdAt: x.createdAt ?? undefined,
+      })
+    );
+
     return {
-      items: list.map(normalizeLesson) as LessonDto[],
+      items: mapped,
       pageInfo: (data as any).pageInfo,
     };
   } catch (e: any) {
@@ -131,6 +233,7 @@ export async function getMyLessons(params?: {
           "/my-page/lessons",
           { params: { ...params, userId } }
         );
+
         let list = pickList(data.result);
         if (params?.tag) {
           list = list.filter(
@@ -138,8 +241,28 @@ export async function getMyLessons(params?: {
               Array.isArray(i.tags) && i.tags.includes(params.tag as string)
           );
         }
+
+        const mapped = list.map(
+          (x: any): LessonWithPostDto => ({
+            lessonId: x.lessonId ?? 0,
+            lessonTitle: x.title ?? "",
+            lessonContent: x.content ?? "",
+            tag: Array.isArray(x.tags) ? (x.tags[0] ?? "") : (x.tag ?? ""),
+
+            postId: x.postId ?? 0,
+            postTitle: x.postTitle ?? "",
+            postContent: x.postContent ?? "",
+            postCategoryName: x.categoryName ?? "",
+            postThumbnailUrl: x.postThumbnailUrl ?? null,
+
+            bestComment: x.bestComment ?? undefined,
+            bestCommentWriter: x.bestCommentWriter ?? undefined,
+            createdAt: x.createdAt ?? undefined,
+          })
+        );
+
         return {
-          items: list.map(normalizeLesson) as LessonDto[],
+          items: mapped,
           pageInfo: (data as any).pageInfo,
         };
       }

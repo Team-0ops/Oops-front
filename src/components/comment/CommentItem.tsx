@@ -10,33 +10,26 @@ import NoColorLike from "../../assets/icons/gray_heart.svg?react";
 import GrayComment from "../../assets/icons/gray_comment.svg?react";
 import ColorLike from "../../assets/icons/ColorHeart.svg?react";
 
-import { submitComment } from "../../hooks/PostPage/useSubmitComment";
-import { useCheerComment } from "../../hooks/PostPage/useCheerComment";
 import { useDeleteComment } from "../../hooks/PostPage/useDeleteComment";
-import { useNavigate } from "react-router-dom";
+import { useCommentLikeOptimistic } from "../../hooks/Mutation/useCommentLikeOptimistic";
 
 interface CommentProps {
   comment: Comment;
   postId: number;
   isReply?: boolean;
-  // onReload: () => void;
+  onReplySubmit?: (parentId: string, text: string) => void;
 }
 
 const CommentItem = ({
   comment,
   postId,
   isReply = false,
-  // onReload,
+  onReplySubmit
 }: CommentProps) => {
-  const navigate = useNavigate();
   //userId 뽑아오기 (내 게시글인지 인식표)
   const userId = useSelector((state: RootState) => state.user.userId);
 
   const [isReportOpen, setIsReportOpen] = useState(false);
-
-  const [liked, setLiked] = useState(comment.liked);
-  const [likes, setLikes] = useState(comment.likes);
-  const { cheerComment } = useCheerComment();
 
   const { deleteComment, success } = useDeleteComment();
 
@@ -63,33 +56,30 @@ const CommentItem = ({
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
 
-  const handleLikeClick = async () => {
-    try {
-      await cheerComment(Number(comment.id));
-      setLiked(comment.liked);
-      setLikes(comment.likes);
-
-      // 서버 데이터 동기화가 필요하다면
-      // if (onReload) onReload();
-    } catch (e) {
-      alert("공감 실패!");
-      throw e;
-    }
+  const {
+    liked,
+    likes,
+    toggle: toggleCommentLike,
+  } = useCommentLikeOptimistic({
+    postId,
+    commentId: comment.id,           // 문자열/숫자 모두 허용
+    initialLiked: comment.liked,
+    initialLikes: comment.likes,
+    // extraInvalidateKeys: [["feed"]], // 필요 시 목록 캐시도 무효화
+  });
+  
+  // 클릭 핸들러
+  const handleLikeClick = () => {
+    if (!comment.id) return; // 방어
+    toggleCommentLike();
   };
 
   const handleReplySubmit = async (text: string) => {
-    try {
-      await submitComment(Number(postId), text, comment.id); // comment.id가 부모
-      // 대댓글 새로고침 or 추가 로직
-      console.log("대댓글 성공", comment.id);
-      setShowReplyForm(false); // 작성 후 폼 닫기
-      // onReload();
-    } catch (e) {
-      console.log("대댓글 작성 실패!");
-      throw e;
-    }
+    // 부모로 위임 → 옵티미스틱 처리/롤백/치환은 부모 훅이 수행
+    if (!text.trim()) return;
+    onReplySubmit?.(String(comment.id), text);
+    setShowReplyForm(false);
   };
-  console.log("코멘트 정보", comment);
 
   return (
     <>
@@ -98,7 +88,7 @@ const CommentItem = ({
         <div className="flex flex-col w-full pl-[34px] pr-[20px] py-[13px] bg-[#fbf3ec] border border-[#f0e7e0]">
           <div className="mb-[4px] flex justify-between items-center">
             <span className="body5 text-[#808080]">
-              {Number(userId) === comment.userId ? "나" : comment.author}
+              {Number(userId) === comment.userId ? "나" : comment.userName}
             </span>
             {Number(userId) === comment.userId ? (
               <>
@@ -107,7 +97,7 @@ const CommentItem = ({
                   onClick={() => {
                     deleteComment(Number(postId), Number(comment.id));
                     {
-                      if (success) navigate("/");
+                      if (success) alert("삭제되었습니다.");
                     }
                   }}
                 >
@@ -167,6 +157,7 @@ const CommentItem = ({
       {/* 대댓글 작성 폼 */}
       {showReplyForm && (
         <CommentForm
+          comment={comment}
           postId={postId}
           parentId={comment.id}
           onSubmit={handleReplySubmit}
@@ -180,7 +171,7 @@ const CommentItem = ({
           comment={{
             type: "reComment", // ✅ 대댓글 신고 타입 지정
             id: selectedReply.id,
-            author: selectedReply.author,
+            author: selectedReply.userName,
             content:
               selectedReply.content.length > 20
                 ? selectedReply.content.slice(0, 20) + "..."
@@ -196,7 +187,7 @@ const CommentItem = ({
           comment={{
             type: "comment",
             id: comment.id,
-            author: comment.author,
+            author: comment.userName,
             content:
               comment.content.length > 20
                 ? comment.content.slice(0, 20) + "..."
