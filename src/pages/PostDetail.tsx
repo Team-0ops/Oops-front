@@ -76,10 +76,8 @@ const PostDetail = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [isLessonWritten, setIsLessonWritten] = useState(false);
 
-  // 슬라이드 관련 ref
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
-  // 슬라이드전환시 현재 동작중인 페이지 알려주기 위함
   const [activeIndex, setActiveIndex] = useState(0);
 
   // 댓글 입력과 optimistic ui적용
@@ -100,21 +98,17 @@ const PostDetail = () => {
     });
   };
 
-  // SITUATION_ORDER 순서대로 post 배열 만들기
   const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
     (p): p is NonNullable<typeof p> => !!p
   );
-  // Swiper 이동 핸들러
   const handleSlideChange = (index: number) => {
     setActiveIndex(index);
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
 
-    // 슬라이드시에 url 변경
     const nextPostId = validPosts[index]?.postId;
     if (nextPostId) navigate(`/post/${nextPostId}`, { replace: false });
   };
-  // 현재 활성화된 게시글 및 댓글
   const currentPost = validPosts[activeIndex];
   const currentPostId = currentPost?.postId;
   const currentComments =
@@ -128,6 +122,7 @@ const PostDetail = () => {
       liked: comment.liked,
       userId: comment.userId,
     })) || [];
+
 
   //작성된 교훈이 있는지 없는지 확인
   useEffect(() => {
@@ -146,12 +141,10 @@ const PostDetail = () => {
     checkLessonExists();
   }, [currentPostId]);
 
-  // 슬라이드 변경시 localComments 동기화 (서버 데이터로 초기화)
   useEffect(() => {
     setLocalComments(currentComments);
   }, [activeIndex, postDetail]);
 
- 
   const reportTarget: ReportTarget = {
     type: "post",
     id: String(currentPost?.postId),
