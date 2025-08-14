@@ -60,32 +60,24 @@ const PostDetail = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [isLessonWritten, setIsLessonWritten] = useState(false);
 
-  // 슬라이드 관련 ref
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
-  // 슬라이드전환시 현재 동작중인 페이지 알려주기 위함
   const [activeIndex, setActiveIndex] = useState(0);
-  // 댓글 입력 상태
   const [commentInput, setCommentInput] = useState("");
 
-  // 로컬 댓글 상태 (Optimistic UI)
   const [localComments, setLocalComments] = useState<any[]>([]);
 
-  // SITUATION_ORDER 순서대로 post 배열 만들기
   const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
     (p): p is NonNullable<typeof p> => !!p
   );
-  // Swiper 이동 핸들러
   const handleSlideChange = (index: number) => {
     setActiveIndex(index);
     buttonSwiperRef.current?.slideTo(index);
     contentSwiperRef.current?.slideTo(index);
 
-    // 슬라이드시에 url 변경
     const nextPostId = validPosts[index]?.postId;
     if (nextPostId) navigate(`/post/${nextPostId}`, { replace: false });
   };
-  // 현재 활성화된 게시글 및 댓글
   const currentPost = validPosts[activeIndex];
   const currentPostId = currentPost?.postId;
   const currentComments =
@@ -99,8 +91,7 @@ const PostDetail = () => {
       liked: comment.liked,
       userId: comment.userId,
     })) || [];
-    
-  //작성된 교훈이 있는지 없는지 확인
+
   useEffect(() => {
     const checkLessonExists = async () => {
       if (!currentPostId) return;
@@ -117,7 +108,6 @@ const PostDetail = () => {
     checkLessonExists();
   }, [currentPostId]);
 
-  // 슬라이드 변경시 localComments 동기화 (서버 데이터로 초기화)
   useEffect(() => {
     setLocalComments(currentComments);
   }, [activeIndex, postDetail]);
@@ -126,11 +116,10 @@ const PostDetail = () => {
   const handleAddComment = async () => {
     if (!commentInput.trim() || !currentPostId) return;
 
-    // localComments에 바로 추가
     const newComment = {
-      id: Date.now().toString(), // 임시 id
+      id: Date.now().toString(),
       content: commentInput,
-      author: "나", // 실제 로그인 사용자명으로 교체
+      author: "나",
       likes: 0,
       createdAt: new Date().toISOString(),
       parentId: null,
@@ -140,10 +129,8 @@ const PostDetail = () => {
 
     try {
       await submitComment(Number(currentPostId), commentInput, null);
-      // 성공하면 별도 동작 X useEffect에서 서버 데이터로 덮어쓰기
       console.log("댓글 작성 성공!");
     } catch (e) {
-      // 에러 시 localComments에서 제거
       setLocalComments((prev) => prev.filter((c) => c.id !== newComment.id));
       alert("댓글 작성 실패!");
       throw e;
