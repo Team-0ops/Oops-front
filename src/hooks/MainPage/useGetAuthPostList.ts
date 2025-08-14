@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getPostListInMainPage } from "../../apis/post";
 import type { ResponseMainPostListDTO } from "../../types/post";
 
-function useGetPostListInMain() {
+function useGetAuthPostListInMain() {
   const [posts, setPosts] = useState<ResponseMainPostListDTO | null>(null);
   const [mainLoading, setLoading] = useState(true);
   const [mainError, setError] = useState<string | null>(null);
@@ -25,4 +25,4 @@ function useGetPostListInMain() {
   return { posts, mainLoading, mainError };
 }
 
-export default useGetPostListInMain;
+export default useGetAuthPostListInMain;

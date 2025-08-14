@@ -1,9 +1,15 @@
+import type { User } from "../../types/User";
 import instance from "../instance";
 import Cookies from "js-cookie";
 
-type LoginResult =
-  | { accessToken: string; refreshToken?: string; userId?: string | number }
-  | string;
+type LoginResult = {
+  accessToken: string;
+  refreshToken?: string;
+  userId: number;
+  nickName: string;
+  email: string;
+  profileImage: string | null;
+};
 
 export type TermsAgreementItem = {
   termId: number;
@@ -39,14 +45,37 @@ export const postLogin = async ({
   const result: LoginResult = res.data?.result;
   let accessToken = "";
   let refreshToken = "";
-  let userId: string | number | undefined;
+  let user: User = {
+    userId: result.userId,
+    nickname: result.nickName,
+    email: result.email,
+    profileImage: result.profileImage,
+  };
 
-  if (typeof result === "string") {
-    accessToken = result;
-  } else if (result && typeof result === "object") {
-    accessToken = result.accessToken;
-    refreshToken = result.refreshToken ?? "";
-    userId = result.userId;
+  //이부분 무조건 객체러 넘어와서 string 부분 빼고 object만 구현할게요! (예은)
+
+  // if (typeof result === "string") {
+  //   accessToken = result;
+  // } else if (result && typeof result === "object") {
+  //   accessToken = result.accessToken;
+  //   refreshToken = result.refreshToken ?? "";
+  //   user = result.
+  // }
+
+  if (result) {
+    //result 객체 분해할당 -> user 데이터 넣을려고!
+    const {
+      accessToken: at,
+      refreshToken: rt = "",
+      userId,
+      nickName: nickname,
+      email,
+      profileImage,
+    } = result;
+
+    accessToken = at;
+    refreshToken = rt;
+    user = { userId, nickname, email, profileImage };
   }
 
   if (!accessToken) {
@@ -56,8 +85,8 @@ export const postLogin = async ({
   //const token = res.data.result;
   localStorage.setItem("accessToken", accessToken);
   if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-  if (userId !== undefined) localStorage.setItem("userId", String(userId));
-
+  localStorage.setItem("userId", String(user.userId));
+  localStorage.setItem("profileImage", user.profileImage ?? "");
   // Cookies.set("AccessToken", `Bearer+${accessToken}`, {
   //   path: "/",
   // });
