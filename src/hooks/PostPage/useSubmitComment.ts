@@ -12,7 +12,6 @@ export async function submitComment(
     parentId,
     content,
   });
-  console.log(parentId)
   return response.data;
 } catch(e) {
     console.log("실패");

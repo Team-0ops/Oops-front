@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import useGetPostListInMain from "../../hooks/MainPage/UseGetPostList";
+import useGetPostListInMain from "../../hooks/MainPage/useGetAuthPostList";
 
 type TitleLike = { title?: string; name?: string };
 

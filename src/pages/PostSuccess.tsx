@@ -1,19 +1,22 @@
 import Logo from "../assets/icons/newLogo.svg?react";
 
 import { useEffect } from "react";
-
 import { useNavigate, useLocation } from "react-router-dom";
+import { useGetRecommendations } from "../hooks/PostPage/useGetRecommendations";
+import { SituationRow } from "../components/common/Row";
+import { usePostDetail } from "../hooks/PostPage/usePostDetail";
 
 const PostSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const postId = location.state?.postId;
+  const {postDetail} = usePostDetail(Number(postId));
 
   const goToDetail = () => {
     if (!postId) return alert("방금 작성한 게시글이 없습니다.");
     navigate(`/post/${postId}`);
   };
-  
+
   const handleMain = () => {
     navigate("/");
   };
@@ -22,9 +25,13 @@ const PostSuccess = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const { data, loadingRecommendation, error } = useGetRecommendations(postId ?? 0);
+
+  const goToPost = (id: number) => navigate(`/post/${id}`);
+
   return (
     <div className="flex justify-center items-center ">
-      <div className="w-full h-full pb-[20px] ">
+      <div className="w-full h-full ">
         {/* 첫번째 섹션 */}
         {/* 로고 ~ 버튼 */}
         <section className="bg-[#FFFBF8] flex flex-col items-center mt-[1px] mb-[30px] px-[20px]">
@@ -53,98 +60,65 @@ const PostSuccess = () => {
           </div>
         </section>
 
-        {/* 두번째 섹션 */}
-        {/* 추천 글 */}
-        <section
-          className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen
-         mb-[20px]"
-        >
-          {/* 추천 글을 여기다 끌어오면 됨 */}
-
-          {/* 주제 */}
-          <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-            작은 일 추천 글
+        {/* 로딩/에러 */}
+        {loadingRecommendation && (
+          <div className="-mx-[20px] w-screen bg-[#FFFBF8] py-[20px] text-center text-[#666]">
+            추천 글을 불러오는 중...
           </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            내가 있잖아?
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px] ">
-              웁스 중
-            </span>
+        )}
+        {error && (
+          <div className="-mx-[20px] w-screen bg-[#FFFBF8] py-[20px] text-center text-red-500">
+            추천 글을 불러오는 데 실패했습니다.
           </div>
+        )}
 
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            지금 너무너무 졸린데
-            <span className="body4 bg-[#14441a] mr-[20px] text-[#b3e378] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px] ">
-              극복 중
-            </span>
-          </div>
+        {/* 두번째 섹션 — 추천 글 */}
+        {!loadingRecommendation && !error && (
+          <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mb-[20px]">
+            <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
+              {`${postDetail?.category.name} 추천 글`}
+            </div>
 
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바 출근하기 싫을 때
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] text-[14px] w-auto h-[24px] ">
-              웁스 중
-            </span>
-          </div>
+            {data?.similarPosts?.length ? (
+              data.similarPosts.map((p) => (
+                <SituationRow
+                  key={p.postId}
+                  title={p.title}
+                  situation={p.situation}
+                  onClick={() => goToPost(p.postId)}
+                />
+              ))
+            ) : (
+              <div className="caption2 text-[#999] w-full pl-[38px] py-[12px] border-b-[1px] border-[#e9e5e2]">
+                추천 글이 아직 없습니다.
+              </div>
+            )}
+          </section>
+        )}
 
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            꿀팁 전수요
-            <span className="body4 bg-[#14441a] mr-[20px] text-[#b3e378] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px] ">
-              극복 중
-            </span>
-          </div>
+        {/* 세번째 섹션 — 베스트 글 */}
+        {!loadingRecommendation && !error && (
+          <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen ">
+            <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
+              베스트 Failers
+            </div>
 
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            그냥 안가면 돼...
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px] ">
-              웁스 중
-            </span>
-          </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            알바같이 하는 애한테 너무 미안하네
-            <span className="body4 bg-[#1d1d1d] mr-[20px] text-[#b3e378] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px] ">
-              극복 완
-            </span>
-          </div>
-        </section>
-
-        {/* 세번째 섹션 */}
-        {/* 베스트 글 */}
-        <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center font-[pretendard] w-screen mb-[30px]">
-          {/* 주제 */}
-          <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-            베스트 Failers
-          </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px] ">
-            내가 있잖아?
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px]">
-              웁스 중
-            </span>
-          </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px] ">
-            지금 너무너무 졸린데
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px]">
-              극복 중
-            </span>
-          </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            꿀팁 전수요
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px]">
-              웁스 중
-            </span>
-          </div>
-
-          <div className="caption2 text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full h-34px pl-[38px]">
-            그냥 안가면 돼...
-            <span className="body4 bg-[#B3E378] mr-[20px] text-[#1d1d1d] flex items-center justify-center mt-[4px] mb-[6px] rounded-[20px] px-[13px] py-[6px] w-auto h-[24px]">
-              웁스 중
-            </span>
-          </div>
-        </section>
+            {data?.bestFailers?.length ? (
+              data.bestFailers.map((p) => (
+                <SituationRow
+                  key={p.postId}
+                  title={p.title}
+                  situation={p.situation}
+                  onClick={() => goToPost(p.postId)}
+                />
+              ))
+            ) : (
+              <div className="caption2 text-[#999] w-full pl-[38px] py-[12px] border-b-[1px] border-[#e9e5e2]">
+                베스트 글이 아직 없습니다.
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );

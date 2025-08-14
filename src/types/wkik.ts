@@ -1,12 +1,7 @@
+import type { CommonResponse } from "./common";
 import type { BestFailers } from "./post";
 
-export type ResponseWikiSearch = {
-  keyword: string;
-  summary: string;
-  aiTip: string;
-  postCount: number;
-  bestFailers: BestFailers[];
-};
+export type ResponseWikiSearch = CommonResponse<wikiTips>;
 
 type wiki = {
   keyword: string;
@@ -16,4 +11,12 @@ type wiki = {
   modifiedAt: string;
 };
 
-export type ResponseCurrentWiki = wiki[];
+export type wikiTips = {
+  keyword: string;
+  summary: string;
+  aiTip: string;
+  postCount: number;
+  bestFailers: BestFailers[];
+};
+
+export type ResponseCurrentWiki = CommonResponse<wiki[]>;

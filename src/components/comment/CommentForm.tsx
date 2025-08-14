@@ -1,13 +1,15 @@
 import { useState } from "react";
+import type { Comment } from "../../types/Comment";
 
 interface CommentFormProps {
+  comment: Comment
   postId: number;
   parentId: string|null;
   onSubmit: (reply: string) => void;
   onCancel: () => void;
 }
 
-const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps) => {
+const CommentForm = ({ comment, postId, parentId, onSubmit, onCancel }: CommentFormProps) => {
   const [reply, setReply] = useState("");
 
   console.log(parentId, postId)
@@ -21,9 +23,9 @@ const CommentForm = ({ postId, parentId, onSubmit, onCancel }: CommentFormProps)
     <div className="ml-[34px]">
       <div className="w-full flex flex-col gap-[10px] pl-[32px] pr-[20px] py-[13px] bg-[#fbf3ec] border-[1px] border-[#f0e7e0]">
         <div className="flex flex-col justify-start gap-[4px]">
-          <span className="body5 text-[#808080]">닉네임</span>
+          <span className="body5 text-[#808080]">{comment.userName}</span>
         <textarea
-          className="body5 placeholder:text-[#1d1d1d] placeholder: text-[#1d1d1d] break-words w-full min-h-[20px] resize-none bg-transparent border-none outline-none whitespace-pre-wrap overflow-hidden"
+          className="body5 placeholder:text-gray-400 break-words w-full min-h-[20px] resize-none bg-transparent border-none outline-none whitespace-pre-wrap overflow-hidden"
           placeholder="답글을 입력하세요..."
           value={reply}
           onChange={(e) => {

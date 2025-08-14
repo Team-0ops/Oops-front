@@ -21,6 +21,25 @@ const imageFiles = [
   "/croco.png"     // 8: 악어
 ];
 
+// 줄바꿈 함수
+const formatContent = (text: string, maxCharsPerLine: number) => {
+  let result = "";
+  let count = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    result += text[i];
+    count++;
+
+    if (count >= maxCharsPerLine && /[ ,，.]/.test(text[i])) {
+      result += "\n"; // 줄바꿈 삽입
+      count = 0;
+    }
+  }
+
+  return result;
+};
+
+
 const FullResultCard = ({ onClose, card, selectedIndex }: FullResultCardProps) => {
   const { name, content, FrontComponent } = card;
 
@@ -52,9 +71,11 @@ const FullResultCard = ({ onClose, card, selectedIndex }: FullResultCardProps) =
           {name}
         </h2>
 
-        <p className="text-[#FFFBF8] text-[14px] font-semibold text-center leading-snug mb-[24px]">
-          {content}
-        </p>
+        <p
+  className="text-[#FFFBF8] text-[14px] font-semibold text-center leading-snug mb-[24px] whitespace-pre-line"
+>
+  {formatContent(content, 15)} {/* 15글자 근처에서 줄바꿈 */}
+</p>
 
         <div className="w-[250px] h-[353px] mb-[46px] rounded-[4px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] overflow-hidden bg-white">
           <FrontComponent />

@@ -22,9 +22,9 @@ const FeedbackView = ({ postId, onClose }: FeedbackViewProps) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col gap-[6px] mr-[29px] mb-[4px]">
-          <span className="body4">{lesson?.title}</span>
-          <span className="caption1 text-[#4d4d4d] mt-[4px]">{lesson?.content}</span>
+        <div className="flex flex-col gap-[6px] mr-[16px] mb-[4px]">
+          <span className="body4 break-words w-full" >{lesson?.title}</span>
+          <span className="caption1 text-[#4d4d4d] break-words w-full mt-[4px]">{lesson?.content}</span>
         </div>
         <div className="flex justify-end gap-[6px] flex-wrap">
           {lesson?.tagNames?.map((tag:string) => (
