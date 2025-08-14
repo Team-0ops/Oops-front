@@ -10,7 +10,6 @@ import NoColorLike from "../../assets/icons/gray_heart.svg?react";
 import GrayComment from "../../assets/icons/gray_comment.svg?react";
 import ColorLike from "../../assets/icons/ColorHeart.svg?react";
 
-import { useCheerComment } from "../../hooks/PostPage/useCheerComment";
 import { useDeleteComment } from "../../hooks/PostPage/useDeleteComment";
 import { useCommentLikeOptimistic } from "../../hooks/Mutation/useCommentLikeOptimistic";
 
