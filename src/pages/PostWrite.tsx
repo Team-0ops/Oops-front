@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect} from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
@@ -13,11 +13,49 @@ import "../App.css";
 import { usePreviousPosts } from "../hooks/PostPage/usePreviousPosts";
 import { axiosInstance } from "../apis/axios";
 
+const BASE_CATEGORY_COUNT = 15;
+const normalize = (s: string) => s.trim().toLowerCase();
+
 const PostWrite = () => {
+  //토픽 이름 받아오기
   const location = useLocation();
-  const topicNameFromState = location.state?.topicName;
+  const topicNameFromState: string = location.state?.topicName;
+  // 토픽 마스터 (이름 ↔ id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
+  const topicMaster = useMemo(
+    () =>
+      [
+        "발표",
+        "노래",
+        "고백",
+        "택배",
+        "지각",
+        "회식",
+        "시험",
+        "길 찾기",
+        "운전",
+        "SNS",
+        "면접",
+        "이사",
+        "다이어트",
+        "선물",
+        "소개팅",
+        "기프티콘",
+        "집중력",
+        "핸드폰",
+        "첫인상",
+        "알바",
+      ] as const,
+    []
+  );
+  const topicIdMap = useMemo(() => {
+    const m = new Map<string, number>();
+    topicMaster.forEach((name, idx) => m.set(normalize(name), idx + 1));
+    return m;
+  }, [topicMaster]);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const selectedStep = useSelector(
     (state: RootState) => state.post.selectedStep
   );
@@ -33,16 +71,16 @@ const PostWrite = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [category, setCategory] = useState<number | null>(null);
   const [commentType, setCommentType] = useState<string[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
+  // 새 구조: 라벨만 직접 선택/표시
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
-  const normalize = (s = "") => s.replace(/\s+/g, "").toLowerCase();
-  const [categories, setCategories] = useState<string[]>([
+  // 실제 서버로 보낼 ID — 라벨 매핑에 의해 자동 결정
+  const [categoryId, setCategoryId] = useState<number | null>(null); // 1~15
+  const [topicId, setTopicId] = useState<number | null>(null); // 토픽에 매칭되면 세팅
+
+  const [categories] = useState<string[]>([
     "일상",
     "연애",
     "인간관계",
@@ -59,6 +97,15 @@ const PostWrite = () => {
     "정신 건강",
     "자유",
   ]);
+  const [topics, setTopics] = useState<string[]>([]); // 표시/매칭용 토픽 라벨 목록
+
+  // ui
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 이전 단계 글 목록
+  const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
   // 이미지 업로드 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,61 +118,84 @@ const PostWrite = () => {
       setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
-
   const handleClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 작성 핸들러
-  const submitPost = async (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
-    const data: OopsPost = {
-      title,
-      content,
-      situation,
-      categoryId: category!,
-      topicId: null,
-      previousPostId: situation !== "OOPS" ? selectedPostId : null,
-      wantedCommentTypes: commentType.map((type) =>
-        type === "조언" ? "ADVICE" : "EMPATHY"
-      ),
-    };
+  // 매핑용 맵
 
-    // FormData 객체 생성
-    const formData = new FormData();
-    formData.append("data", JSON.stringify(data)); // JSON 문자열로 추가
-    images.forEach((file) => {
-      formData.append("images", file); // 여러 장 전송시 이름을 똑같이 반복!
+  // 카테고리(1~15) 라벨 → categoryId
+  const categoryMap = useMemo(() => {
+    const m = new Map<string, number>();
+    categories.slice(0, BASE_CATEGORY_COUNT).forEach((name, idx) => {
+      m.set(normalize(name), idx + 1); // 1-based
     });
+    return m;
+  }, [categories]);
 
-    try {
-      const res = await axiosInstance.post("/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const postId = res.data.result?.postId;
-      await fetchPreviousPosts();
-      if (situation === "OOPS") {
-        dispatch(setSelectedStep(1));
-        navigate("/postsuccess", { state: { postId } });
-      } else if (situation === "OVERCOMING") {
-        dispatch(setSelectedStep(2));
-        navigate("/postsuccess", { state: { postId } });
-      } else {
-        dispatch(setSelectedStep(0));
-        dispatch(setSelectedPostId(null));
-        navigate("/postsuccess", { state: { postId } });
+  // 토픽 라벨 → 존재 여부 (topicId는 topicIdMap을 사용)
+  const topicSet = useMemo(() => {
+    const s = new Set<string>();
+    topics.forEach((name) => s.add(normalize(name)));
+    return s;
+  }, [topics]);
+
+  // 화면 표시용 목록: 카테고리 + 토픽(중복 제거)
+  const displayList = useMemo(() => {
+    const seen = new Set<string>();
+    const list: string[] = [];
+    for (const name of categories) {
+      const n = normalize(name);
+      if (!seen.has(n)) {
+        seen.add(n);
+        list.push(name);
       }
-      setTitle("");
-      setContent("");
-      setImages([]);
-      setCommentType([]);
-      console.log("성공");
-    } catch (error) {
-      console.log("글 작성에 실패했습니다. 다시 시도해주세요.");
-      console.error(error);
     }
-  };
+    for (const name of topics) {
+      const n = normalize(name);
+      if (!seen.has(n)) {
+        seen.add(n);
+        list.push(name);
+      }
+    }
+    return list;
+  }, [categories, topics]);
+
+  // 선택 라벨 -> id적용
+  const applySelection = useCallback(
+    (label: string | null) => {
+      setSelectedLabel(label);
+
+      if (!label) {
+        setCategoryId(null);
+        setTopicId(null);
+        return;
+      }
+
+      const key = normalize(label);
+
+      // 카테고리(1~15 범위) 우선
+      const cid = categoryMap.get(key);
+      if (cid && cid >= 1 && cid <= BASE_CATEGORY_COUNT) {
+        setCategoryId(cid);
+        setTopicId(null);
+        return;
+      }
+
+      // 카테고리에 없고 토픽에 있으면 topicId 세팅, categoryId는 null
+      if (topicSet.has(key)) {
+        const tid = topicIdMap.get(key) ?? null; // 실제 토픽 ID 매핑
+        setCategoryId(null);
+        setTopicId(tid);
+        return;
+      }
+
+      // 둘 다 아니면 null
+      setCategoryId(null);
+      setTopicId(null);
+    },
+    [categoryMap, topicSet, topicIdMap]
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -146,89 +216,137 @@ const PostWrite = () => {
   useEffect(() => {
     if (!topicNameFromState) return;
 
-    const n = normalize(topicNameFromState);
-
-    setCategories((prev) => {
-      const idx = prev.findIndex((c) => normalize(c) === n);
-      if (idx !== -1) {
-        setCategory(idx + 1); // 이미 있으면 바로 선택
-        return prev;
-      }
-      const next = [...prev, topicNameFromState]; // 없으면 동적 추가
-      setCategory(next.length); // 방금 추가한 항목 선택(1-based)
-      return next;
+    // topics 목록에 없으면 추가
+    setTopics((prev) => {
+      const k = normalize(topicNameFromState);
+      return prev.some((t) => normalize(t) === k)
+        ? prev
+        : [...prev, topicNameFromState];
     });
-  }, [topicNameFromState]);
+
+    // 선택 라벨을 이 주제로 지정 (ID는 규칙에 따라 자동 결정)
+    applySelection(topicNameFromState);
+  }, [topicNameFromState, applySelection]);
 
   // OopsList에서 클릭했을때 해당하는 카테고리 고정
+
   useEffect(() => {
     if (!selectedPostId) return;
 
-    // 현재 단계 기준 "이전 단계"를 결정
     const sourceSituation =
       selectedStep === 1 ? "OOPS" : selectedStep === 2 ? "OVERCOMING" : null;
-
     if (!sourceSituation) return;
 
-    // 이전 단계에서 선택된 글 찾기
     const selectedPrev = previousPosts
       .filter((p) => p.situation === sourceSituation)
       .find((p) => p.postId === selectedPostId);
-
     if (!selectedPrev) return;
 
-    // categoryId가 있으면 그대로 사용
+    // 1) categoryId가 1~15면 해당 라벨로 선택
     if (typeof (selectedPrev as any).categoryId === "number") {
-      setCategory((selectedPrev as any).categoryId);
+      const cid = (selectedPrev as any).categoryId as number;
+      if (cid >= 1 && cid <= BASE_CATEGORY_COUNT) {
+        const label = categories[cid - 1];
+        if (label) applySelection(label);
+        return;
+      }
+    }
+
+    // 2) categoryName이 있으면 라벨로 선택 (카테고리/토픽 여부는 applySelection이 판별)
+    const name = (selectedPrev as any).categoryName as string | undefined;
+    if (name) {
+      applySelection(name);
       return;
     }
 
-    // categoryName만 있는 경우: 문자열 매칭/동적 추가
-    const name = (selectedPrev as any).categoryName as string | undefined;
-    if (!name) return;
+    // 3) (필요 시) topicName이 별도로 온다면 여기에 적용
+    // const tname = (selectedPrev as any).topicName as string | undefined;
+    // if (tname) applySelection(tname);
+  }, [selectedStep, selectedPostId, previousPosts, categories, applySelection]);
 
-    setCategories((prev) => {
-      const idx = prev.findIndex((c) => normalize(c) === normalize(name));
-      if (idx !== -1) {
-        setCategory(idx + 1);
-        return prev;
+  // 전송
+
+  const clampCategoryId = (id: number | null) =>
+    id && id >= 1 && id <= BASE_CATEGORY_COUNT ? id : null;
+
+  const submitPost = async (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
+    const data: OopsPost = {
+      title,
+      content,
+      situation,
+      categoryId: clampCategoryId(categoryId),
+      topicId: topicId ?? null,
+      previousPostId: situation !== "OOPS" ? selectedPostId : null,
+      wantedCommentTypes: commentType.map((type) =>
+        type === "조언" ? "ADVICE" : "EMPATHY"
+      ),
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(data));
+    images.forEach((file) => formData.append("images", file));
+
+    try {
+      const res = await axiosInstance.post("/posts", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const postId = res.data.result?.postId;
+
+      await fetchPreviousPosts();
+
+      if (situation === "OOPS") {
+        dispatch(setSelectedStep(1));
+        navigate("/postsuccess", { state: { postId } });
+      } else if (situation === "OVERCOMING") {
+        dispatch(setSelectedStep(2));
+        navigate("/postsuccess", { state: { postId } });
+      } else {
+        dispatch(setSelectedStep(0));
+        dispatch(setSelectedPostId(null));
+        navigate("/postsuccess", { state: { postId } });
       }
-      const next = [...prev, name];
-      setCategory(next.length);
-      return next;
-    });
-  }, [selectedStep, selectedPostId, previousPosts]);
+
+      setTitle("");
+      setContent("");
+      setImages([]);
+      setImagePreviews([]);
+      setCommentType([]);
+      // 선택값 초기화(선택 사항)
+      setSelectedLabel(null); setCategoryId(null); setTopicId(null);
+      console.log("성공");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // button 스타일
   const buttonStyle =
     "body4 w-auto px-[13px] py-[6px] rounded-[20px] flex items-center justify-center cursor-pointer";
 
   // 버튼 비활성화 및 자동 포커스
-  const isFormValid = !!title.trim() && !!content.trim() && !!category;
+  const isFormValid =
+    !!title.trim() && !!content.trim() && (!!categoryId || !!topicId);
 
+  // 핸들러
   const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
     if (!title.trim()) {
       titleRef.current?.focus();
       return;
     }
-
     if (!content.trim()) {
       contentRef.current?.focus();
       return;
     }
-
-    if (!category) {
+    if (!categoryId && !topicId) {
       setIsDropdownOpen(true);
       categoryRef.current?.focus();
       return;
     }
-
     submitPost(situation);
   };
 
   return (
     <div className="flex justify-center items-center ">
-      {/* <Navbar /> 들어가면 됨 */}
       <div className="w-full h-full bg-[#FFFBF8] ">
         {/* 첫번째 section */}
         <section className="w-full pt-[17px] pb-[30px] flex flex-col gap-[20px]">
@@ -378,9 +496,7 @@ const PostWrite = () => {
               className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] rounded-[20px] cursor-pointer bg-[#E6E6E6] outline-none select-none"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
             >
-              {/* ✅ 선택된 카테고리 이름 보여주기 */}
-              {category ? categories[category - 1] : "카테고리 선택"}
-
+              {selectedLabel ?? "카테고리 선택"}
               {isDropdownOpen ? (
                 <UpArrow className="w-[18px] h-[18px]" />
               ) : (
@@ -392,31 +508,36 @@ const PostWrite = () => {
             {isDropdownOpen && (
               <ul
                 className="
-              absolute top-[82px] 
-            bg-[#f3f3f3]
-              w-[120px] h-[118px] 
-              rounded-b-[10px] 
-              overflow-y-scroll text-[14px] shadow"
+                  absolute top-[82px]
+                  bg-[#f3f3f3]
+                  w-[120px] h-[180px]
+                  rounded-b-[10px]
+                  overflow-y-scroll text-[14px] shadow
+                "
               >
-                {categories.map((item, idx) => (
-                  <li
-                    key={item}
-                    onClick={() => {
-                      setCategory(idx + 1); // 1부터 시작하는 ID로 저장
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`body4 px-[13px] py-[8px] cursor-pointer
-                      ${category === idx + 1 ? "text-black" : "text-[#999999]"}
-                      ${
-                        idx !== categories.length - 1
-                          ? "border-b border-[#e6e6e6]"
-                          : ""
-                      }
-                  `}
-                  >
-                    {item}
-                  </li>
-                ))}
+                {displayList.map((label, idx) => {
+                  const isSelected =
+                    selectedLabel &&
+                    normalize(selectedLabel) === normalize(label);
+                  return (
+                    <li
+                      key={`${label}-${idx}`}
+                      onClick={() => {
+                        applySelection(label);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`body4 px-[13px] py-[8px] cursor-pointer
+                        ${isSelected ? "text-black" : "text-[#999999]"}
+                        ${
+                          idx !== displayList.length - 1
+                            ? "border-b border-[#e6e6e6]"
+                            : ""
+                        }`}
+                    >
+                      {label}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </form>

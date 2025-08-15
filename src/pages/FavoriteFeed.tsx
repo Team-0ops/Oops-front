@@ -7,6 +7,7 @@ import type { Post } from "../types/post";
 import PostCard from "../components/common/PostCard";
 import PostStatusTab from "../components/FeedPage/PostStatusTab";
 import LeftArrow from "../assets/icons/left-point.svg?react";
+import Star from "../assets/icons/star.svg?react"
 import type { PostStatus } from "../components/FeedPage/PostStatusTab";
 
 const FavoriteFeed = () => {
@@ -41,7 +42,7 @@ const FavoriteFeed = () => {
           <LeftArrow className="w-[9.48px] h-[16.97px] relative top-[1.5px]" />
         </button>
         <h2 className="text-[20px] font-semibold flex gap-[4px]">
-          <img src="src/assets/icons/star.svg" alt="star" />
+          <Star  className="mt-[3px]"/>
           즐겨찾기한 카테고리
         </h2>
       </div>
