@@ -3,9 +3,10 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
   type PropsWithChildren,
 } from "react";
-import { postLogin } from "../apis/auth/authApi";
+import { postLogin, getMyProfile, postLogout } from "../apis/auth/authApi";
 import type { User } from "../types/User";
 
 type LoginParams = { email: string; password: string };
@@ -15,6 +16,8 @@ interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
   login: (params: LoginParams) => Promise<void>;
+  refreshUser: () => Promise<void>;
+  logout: (opts?: { redirect?: boolean }) => Promise<void>;
 }
 
 const ACCESS_TOKEN_KEY = "accessToken";
@@ -28,6 +31,8 @@ export const AuthContext = createContext<AuthContextType>({
   login: async () => {
     throw new Error("AuthProvider가 설정되지 않았습니다.");
   },
+  refreshUser: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -48,46 +53,83 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   });
 
-  const login = async (signinData: LoginParams) => {
+  const refreshUser = async () => {
+    if (!localStorage.getItem(ACCESS_TOKEN_KEY)) {
+      setUser(null);
+      localStorage.removeItem(USER_KEY);
+      return;
+    }
     try {
-      const { data } = await postLogin(signinData);
-
-      if (!data) throw new Error("로그인 응답이 없습니다.");
-
-      const newAccessToken = data.accessToken as string;
-      const newRefreshToken = data.refreshToken as string;
-
-      // 서버 키가 nickName / nickname 혼용될 수 있어 보호적으로 처리
-      const nickname = data.nickname ?? data.nickName;
-
-      const newUser: User = {
-        userId: Number(data.userId),
-        nickname,
-        email: String(data.email),
-        profileImage: data.profileImage ?? null,
-      };
-
-      // 1) state
-      setAccessToken(newAccessToken);
-      setRefreshToken(newRefreshToken);
-      setUser(newUser);
-
-      // 2) storage
-      localStorage.setItem(ACCESS_TOKEN_KEY, newAccessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
-      localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-
-      // 라우팅은 Provider 밖(페이지)에서 navigate로 처리 추천
-      // ex) 로그인 페이지에서: await login(...); navigate("/");
-    } catch (error) {
-      console.error("Login failed", error);
-      throw error; // 호출한 쪽에서 에러 UI 처리
+      const me = await getMyProfile();
+      setUser(me);
+      localStorage.setItem(USER_KEY, JSON.stringify(me));
+    } catch (e) {
+      // 토큰이 유효하지 않으면 정리
+      console.warn("refreshUser failed:", e);
+      setUser(null);
+      localStorage.removeItem(USER_KEY);
     }
   };
 
+  const login = async (signinData: LoginParams) => {
+    try {
+      const resp: any = await postLogin(signinData);
+      const result = resp?.result ?? resp ?? {};
+      const at = String(
+        result?.accessToken ?? localStorage.getItem(ACCESS_TOKEN_KEY) ?? ""
+      );
+      const rt = String(
+        result?.refreshToken ?? localStorage.getItem(REFRESH_TOKEN_KEY) ?? ""
+      );
+
+      if (!at) throw new Error("로그인 응답에 accessToken이 없습니다.");
+
+      // 3) 상태/스토리지 동기화 (상태 먼저 올려서 UI 즉시 전환)
+      setAccessToken(at);
+      setRefreshToken(rt || null);
+      localStorage.setItem(ACCESS_TOKEN_KEY, at);
+      if (rt) localStorage.setItem(REFRESH_TOKEN_KEY, rt);
+      await refreshUser();
+      // 라우팅은 페이지 컴포넌트에서 navigate 처리
+    } catch (error) {
+      console.error("Login failed", error);
+      throw error;
+    }
+  };
+  const logout = async (opts?: { redirect?: boolean }) => {
+    try {
+      // 서버에 세션&리프레시 토큰 무효화 요청
+      await postLogout().catch(() => {});
+    } finally {
+      // 클라이언트 상태&스토리지 초기화
+      setAccessToken(null);
+      setRefreshToken(null);
+      setUser(null);
+      try {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem("userId");
+      } catch {}
+
+      if (opts?.redirect !== false) {
+        window.location.replace("/");
+      }
+
+      // 보호 경로에서 자동 호출되는 API 재요청 방지 + 즉시 반영
+      window.location.replace("/");
+    }
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem(ACCESS_TOKEN_KEY)) {
+      refreshUser().catch(() => {});
+    }
+  }, []);
+
   // value는 메모이즈해서 불필요 리렌더 방지
   const value = useMemo<AuthContextType>(
-    () => ({ accessToken, refreshToken, user, login }),
+    () => ({ accessToken, refreshToken, user, login, refreshUser, logout }),
     [accessToken, refreshToken, user]
   );
 

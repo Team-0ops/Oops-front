@@ -1,27 +1,42 @@
 import { useEffect, useState } from "react";
 import { getPostListInMainPagetoGuest } from "../../apis/post";
 import type { ResponseMainPostListDTO } from "../../types/post";
+import { useAuth } from "../../context/AuthContext";
 
 function useGetGuestPostListInMain() {
   const [posts, setPosts] = useState<ResponseMainPostListDTO | null>(null);
   const [mainLoading, setLoading] = useState(true);
   const [mainError, setError] = useState<string | null>(null);
+  const { accessToken } = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
+    // [MOD] 토큰이 있으면 게스트 호출하지 않음
+    if (accessToken) {
+      setPosts(null);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    let aborted = false;
+    setLoading(true);
+    setError(null);
+
+    (async () => {
       try {
-        const data = await getPostListInMainPagetoGuest(); // data.data 반환
-        setPosts(data);
-      } catch (err) {
-        setError("게시글 불러오기 실패");
+        const data = await getPostListInMainPagetoGuest();
+        if (!aborted) setPosts(data);
+      } catch {
+        if (!aborted) setError("게시글 불러오기 실패");
       } finally {
-        setLoading(false);
+        if (!aborted) setLoading(false);
       }
+    })();
+
+    return () => {
+      aborted = true;
     };
-
-    fetchData();
-  }, []);
-
+  }, [accessToken]);
   return { posts, mainLoading, mainError };
 }
 
