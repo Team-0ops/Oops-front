@@ -10,7 +10,9 @@ import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { accessToken, user } = useAuth();
+  const { accessToken } = useAuth();
+  const profile = localStorage.getItem("profileImage");
+  console.log("사용자정보" + profile);
   return (
     <>
       <nav className="flex justify-between items-center px-[20px] py-[12px] bg-[#FFF] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
@@ -49,9 +51,9 @@ const Navbar = () => {
             </Link>
 
             <Link to="/mypage">
-              {user?.profileImage ? (
+              {profile ? (
                 <img
-                  src={user.profileImage}
+                  src={profile}
                   alt="프로필"
                   className="w-6 h-6 rounded-full object-cover"
                 />
