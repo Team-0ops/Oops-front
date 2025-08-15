@@ -3,7 +3,14 @@ const Footer = () => {
     <footer className="flex w-full border-t border-[#B3B3B3]">
       <div className="flex gap-[33px] mt-[15px] text-[#B3B3B3]">
         <div className="flex flex-col gap-[6px] ml-[20px]">
-          <p>서비스 소개</p>
+          <a
+            href="https://humane-trollius-aaf.notion.site/Oops-24f794923899800cbae1f5780c547eb3?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            서비스 소개
+          </a>
           <p>광고문의</p>
           <p>멤버 소개</p>
         </div>
@@ -24,14 +31,7 @@ const Footer = () => {
           >
             개인정보 처리방침
           </a>
-          <a
-            href="https://humane-trollius-aaf.notion.site/Oops-24f794923899800cbae1f5780c547eb3?source=copy_link"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            신고가이드
-          </a>
+          <p>신고가이드</p>
         </div>
       </div>
     </footer>
