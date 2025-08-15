@@ -192,7 +192,7 @@ export default function MyFailuresPage() {
         {loading && <div className="text-center py-4">불러오는 중...</div>}
       </div>
 
-      {!loading && hasNext && (
+      {/* {!loading && hasNext && (
         <div className="flex justify-center py-4">
           <button
             type="button"
@@ -202,7 +202,7 @@ export default function MyFailuresPage() {
             더 보기
           </button>
         </div>
-      )}
+      )} */}
 
       {!loading && !hasNext && displayCards.length > 0 && (
         <div className="text-center text-gray-400 py-4">
