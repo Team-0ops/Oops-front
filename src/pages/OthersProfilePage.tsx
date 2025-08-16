@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import PostCard from "../components/common/PostCard";
@@ -9,6 +9,9 @@ import othersProfile from "../assets/icons/othersprofile.svg";
 import type { OthersProfileResult } from "../types/mypage";
 import { getOthersProfile } from "../apis/othersApi";
 import BestFailerTitleList from "../components/common/BestFailerTitleList"; // 경로 확인
+//import WikiBestFailerList from "../components/FailWiki/WikiBestFailerList";
+//import type { BestFailers } from "../types/post";
+//import { SituationRow } from "../components/common/Row";
 
 function toCard(p: any) {
   const rawId =
@@ -34,10 +37,15 @@ function toCard(p: any) {
 export default function OthersProfilePage() {
   const { userId } = useParams();
   const nav = useNavigate();
+  const location = useLocation();
+  const preload =
+    (location.state as { nickname?: string; profileImageUrl?: string }) || {};
 
   const [data, setData] = useState<OthersProfileResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  //추천글 게시글로 보내기
+  //const goToPost = (id: number) => nav(`/post/${id}`);
 
   useEffect(() => {
     if (!userId) return;
@@ -55,11 +63,14 @@ export default function OthersProfilePage() {
     })();
   }, [userId]);
 
-  const nickname = data?.profile.nickname ?? "사용자";
-  const avatar = data?.profile.profileImageUrl || othersProfile;
+  const nickname = data?.profile.nickname ?? preload.nickname ?? "사용자";
+  const avatar =
+    data?.profile.profileImageUrl ?? preload.profileImageUrl ?? othersProfile;
+
   const cards = (data?.posts ?? []).map(toCard);
 
   console.log("[others] raw posts", data?.posts);
+  //const bestFailerList: BestFailers[] | undefined = (data as any)?.bestFailers;
 
   return (
     <div className="min-h-screen bg-[#FFFBF8] flex flex-col">
@@ -85,6 +96,15 @@ export default function OthersProfilePage() {
               src={avatar}
               alt="프로필 이미지"
               className="h-[100px] w-[100px] rounded-full object-cover"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+                e.currentTarget.insertAdjacentHTML(
+                  "afterend",
+                  `<div style="width:100px;height:100px;border-radius:50%;background:#D9D9D9;"></div>`
+                );
+              }}
             />
             <p className="text-[20px] font-semibold text-[#1D1D1D]">
               {nickname}
