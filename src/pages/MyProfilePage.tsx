@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Warning from "../assets/icons/warning.svg?react";
 import { getMyProfile, patchMyProfile } from "../apis/mypageApi";
 import type { MyProfileRes } from "../types/mypage";
@@ -51,7 +51,7 @@ export default function MyProfilePage() {
   const imgCandsRef = useRef<string[]>([]);
   const imgIdxRef = useRef(0);
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const location = useLocation();
   const { accessToken, logout } = useAuth();
 
