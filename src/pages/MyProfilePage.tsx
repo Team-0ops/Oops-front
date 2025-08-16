@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Warning from "../assets/icons/warning.svg?react";
-import MyProfileIcon from "../assets/icons/myprofile.svg?react";
 import { getMyProfile, patchMyProfile } from "../apis/mypageApi";
-//import { postLogout } from "../apis/auth/authApi";
 import type { MyProfileRes } from "../types/mypage";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,6 +15,17 @@ function makeImgCandidates(raw?: string | null): string[] {
   );
 }
 
+// 하드 리로드
+function hardReload() {
+  try {
+    sessionStorage.setItem("PROFILE_RELOADED_ONCE", "1");
+  } catch {}
+  const url = new URL(window.location.href);
+  url.searchParams.set("r", String(Date.now()));
+  // 뒤로가기 히스토리 남기지 않음
+  window.location.replace(url.toString());
+}
+
 export default function MyProfilePage() {
   const [profile, setProfile] = useState<MyProfileRes | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,13 +34,13 @@ export default function MyProfilePage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const inflightPreviewRef = useRef<string | null>(null);
 
+  const [uploading, setUploading] = useState(false);
   const uploadingRef = useRef(false);
   useEffect(() => {
     uploadingRef.current = uploading;
   }, [uploading]);
-  const inflightPreviewRef = useRef<string | null>(null);
 
   const [userId, setUserId] = useState<string | null>(
     (typeof localStorage !== "undefined" && localStorage.getItem("userId")) ||
@@ -46,6 +55,13 @@ export default function MyProfilePage() {
   const location = useLocation();
   const { accessToken, logout } = useAuth();
 
+  // 리로드 플래그 한 번만 제거
+  useEffect(() => {
+    if (sessionStorage.getItem("PROFILE_RELOADED_ONCE")) {
+      sessionStorage.removeItem("PROFILE_RELOADED_ONCE");
+    }
+  }, []);
+
   useEffect(() => {
     if (!accessToken) {
       setLoading(false);
@@ -56,6 +72,7 @@ export default function MyProfilePage() {
     let cancelled = false;
     (async () => {
       try {
+        if (uploadingRef.current) return;
         setLoading(true);
         const data = await getMyProfile();
         if (uploadingRef.current || cancelled) return;
@@ -77,6 +94,7 @@ export default function MyProfilePage() {
 
   useEffect(() => {
     if (!accessToken) return;
+    if (uploadingRef.current) return;
     let cancelled = false;
     (async () => {
       try {
@@ -128,7 +146,6 @@ export default function MyProfilePage() {
   useEffect(() => {
     const url = profile?.profileImageUrl || null;
 
-    // [FIX] blob/data → 후보 변환 금지, 그대로 사용
     if (url && /^(blob:|data:)/i.test(url)) {
       imgCandsRef.current = [url];
       imgIdxRef.current = 0;
@@ -147,25 +164,12 @@ export default function MyProfilePage() {
     fileInputRef.current?.click();
   };
 
-  function validateFile(file: File) {
-    if (!/^(image\/(png|jpe?g|gif|webp))$/i.test(file.type)) {
-      alert("PNG/JPG/GIF/WEBP 형식의 이미지 파일만 업로드할 수 있어요.");
-      return false;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      alert("이미지 용량이 너무 커요. 최대 10MB까지 업로드할 수 있어요.");
-      return false;
-    }
-    return true;
-  }
-
   const onSelectImage: React.ChangeEventHandler<HTMLInputElement> = async (
     e
   ) => {
     const file = e.target.files?.[0];
     e.currentTarget.value = "";
     if (!file) return;
-    if (!validateFile(file)) return;
 
     // 즉시 미리보기
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -179,19 +183,24 @@ export default function MyProfilePage() {
 
     try {
       setUploading(true);
-      const myUserIdAtStart = userId;
-      const updated = await patchMyProfile({ file });
 
-      // 레이스 차단
+      const myUserIdAtStart = userId;
+      await patchMyProfile({ file }); // 여기서 GET 요청 같이 받지 않도록 수정함
+
+      // 레이스 차단: 업로드 중 DOM 이동/계정변경 등
       if (inflightPreviewRef.current !== localUrl) return;
       if (myUserIdAtStart !== (localStorage.getItem("userId") || null)) return;
 
-      if (updated) {
-        setProfile(updated);
-      } else {
-        const fresh = await getMyProfile();
-        setProfile(fresh);
+      // 리로드 전에 미리 리소스 정리
+      if (previewUrlRef.current === localUrl) {
+        URL.revokeObjectURL(localUrl);
+        previewUrlRef.current = null;
       }
+      inflightPreviewRef.current = null;
+
+      // 업로드 성공하면 자동 새로고침 (캐시버스트)
+      hardReload();
+      return;
     } catch (e: any) {
       console.error("[프로필 이미지 업로드 실패]", {
         error: e,
@@ -216,14 +225,34 @@ export default function MyProfilePage() {
     }
   };
 
-  const handleImgError = () => {
-    const next = imgIdxRef.current + 1;
-    if (next < imgCandsRef.current.length) {
-      imgIdxRef.current = next;
-      setImgSrc(imgCandsRef.current[next]);
-    } else {
-      setImgSrc(null);
+  const imgErrorRef = useRef(0);
+  const handleImgError = async () => {
+    // 리로드 모드에서는 단순 폴백만 유지
+    const tryCount = ++imgErrorRef.current;
+    const nextIdx = imgIdxRef.current + 1;
+    if (nextIdx < imgCandsRef.current.length) {
+      imgIdxRef.current = nextIdx;
+      setImgSrc(imgCandsRef.current[nextIdx]);
+      return;
     }
+
+    // 한 번 정도만 재조회 시도
+    if (tryCount <= 1) {
+      try {
+        if (uploadingRef.current) return;
+        const fresh = await getMyProfile();
+        if (
+          fresh?.profileImageUrl &&
+          fresh.profileImageUrl !== profile?.profileImageUrl
+        ) {
+          setProfile(fresh);
+          return;
+        }
+      } catch {}
+    }
+
+    // 그래도 실패하면 기본 아이콘
+    setImgSrc(null);
   };
 
   const handleLogout = async () => {
@@ -250,14 +279,16 @@ export default function MyProfilePage() {
       <div className="flex items-center gap-4">
         {imgSrc ? (
           <img
-            key={imgSrc} // 강제 리렌더
+            key={imgSrc}
             src={imgSrc}
-            onError={handleImgError} // 경로 폴백
+            onError={handleImgError}
             alt="profile"
             className="h-[100px] w-[100px] rounded-full object-cover"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
           />
         ) : (
-          <MyProfileIcon className="h-[100px] w-[100px] rounded-full object-cover" />
+          <div className="h-[100px] w-[100px] rounded-full bg-[#D9D9D9]" />
         )}
 
         <div className="space-y-[5px]">

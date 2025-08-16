@@ -30,14 +30,16 @@ export const getMyProfile = async (): Promise<MyProfileRes> => {
   const { data } =
     await instance.get<ApiResponse<MyProfileRes>>("/my-page/profile");
 
+  console.log("마이페이지", data);
+
   const raw: any = data.result;
 
-  raw.profileImageUrl =
-    raw.profileImageUrl ?? raw.profileImage ?? raw.imageUrl ?? null;
+  // raw.profileImageUrl =
+  //   raw.profileImageUrl ?? raw.profileImage ?? raw.imageUrl ?? null;
 
-  if (raw.profileImageUrl) {
-    raw.profileImageUrl = normalizeUrl(addBust(raw.profileImageUrl));
-  }
+  // if (raw.profileImageUrl) {
+  //   raw.profileImageUrl = normalizeUrl(addBust(raw.profileImageUrl));
+  // }
   return raw as MyProfileRes;
 };
 
