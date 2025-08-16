@@ -1,4 +1,3 @@
-
 export type MyStatus = "oops" | "doing" | "done";
 
 interface Props {
@@ -20,7 +19,7 @@ export default function MyStatusTab({ value, onChange }: Props) {
           key={t.key}
           onClick={() => onChange(t.key)}
           className={`flex-1 basis-0 min-w-[60px] h-[30px] rounded-[20px] whitespace-nowrap
-                      px-[12px] py-[6px] text-[12px] font-semibold
+                      px-[12px] py-[6px] text-[12px] font-bold
                       ${
                         value === t.key
                           ? "bg-[#1D1D1D] text-white"
