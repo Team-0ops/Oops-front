@@ -419,6 +419,7 @@ const PostWrite = () => {
               posts={previousPosts.filter((p) => p.situation === "OOPS")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
           {selectedStep === 2 && (
@@ -426,6 +427,7 @@ const PostWrite = () => {
               posts={previousPosts.filter((p) => p.situation === "OVERCOMING")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
         </section>
