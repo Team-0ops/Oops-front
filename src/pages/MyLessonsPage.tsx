@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import type { LessonWithPostDto } from "../types/mypage";
 import { getMyLessons } from "../apis/mypageApi";
 import ArrowIcon from "../assets/icons/Arrow.svg?react";
+import { Link, useNavigate } from "react-router-dom";
 
 const tags = ["인생 교훈", "회사", "친구", "먹을 거", "위로"];
-
+const POST_DETAIL_BASE = "/post";
 export default function MyLessonsPage() {
   const [tag, setTag] = useState<string | null>(null);
   const [lessons, setLessons] = useState<LessonWithPostDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -29,6 +31,18 @@ export default function MyLessonsPage() {
       }
     })();
   }, [tag]);
+
+  const goPost = (postId?: number) => {
+    if (!postId) return;
+    navigate(`${POST_DETAIL_BASE}/${postId}`);
+  };
+
+  const onKeyGoPost = (e: KeyboardEvent<HTMLDivElement>, postId?: number) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      goPost(postId);
+    }
+  };
 
   return (
     <section className="p-4">
@@ -61,8 +75,14 @@ export default function MyLessonsPage() {
                   key={lesson.lessonId}
                   className="flex flex-col gap-0 w-full"
                 >
-                  {/* 게시글 카드 */}
-                  <div className="flex items-center justify-between gap-[12px] rounded-[10px] bg-[#F0E7E0] px-[14px] py-[16px] w-full">
+                  {/* 게시글 카드 클릭 가능하게 수정 */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => goPost(lesson.postId)}
+                    onKeyDown={(e) => onKeyGoPost(e, lesson.postId)}
+                    className="flex items-center justify-between gap-[12px] rounded-[10px] bg-[#F0E7E0] px-[14px] py-[16px] w-full cursor-pointer hover:brightness-95 transition"
+                  >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <h4 className="truncate text-[14px] font-bold text-[#1D1D1D]">
@@ -85,17 +105,17 @@ export default function MyLessonsPage() {
                     )}
                   </div>
 
-                  {/* 교훈 카드 */}
-                  <div className="flex flex-col gap-[8px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[6px] w-full">
-                    {/* 화살표 + 제목 */}
+                  {/* 교훈 카드도 누르면 이동 */}
+                  <Link
+                    to={`${POST_DETAIL_BASE}/${lesson.postId}`}
+                    className="flex flex-col gap-[8px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[6px] w-full hover:brightness-95 transition"
+                  >
                     <div className="flex items-center gap-[6px]">
                       <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
                       <h4 className="text-[13px] font-bold text-[#1D1D1D]">
                         {lesson.lessonTitle || "교훈 제목 없음"}
                       </h4>
                     </div>
-
-                    {/* 본문 + 태그를 같은 줄에 */}
                     <div className="flex justify-between items-start w-full">
                       <p className="text-[13px] text-[#1D1D1D] whitespace-pre-line flex-1">
                         {lesson.lessonContent}
@@ -106,7 +126,7 @@ export default function MyLessonsPage() {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
