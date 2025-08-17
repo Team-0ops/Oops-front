@@ -27,7 +27,7 @@ export const SituationRow: React.FC<RowProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className="caption2 h-[34px] text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full pl-[38px] pr-[20px] py-[8px] text-left hover:bg-[#fff5ee] transition-colors"
+    className="caption2 h-[34px] text-[#666666] flex justify-between items-center border-b-[1px] border-[#e9e5e2] w-full pl-[38px] pr-[20px] py-[8px] text-left transition-colors"
   >
     <span className="truncate mr-[12px]">{title}</span>
     <span className={badgeClassBySituation[situation]}>

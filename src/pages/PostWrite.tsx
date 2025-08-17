@@ -545,7 +545,7 @@ const PostWrite = () => {
           </form>
 
           {/* 댓글 종류 선택 */}
-          <fieldset className="ml-[10px] flex flex-col gap-[15px] justify-start items-start">
+          <fieldset className="ml-[10px] flex flex-col space-y-[15px] items-start">
             <legend className="body2 mb-4">댓글 종류 선택</legend>
             <div className="flex items-center">
               <input
@@ -559,9 +559,9 @@ const PostWrite = () => {
                       : prev.filter((type) => type !== "조언")
                   );
                 }}
-                className="accent-[#B3E378] rounded-[4px] scale-200"
+                className="accent-[#B3E378] rounded-[4px] scale-200 shrink-0"
               />
-              <label className="body5 ml-5" htmlFor="comment1">
+              <label className="body5 ml-5 align-middle" htmlFor="comment1">
                 조언
               </label>
             </div>
@@ -578,9 +578,9 @@ const PostWrite = () => {
                       : prev.filter((type) => type !== "공감")
                   );
                 }}
-                className="accent-[#B3E378] rounded-[4px] scale-200"
+                className="accent-[#B3E378] rounded-[4px] scale-200 shrink-0"
               />
-              <label className="body5 ml-5">공감</label>
+              <label className="body5 ml-5 align-middle">공감</label>
             </div>
           </fieldset>
         </section>
