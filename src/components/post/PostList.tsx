@@ -13,6 +13,7 @@ interface PostListProps {
   posts: PreviousPost[];
   onSelect: (id: number) => void;
   step: number; // 1: 극복 중, 2: 극복 완료
+  selectedPostId?: number | null;
 }
 
 const stepToSituationMap: Record<number, "OOPS" | "OVERCOMING"> = {
@@ -22,7 +23,7 @@ const stepToSituationMap: Record<number, "OOPS" | "OVERCOMING"> = {
 
 const POSTS_PER_PAGE = 5;
 
-const PostList = ({ posts, onSelect, step }: PostListProps) => {
+const PostList = ({ posts, onSelect, step, selectedPostId }: PostListProps) => {
   const targetSituation = stepToSituationMap[step];
   const paginationRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<any>(null);
@@ -81,7 +82,12 @@ const PostList = ({ posts, onSelect, step }: PostListProps) => {
               <SwiperSlide key={pageIndex}>
                 <ul className="flex flex-col gap-[12px]">
                   {chunk.map((post) => (
-                    <Post key={post.postId} post={post} onClick={onSelect} />
+                    <Post
+                      key={post.postId}
+                      post={post}
+                      onClick={onSelect}
+                      isSelected={post.postId === selectedPostId}
+                    />
                   ))}
                 </ul>
               </SwiperSlide>
