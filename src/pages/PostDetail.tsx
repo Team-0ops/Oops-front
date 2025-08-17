@@ -70,6 +70,20 @@ const PostDetail = () => {
   //userId 뽑아오기 (내 게시글인지 인식표)
   const userId = useSelector((state: RootState) => state.user.userId);
 
+  const goAuthorProfile = (u: {
+    userId?: number;
+    nickname?: string;
+    profileImage?: string;
+  }) => {
+    if (!u?.userId) return;
+    navigate(`/users/${u.userId}`, {
+      state: {
+        nickname: u?.nickname ?? "",
+        profileImageUrl: u?.profileImage ?? null,
+      },
+    });
+  };
+
   //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLessonView, setShowLessonView] = useState(false);
@@ -263,10 +277,14 @@ const PostDetail = () => {
               >
                 <div className="w-full p-[14px] rounded-[10px] bg-[#f0e7e0] flex flex-col">
                   <div className="flex gap-[6px]">
-                    {/* 아바타(클릭 시 프로필 이동) */}
+                    {/* 아바타 클릭하면 프로필 이동 */}
                     <button
                       onClick={() =>
-                        post?.userId && navigate(`/users/${post.userId}`)
+                        goAuthorProfile({
+                          userId: post?.userId,
+                          nickname: post?.nickname,
+                          profileImage: post?.profileImage,
+                        })
                       }
                       className="w-[42px] h-[42px] rounded-[4px] overflow-hidden bg-[#9a9a9a] shrink-0"
                       aria-label="작성자 프로필로 이동"
@@ -274,26 +292,29 @@ const PostDetail = () => {
                       {post?.profileImage && (
                         <img
                           src={post.profileImage}
-                          alt="" // alt 텍스트 노출 방지
+                          alt=""
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
                         />
                       )}
                     </button>
                     <div className="flex justify-between w-full items-center">
                       <div className="flex flex-col gap-[4px]">
-                        {/* 닉네임도 클릭 시 이동 */}
+                        {/* 닉네임도 클릭하면 프로필 이동 */}
                         <button
                           className="body2 text-left text-[#1d1d1d] hover:underline"
                           onClick={() =>
-                            post?.userId && navigate(`/users/${post.userId}`)
+                            goAuthorProfile({
+                              userId: post?.userId,
+                              nickname: post?.nickname,
+                              profileImage: post?.profileImage,
+                            })
                           }
                           aria-label="작성자 프로필로 이동"
                         >
                           {post?.nickname ?? "닉네임 없음"}
                         </button>
-                        {/* <span className="body2 text-[#1d1d1d]">
-                          {post ? post.nickname : "닉네임 없음"}
-                        </span> */}
                         <span className="body5 text-[#999999]">
                           {formatRelativeTime(String(post?.created_at))}
                         </span>
@@ -343,7 +364,7 @@ const PostDetail = () => {
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
-                  <div className="body5 w-full mb-[16px] text-[#4d4d4d] break-words">
+                  <div className="body5 w-full mb_[16px] text-[#4d4d4d] break-words">
                     {post?.content}
                   </div>
                   <div>
