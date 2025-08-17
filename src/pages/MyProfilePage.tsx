@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Warning from "../assets/icons/warning.svg?react";
 import MyProfileIcon from "../assets/icons/myprofile.svg?react";
 import { getMyProfile, patchMyProfile } from "../apis/mypageApi";
@@ -42,7 +42,6 @@ export default function MyProfilePage() {
   const imgCandsRef = useRef<string[]>([]);
   const imgIdxRef = useRef(0);
 
-  const navigate = useNavigate();
   const location = useLocation();
   const { accessToken, logout } = useAuth();
 

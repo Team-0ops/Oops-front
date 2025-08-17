@@ -50,7 +50,7 @@ const PostDetail = () => {
 
   //api 관련 훅
   const { postDetail, loading } = usePostDetail(Number(postId));
-  const { deletePost, success } = useDeletePost();
+  const { deletePost} = useDeletePost();
   const { data, loadingRecommendation, error } = useGetRecommendations(
     Number(postId)
   );
