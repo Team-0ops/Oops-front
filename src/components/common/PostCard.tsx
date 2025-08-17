@@ -94,9 +94,13 @@ const PostCard = ({
               </span>
             )}
           </div>
-          <p className="text-[12px] font-regular mb-[10px] line-clamp-1 leading-tight pr-[70px]">
-            {content}
-          </p>
+          <p
+  className={`text-[12px] font-regular mb-[10px] line-clamp-1 leading-tight ${
+    showThumb ? "pr-[70px]" : "pr-[20px]"
+  }`}
+>
+  {content}
+</p>
           <PostStats likes={likes} comments={comments} views={views} />
         </div>
       </div>

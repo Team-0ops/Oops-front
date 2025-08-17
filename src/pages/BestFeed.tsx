@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import PostCard from "../components/common/PostCard";
 import { getBestFailersFeed } from "../apis/categoryPost"; 
 import type { Post } from "../types/post";
+import LeftArrow from "../assets/icons/left-point.svg?react";
 
 const BestFeed = () => {
   const navigate = useNavigate();
@@ -30,11 +31,7 @@ const BestFeed = () => {
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px]">
       <div className="flex gap-[8px]">
         <button onClick={() => navigate("/")}>
-          <img
-            src="/src/assets/icons/left-point.svg"
-            alt="뒤로가기"
-            className="w-[9.48px] h-[16.97px] mb-[20px]"
-          />
+          <LeftArrow  className="w-[9.48px] h-[16.97px] mb-[20px]"/>
         </button>
         <h2 className="text-[20px] font-semibold mb-[20px]">베스트 Failers</h2>
       </div>

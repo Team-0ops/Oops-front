@@ -39,7 +39,10 @@ const MainFeedList = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full justify-center items-center gap-[36px]">
+      <div
+        key={isAuthed ? "auth" : "guest"}
+        className="flex flex-col w-full justify-center items-center gap-[36px]"
+      >
         <BestFailerList
           bestPosts={bestPosts} // posts prop 전달
         />
