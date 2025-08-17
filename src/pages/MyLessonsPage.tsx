@@ -51,7 +51,7 @@ export default function MyLessonsPage() {
         {tags.map((t) => (
           <button
             key={t}
-            onClick={() => setTag(t)}
+            onClick={() => setTag((prev) => (prev === t ? null : t))}
             className={`inline-flex h-[28px] items-center justify-center whitespace-nowrap px-[13px] rounded-full text-[12px] font-semibold ${
               tag === t
                 ? "bg-[#1D1D1D] text-[#FFFFFF]"
