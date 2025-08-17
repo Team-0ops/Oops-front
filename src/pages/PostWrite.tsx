@@ -561,12 +561,12 @@ const PostWrite = () => {
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="body5 mx-5" htmlFor="comment1">
+              <label className="body5 ml-5" htmlFor="comment1">
                 조언
               </label>
             </div>
 
-            <div className="flex items-center mb-[8px]">
+            <div className="flex items-center ">
               <input
                 type="checkbox"
                 value="공감"
@@ -580,7 +580,7 @@ const PostWrite = () => {
                 }}
                 className="accent-[#B3E378] rounded-[4px] scale-200"
               />
-              <label className="body5 mx-5">공감</label>
+              <label className="body5 ml-5">공감</label>
             </div>
           </fieldset>
         </section>
