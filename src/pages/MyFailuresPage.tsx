@@ -25,6 +25,23 @@ function statusToParam(s: MyStatus): MyPostStatus {
   }
 }
 
+function pickImage(d: any): string | undefined {
+  return (
+    nonEmpty(d?.image) ||
+    nonEmpty(d?.thumbnailUrl) ||
+    nonEmpty(d?.imageUrl) ||
+    (Array.isArray(d?.images) &&
+      nonEmpty(d.images[0]?.url || d.images[0]?.imageUrl)) ||
+    undefined
+  );
+}
+
+function nonEmpty(x?: string | null): string | undefined {
+  if (!x) return undefined;
+  const s = String(x).trim();
+  return s ? s : undefined;
+}
+
 export default function MyFailuresPage() {
   const [tabStatus, setTabStatus] = useState<MyStatus>("oops");
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
@@ -70,10 +87,7 @@ export default function MyFailuresPage() {
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    if (page > 0 && !hasNext) {
-      return () => controller.abort();
-    }
+    if (page > 0 && !hasNext) return;
     const fetchList = async (reset: boolean) => {
       try {
         setLoading(true);
@@ -86,26 +100,11 @@ export default function MyFailuresPage() {
           params.categoryId = categoryId;
         }
         const { result, pageInfo }: any = await getMyPosts(params);
-
-        console.log("[MyPosts] request params:", params);
-        let next = Array.isArray(result) && result.length >= size;
-        if (pageInfo && typeof pageInfo.hasNext === "boolean") {
-          next = pageInfo.hasNext;
-        }
+        const next =
+          typeof pageInfo?.hasNext === "boolean"
+            ? pageInfo.hasNext
+            : Array.isArray(result) && result.length >= size;
         setHasNext(next);
-
-        if (pageInfo && typeof pageInfo.hasNext === "boolean") {
-          setHasNext(pageInfo.hasNext);
-        } else {
-          setHasNext(Array.isArray(result) && result.length >= size);
-        }
-
-        if (page === 0 && result[0]) {
-          console.log(
-            "[MyPosts] dto keys:",
-            Object.keys(result[0] as unknown as Record<string, unknown>)
-          );
-        }
 
         const mapped: MyPostCardVM[] = result.map(mapToCardVM);
         setCards((prev) => (reset ? mapped : [...prev, ...mapped]));
@@ -113,15 +112,13 @@ export default function MyFailuresPage() {
         if (e?.name === "CanceledError" || e?.code === "ERR_CANCELED") return; // ✅ 취소 시 무시
         console.error(e);
         setErr(e?.response?.data?.message ?? "목록을 불러오지 못했습니다.");
-        setLoading(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchList(page === 0);
-    return () => controller.abort();
-  }, [page, categoryId, tabStatus, size, hasNext]);
+  }, [page, categoryId, tabStatus, size]);
 
   const categoryNames = useMemo(
     () => [
@@ -175,19 +172,26 @@ export default function MyFailuresPage() {
 
       {/* 게시물 목록 */}
       <div className="flex flex-col gap-[12px]">
-        {displayCards.map((p: MyPostCardVM) => (
-          <PostCard
-            key={p.id}
-            postId={p.id}
-            title={p.title}
-            content={p.content}
-            likes={p.likes}
-            comments={p.comments}
-            views={p.views}
-            category={p.category}
-            imageUrl={p.imageUrl}
-          />
-        ))}
+        {displayCards.map((p: MyPostCardVM) => {
+          const img =
+            pickImage((p as any).raw ?? p) ??
+            nonEmpty((p as any).imageUrl) ??
+            "null";
+
+          return (
+            <PostCard
+              key={p.id}
+              postId={p.id}
+              title={p.title}
+              content={p.content}
+              likes={p.likes}
+              comments={p.comments}
+              views={p.views}
+              category={p.category}
+              imageUrl={img}
+            />
+          );
+        })}
 
         {loading && <div className="text-center py-4">불러오는 중...</div>}
       </div>
@@ -221,21 +225,22 @@ export default function MyFailuresPage() {
 }
 
 function mapToCardVM(d: MyPostDto): MyPostCardVM {
-  const id = (d as any).postId ?? (d as any).id;
-  const title = (d as any).title ?? "(제목 없음)";
-  const content = (d as any).content ?? (d as any).contentPreview ?? "";
-  const imageUrl = (d as any).thumbnailUrl ?? (d as any).imageUrl ?? undefined;
+  // const id = (d as any).postId ?? (d as any).id;
+  // const title = (d as any).title ?? "(제목 없음)";
+  // const content = (d as any).content ?? (d as any).contentPreview ?? "";
+  //const imageUrl = (d as any).thumbnailUrl ?? (d as any).imageUrl ?? undefined;
+  const anyD: any = d ?? {};
+  const id = anyD.postId ?? anyD.id;
+  const title = anyD.title ?? "(제목 없음)";
+  const content = anyD.content ?? anyD.contentPreview ?? "";
 
-  const status =
-    (d as any).status ??
-    (d as any).situation ??
-    (d as any).situationType ??
-    undefined;
+  const imageUrl = pickImage(anyD);
 
-  const category =
-    (d as any).categoryName ?? (d as any).categoryOrTopicName ?? "";
-  const views =
-    (d as any).views ?? (d as any).viewCount ?? (d as any).watching ?? 0;
+  const status: MyPostStatus | undefined =
+    anyD.status ?? anyD.situation ?? anyD.situationType ?? undefined;
+
+  const category = anyD.categoryName ?? anyD.categoryOrTopicName ?? "";
+  const views = anyD.views ?? anyD.viewCount ?? anyD.watching ?? 0;
 
   return {
     id,
@@ -247,5 +252,6 @@ function mapToCardVM(d: MyPostDto): MyPostCardVM {
     views,
     category,
     status,
+    ...({ raw: d } as any),
   };
 }
