@@ -545,9 +545,9 @@ const PostWrite = () => {
           </form>
 
           {/* 댓글 종류 선택 */}
-          <fieldset className="ml-[10px] flex flex-col justify-start items-start">
+          <fieldset className="ml-[10px] flex flex-col gap-[15px] justify-start items-start">
             <legend className="body2 mb-4">댓글 종류 선택</legend>
-            <div className="flex items-center mb-[15px]">
+            <div className="flex items-center">
               <input
                 type="checkbox"
                 value="조언"
