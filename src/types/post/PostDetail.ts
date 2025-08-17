@@ -4,8 +4,13 @@ import type { Comment } from "../Comment";
 export interface Category {
   categoryId: number;
   name: string;
-  stored: boolean;
+  stored?: boolean;
 } 
+
+export interface RandomTopic {
+  randomTopicId: number;     // ← API 응답 키와 일치
+  randomTopicName: string;
+}
 
 export interface PostDetail {
   nickname: string;
@@ -25,7 +30,8 @@ export interface PostDetail {
 
 export interface DetailResultType {
   groupId: number;
-  category: Category;
+  randomTopic: RandomTopic | null;
+  category: Category | null;
   postFailure: PostDetail | null;
   postOvercoming: PostDetail | null;
   postOvercome: PostDetail | null;

@@ -20,7 +20,7 @@ const PostWrite = () => {
   //토픽 이름 받아오기
   const location = useLocation();
   const topicNameFromState: string = location.state?.topicName;
-  // 토픽 마스터 (이름 ↔ id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
+  // 토픽 마스터 (이름 id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
   const topicMaster = useMemo(
     () =>
       [
@@ -281,7 +281,7 @@ const PostWrite = () => {
         type === "조언" ? "ADVICE" : "EMPATHY"
       ),
     };
-
+    console.log("전송할 데이터:", data);
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     images.forEach((file) => formData.append("images", file));
