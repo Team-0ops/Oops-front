@@ -76,7 +76,9 @@ const PostSuccess = () => {
         {!loadingRecommendation && !error && (
           <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mb-[20px]">
             <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-              {`${postDetail?.category.name} 추천 글`}
+              {postDetail?.category?.categoryId
+                ? `${postDetail.category.name} 추천 글`
+                : `${postDetail?.randomTopic?.randomTopicName} 추천 글`}
             </div>
 
             {data?.similarPosts?.length ? (

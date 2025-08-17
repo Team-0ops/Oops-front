@@ -90,7 +90,7 @@ export default function MyProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, userId]);
+  }, [accessToken]);
 
   useEffect(() => {
     if (!accessToken) return;

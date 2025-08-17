@@ -20,7 +20,7 @@ const PostWrite = () => {
   //토픽 이름 받아오기
   const location = useLocation();
   const topicNameFromState: string = location.state?.topicName;
-  // 토픽 마스터 (이름 ↔ id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
+  // 토픽 마스터 (이름 id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
   const topicMaster = useMemo(
     () =>
       [
@@ -281,7 +281,7 @@ const PostWrite = () => {
         type === "조언" ? "ADVICE" : "EMPATHY"
       ),
     };
-
+    console.log("전송할 데이터:", data);
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
     images.forEach((file) => formData.append("images", file));
@@ -419,6 +419,7 @@ const PostWrite = () => {
               posts={previousPosts.filter((p) => p.situation === "OOPS")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
           {selectedStep === 2 && (
@@ -426,6 +427,7 @@ const PostWrite = () => {
               posts={previousPosts.filter((p) => p.situation === "OVERCOMING")}
               onSelect={(id) => dispatch(setSelectedPostId(id))}
               step={selectedStep}
+              selectedPostId={selectedPostId}
             />
           )}
         </section>
@@ -543,9 +545,9 @@ const PostWrite = () => {
           </form>
 
           {/* 댓글 종류 선택 */}
-          <fieldset className="ml-[10px] flex flex-col justify-start items-start">
+          <fieldset className="ml-[10px] flex flex-col gap-[15px] justify-start items-start">
             <legend className="body2 mb-4">댓글 종류 선택</legend>
-            <div className="flex items-center mb-[15px]">
+            <div className="flex items-center">
               <input
                 type="checkbox"
                 value="조언"
