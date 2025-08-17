@@ -50,7 +50,7 @@ const PostDetail = () => {
 
   //api 관련 훅
   const { postDetail, loading } = usePostDetail(Number(postId));
-  const { deletePost, success } = useDeletePost();
+  const { deletePost } = useDeletePost();
   const { data, loadingRecommendation, error } = useGetRecommendations(
     Number(postId)
   );
@@ -192,6 +192,29 @@ const PostDetail = () => {
     return `${createdDate.getMonth() + 1}월 ${createdDate.getDate()}일`;
   };
 
+  // postDetail 로드 후, URL의 postId가 속한 슬라이드로 이동
+  useEffect(() => {
+    if (!postDetail || !postId) return;
+    const idNum = Number(postId);
+
+    // 현재 로드된 세 개(또는 그 이하) 포스트 중에서 postId가 위치한 인덱스 탐색
+    const idx = validPosts.findIndex((p) => p?.postId === idNum);
+    if (idx >= 0) {
+      setActiveIndex(idx);
+      // 버튼/본문 스와이퍼를 모두 같은 인덱스로 맞춤 (애니메이션 없이 즉시)
+      buttonSwiperRef.current?.slideTo(idx, 0);
+      contentSwiperRef.current?.slideTo(idx, 0);
+    }
+  }, [postDetail, postId]); // postDetail이 바뀌거나 주소가 바뀌면 재동기화
+
+  // 초기 진입 & postId가 바뀔 때마다 최상단으로 스크롤
+  useEffect(() => {
+    // 크로스 브라우저 안정화
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [postId]);
+
   if (loading) return <div>로딩 중...</div>;
   if (!postDetail) return <div>데이터 없음</div>;
 
@@ -326,8 +349,8 @@ const PostDetail = () => {
                               className="body2 text-[#ffffff] h-[30px] bg-[#262626] px-[12px] py-[5px] rounded-[4px]"
                               onClick={() => {
                                 deletePost(Number(currentPostId));
-                                navigate("/"); 
-                                // 삭제 모달 들어가자 
+                                navigate("/");
+                                // 삭제 모달 들어가자
                               }}
                             >
                               삭제

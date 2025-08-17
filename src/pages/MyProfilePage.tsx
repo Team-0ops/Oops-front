@@ -51,7 +51,6 @@ export default function MyProfilePage() {
   const imgCandsRef = useRef<string[]>([]);
   const imgIdxRef = useRef(0);
 
-  //const navigate = useNavigate();
   const location = useLocation();
   const { accessToken, logout } = useAuth();
 
