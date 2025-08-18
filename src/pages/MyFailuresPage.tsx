@@ -179,17 +179,22 @@ export default function MyFailuresPage() {
             "null";
 
           return (
-            <PostCard
+            <div
               key={p.id}
-              postId={p.id}
-              title={p.title}
-              content={p.content}
-              likes={p.likes}
-              comments={p.comments}
-              views={p.views}
-              category={p.category}
-              imageUrl={img}
-            />
+              className="cursor-pointer transition hover:scale-[1.01] hover:shadow-md rounded-lg" // ✅ 추가된 부분
+            >
+              <PostCard
+                //key={p.id}
+                postId={p.id}
+                title={p.title}
+                content={p.content}
+                likes={p.likes}
+                comments={p.comments}
+                views={p.views}
+                category={p.category}
+                imageUrl={img}
+              />
+            </div>
           );
         })}
 
