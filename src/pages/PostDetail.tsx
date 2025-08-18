@@ -312,14 +312,19 @@ const PostDetail = () => {
                       className="w-[42px] h-[42px] rounded-[4px] overflow-hidden bg-[#9a9a9a] shrink-0"
                       aria-label="작성자 프로필로 이동"
                     >
-                      {post?.profileImage && (
+                      {post?.profileImage ? (
                         <img
                           src={post.profileImage}
                           alt=""
                           className="w-full h-full object-cover"
                           loading="lazy"
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
                         />
+                      ) : (
+                        <span className="w-full h-full bg-[#9a9a9a]" />
                       )}
                     </button>
                     <div className="flex justify-between w-full items-center">
@@ -387,7 +392,7 @@ const PostDetail = () => {
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
-                  <div className="body5 whitespace-pre-line w-full mb_[16px] text-[#4d4d4d] break-words">
+                  <div className="body5 whitespace-pre-line w-full mb-[16px] text-[#4d4d4d] break-words">
                     {post?.content}
                   </div>
                   <div>
