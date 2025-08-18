@@ -7,6 +7,7 @@ export interface PreviousPost {
   situation: "OOPS" | "OVERCOMING" | "OVERCOME";
   content: string;
   categoryName: string;
+  topicName: string;
   imageUrls: string[];
 }
 
