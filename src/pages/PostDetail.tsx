@@ -354,7 +354,7 @@ const PostDetail = () => {
                               className="body2 text-[#ffffff] h-[30px] bg-[#262626] px-[12px] py-[5px] rounded-[4px]"
                               onClick={() => {
                                 deletePost(Number(currentPostId));
-                                navigate("/");
+                                console.error(error);
                                 // 삭제 모달 들어가자
                               }}
                             >
