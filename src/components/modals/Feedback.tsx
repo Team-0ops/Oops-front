@@ -93,7 +93,11 @@ const Feedback = ({
           {/* 게시글 들어올곳 */}
           <div className="flex flex-col bg-[#f0e7e0] px-[14px] py-[10px] mt-[10px] rounded-[10px] gap-[4px] font-['Pretendard'] w-full">
             <div className="w-full flex justify-between ">
-              <span className="body4">{postTitle}</span>
+              <span className="body4">
+                {postTitle.length > 15
+                  ? `${postTitle.slice(0, 15)}...`
+                  : postTitle}
+              </span>
               <span className="caption2 text-[#999999]">{category}</span>
             </div>
             <span className="caption3 text-[#262626]">

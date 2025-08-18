@@ -27,7 +27,7 @@ const Post = ({ post, onClick, isSelected }: PostProps) => {
         <div className="flex justify-between items-center w-full">
           <span className="body4">{post.title}</span>
           <span className="caption2 text-[#999999] whitespace-nowrap ml-2">
-            {post.categoryName}
+            {post.categoryName ? post.categoryName : post.topicName}
           </span>
         </div>
         <span className="caption3 text-[#262626] max-w-[calc(100%-60px)] truncate">

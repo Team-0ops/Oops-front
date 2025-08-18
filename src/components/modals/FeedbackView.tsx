@@ -10,13 +10,13 @@ const FeedbackView = ({ postId, onClose }: FeedbackViewProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="absolute inset-0 z-50 flex items-center justify-center"
       onClick={onClose}
     >
       <div
         className="absolute right-[70px] top-[220px] 
         bg-[#b3e378] w-[165px] rounded-[4px] border-[1px] border-solid border-[#9bd654]
-        px-[13px] py-[10px]"
+        px-[13px] py-[10px] z-10"
         style={{
           boxShadow: "inset 0px 0px 10.5px 0px rgba(162, 226, 86, 0.25)",
         }}
