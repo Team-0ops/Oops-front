@@ -387,7 +387,7 @@ const PostDetail = () => {
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
-                  <div className="body5 w-full mb_[16px] text-[#4d4d4d] break-words">
+                  <div className="body5 whitespace-pre-line w-full mb_[16px] text-[#4d4d4d] break-words">
                     {post?.content}
                   </div>
                   <div>
