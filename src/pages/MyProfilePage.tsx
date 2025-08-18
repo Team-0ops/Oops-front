@@ -324,7 +324,7 @@ export default function MyProfilePage() {
           {point} P
         </span>
       </div>
-
+      <div className="w-full h-[1px] bg-[#E9E5E2] mt-2" />
       <div className="space-y-[10px]">
         <div className="w-[335px] space-y-2 p-5">
           <div className="flex items-center gap-[10px]">

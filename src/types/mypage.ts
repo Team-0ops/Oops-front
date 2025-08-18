@@ -72,6 +72,7 @@ export type LessonWithPostDto = {
   lessonTitle: string;
   lessonContent: string;
   tag: string;
+  tags?: string[];
   bestComment?: string;
   bestCommentWriter?: string;
 

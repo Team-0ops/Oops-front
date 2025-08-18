@@ -186,30 +186,27 @@ function pickList(result: any): any[] {
   return [];
 }
 
-export async function getMyLessons(params?: {
-  tag?: string;
-  page?: number;
-  size?: number;
-}) {
-  try {
-    const { data } = await instance.get<ApiResponse<any>>("/my-page/lessons", {
-      params,
-    });
+export async function getMyLessons(params?: { page?: number; size?: number }) {
+  const query = { page: params?.page, size: params?.size };
+  const mapLessons = (list: any[]): LessonWithPostDto[] =>
+    list.map((x: any): LessonWithPostDto => {
+      //const tags: string[] = Array.isArray(x.tags) ? x.tags.map(String) : [];
+      const tags: string[] = Array.isArray(x.tags)
+        ? (x.tags as (string | null | undefined)[]).filter(
+            (t): t is string => !!t && t.trim() !== ""
+          )
+        : [];
+      const firstTag =
+        (Array.isArray(x.tags) && x.tags.length ? String(x.tags[0]) : null) ??
+        (typeof x.tag === "string" ? x.tag : "") ??
+        "";
 
-    let list = pickList(data.result);
-    if (params?.tag) {
-      list = list.filter(
-        (i: any) =>
-          Array.isArray(i.tags) && i.tags.includes(params.tag as string)
-      );
-    }
-
-    const mapped = list.map(
-      (x: any): LessonWithPostDto => ({
+      return {
         lessonId: x.lessonId ?? 0,
         lessonTitle: x.title ?? "",
         lessonContent: x.content ?? "",
-        tag: Array.isArray(x.tags) ? (x.tags[0] ?? "") : (x.tag ?? ""),
+        tags,
+        tag: firstTag,
 
         postId: x.postId ?? 0,
         postTitle: x.postTitle ?? "",
@@ -220,53 +217,25 @@ export async function getMyLessons(params?: {
         bestComment: x.bestComment ?? undefined,
         bestCommentWriter: x.bestCommentWriter ?? undefined,
         createdAt: x.createdAt ?? undefined,
-      })
-    );
+      };
+    });
 
-    return {
-      items: mapped,
-      pageInfo: (data as any).pageInfo,
-    };
+  try {
+    const { data } = await instance.get<ApiResponse<any>>("/my-page/lessons", {
+      params: query,
+    });
+    const list = pickList(data.result);
+    return { items: mapLessons(list), pageInfo: (data as any).pageInfo };
   } catch (e: any) {
     if (e?.response?.status === 400 || e?.response?.status === 403) {
       const userId = localStorage.getItem("userId");
       if (userId) {
         const { data } = await instance.get<ApiResponse<any>>(
           "/my-page/lessons",
-          { params: { ...params, userId } }
+          { params: { ...query, userId } }
         );
-
-        let list = pickList(data.result);
-        if (params?.tag) {
-          list = list.filter(
-            (i: any) =>
-              Array.isArray(i.tags) && i.tags.includes(params.tag as string)
-          );
-        }
-
-        const mapped = list.map(
-          (x: any): LessonWithPostDto => ({
-            lessonId: x.lessonId ?? 0,
-            lessonTitle: x.title ?? "",
-            lessonContent: x.content ?? "",
-            tag: Array.isArray(x.tags) ? (x.tags[0] ?? "") : (x.tag ?? ""),
-
-            postId: x.postId ?? 0,
-            postTitle: x.postTitle ?? "",
-            postContent: x.postContent ?? "",
-            postCategoryName: x.categoryName ?? "",
-            postThumbnailUrl: x.postThumbnailUrl ?? null,
-
-            bestComment: x.bestComment ?? undefined,
-            bestCommentWriter: x.bestCommentWriter ?? undefined,
-            createdAt: x.createdAt ?? undefined,
-          })
-        );
-
-        return {
-          items: mapped,
-          pageInfo: (data as any).pageInfo,
-        };
+        const list = pickList(data.result);
+        return { items: mapLessons(list), pageInfo: (data as any).pageInfo };
       }
     }
     throw e;

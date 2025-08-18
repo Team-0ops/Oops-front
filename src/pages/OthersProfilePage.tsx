@@ -8,11 +8,11 @@ import othersProfile from "../assets/icons/othersprofile.svg";
 
 import type { OthersProfileResult } from "../types/mypage";
 import { getOthersProfile } from "../apis/othersApi";
-import BestFailerTitleList from "../components/common/BestFailerTitleList"; // 경로 확인
-//import WikiBestFailerList from "../components/FailWiki/WikiBestFailerList";
-//import type { BestFailers } from "../types/post";
-//import { SituationRow } from "../components/common/Row";
+import { SituationRow, type Situation } from "../components/common/Row";
+import instance from "../apis/instance";
+import type { ApiResponse } from "../types/api";
 
+type BestFailer = { postId: number; title: string; situation: Situation };
 function toCard(p: any) {
   const rawId =
     p.postId ?? p.id ?? p.post?.id ?? p.post_id ?? p.postID ?? undefined;
@@ -33,7 +33,7 @@ function toCard(p: any) {
     authorAvatar: p.profileImageUrl ?? p.authorImageUrl ?? null,
   };
 }
-
+const POST_DETAIL_BASE = "/post";
 export default function OthersProfilePage() {
   const { userId } = useParams();
   const nav = useNavigate();
@@ -46,6 +46,7 @@ export default function OthersProfilePage() {
   const [err, setErr] = useState<string | null>(null);
   //추천글 게시글로 보내기
   //const goToPost = (id: number) => nav(`/post/${id}`);
+  const [bestFailers, setBestFailers] = useState<BestFailer[]>([]);
 
   useEffect(() => {
     if (!userId) return;
@@ -55,6 +56,26 @@ export default function OthersProfilePage() {
         setErr(null);
         const res = await getOthersProfile(userId);
         setData(res);
+
+        const { data: raw } = await instance.get<ApiResponse<any>>(
+          `/my-page/profile/${userId}`
+        );
+        const rawBest =
+          raw?.result?.bestFailers ??
+          //raw?.result?.bestFailures ??
+          [];
+
+        const parsed: BestFailer[] = Array.isArray(rawBest)
+          ? rawBest
+              .map((b: any) => ({
+                postId: Number(b?.postId) || 0,
+                title: (b?.title ?? "").trim(),
+                situation: b?.situation,
+              }))
+              .filter((b) => b.postId > 0 && b.title.length > 0)
+          : [];
+
+        setBestFailers(parsed);
       } catch (e: any) {
         setErr(e?.response?.data?.message ?? "프로필을 불러오지 못했습니다.");
       } finally {
@@ -70,8 +91,10 @@ export default function OthersProfilePage() {
   const cards = (data?.posts ?? []).map(toCard);
 
   console.log("[others] raw posts", data?.posts);
-  //const bestFailerList: BestFailers[] | undefined = (data as any)?.bestFailers;
-
+  const goPost = (id?: number) => {
+    if (!id) return;
+    nav(`${POST_DETAIL_BASE}/${id}`);
+  };
   return (
     <div className="min-h-screen bg-[#FFFBF8] flex flex-col">
       <Navbar />
@@ -131,7 +154,29 @@ export default function OthersProfilePage() {
               </p>
             )}
           </div>
-          <BestFailerTitleList />
+          {/* 베스트 실패담 */}
+          <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mt-[20px]">
+            {" "}
+            <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
+              베스트 Failers
+            </div>
+            {bestFailers.length ? (
+              bestFailers
+                .slice(0, 5)
+                .map((p) => (
+                  <SituationRow
+                    key={p.postId}
+                    title={p.title}
+                    situation={p.situation}
+                    onClick={() => goPost(p.postId)}
+                  />
+                ))
+            ) : (
+              <div className="caption2 text-[#999] w-full pl-[38px] py-[12px] border-b-[1px] border-[#e9e5e2]">
+                베스트 글이 아직 없습니다.
+              </div>
+            )}
+          </section>
           <div className="h-[50px]" />
         </>
       )}

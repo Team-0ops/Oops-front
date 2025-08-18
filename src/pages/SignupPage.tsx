@@ -229,11 +229,11 @@ const SignupPage = () => {
             label="닉네임"
             value={form.userName}
             onChange={handleInput("userName")}
-            placeholder="한영,숫자,기호로 이루어진 3~10자를 입력해주세요."
+            //placeholder="한영,숫자,기호로 이루어진 3~10자를 입력해주세요."
             height="44px"
             padding="14px 11px"
             borderColor="#ECE6DF"
-            hint="3자 이상 10자 이하 글자수를 지켜 작성해주세요!"
+            //hint="3자 이상 10자 이하 글자수를 지켜 작성해주세요!"
           />
 
           <div className="mt-6 w-full">
