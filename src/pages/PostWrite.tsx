@@ -372,7 +372,7 @@ const PostWrite = () => {
               ref={contentRef}
               required
               placeholder="내용을 입력해주세요. (필수)"
-              className="caption1 whitespace-pre placeholder:caption1 placeholder-[#999] w-full min-h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
+              className="caption1 placeholder:caption1 placeholder-[#999] w-full min-h-[155px] [box-shadow:inset_0_0_5.4px_rgba(0,0,0,0.25)] bg-transparent border-transparent border-[1px] rounded-[4px] pl-[16px] pt-[14px]"
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
