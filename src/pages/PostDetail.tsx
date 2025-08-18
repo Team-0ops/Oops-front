@@ -209,19 +209,25 @@ const PostDetail = () => {
           <button
             className="cursor-pointer"
             onClick={() => {
-              const categoryKey = getCategoryKeyByLabel(
-                postDetail.category.name
-              );
-              if (categoryKey) {
-                navigate(`/category-feed/${categoryKey}`);
-              } else {
-                alert("카테고리 정보를 찾을 수 없습니다.");
+              if (postDetail.category?.categoryId) {
+                const categoryKey = getCategoryKeyByLabel(
+                  postDetail.category.name
+                );
+                if (categoryKey) {
+                  navigate(`/category-feed/${categoryKey}`);
+                } else {
+                  alert("카테고리 정보를 찾을 수 없습니다.");
+                }
+              } else if (postDetail.randomTopic?.randomTopicId) {
+                navigate(`/random-feed`);
               }
             }}
           >
             <LeftIcon className="w-[24px] h-[24px]" />
           </button>
-          {postDetail.category.name}
+          {postDetail.category?.categoryId
+            ? postDetail.category.name
+            : (postDetail.randomTopic?.randomTopicName ?? "")}
         </div>
 
         {/* 첫번째 섹션 게시글 */}
@@ -320,9 +326,8 @@ const PostDetail = () => {
                               className="body2 text-[#ffffff] h-[30px] bg-[#262626] px-[12px] py-[5px] rounded-[4px]"
                               onClick={() => {
                                 deletePost(Number(currentPostId));
-                                {
-                                  if (success) navigate("/");
-                                }
+                                navigate("/"); 
+                                // 삭제 모달 들어가자 
                               }}
                             >
                               삭제
@@ -496,7 +501,9 @@ const PostDetail = () => {
         {!loading && !error && (
           <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mb-[20px]">
             <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
-              {`${postDetail.category.name} 추천 글`}
+              {postDetail.category?.categoryId
+                ? `${postDetail.category.name} 추천 글`
+                : `${postDetail.randomTopic?.randomTopicName} 추천 글`}
             </div>
 
             {data?.similarPosts?.length ? (
