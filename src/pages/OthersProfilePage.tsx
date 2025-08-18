@@ -136,17 +136,33 @@ export default function OthersProfilePage() {
           {/* 게시물 카드 */}
           <div className="mt-[20px] flex flex-col gap-[12px] px-[20px]">
             {cards.map((p) => (
-              <PostCard
+              <div
                 key={p.postId}
-                postId={p.postId}
-                title={p.title}
-                content={p.content}
-                imageUrl={p.imageUrl}
-                likes={p.likes}
-                comments={p.comments}
-                views={p.views}
-                category={p.category}
-              />
+                role="button"
+                tabIndex={0}
+                onClick={() => goPost(p.postId)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    goPost(p.postId);
+                  }
+                }}
+                className="cursor-pointer rounded-lg transition
+                 hover:scale-[1.01] hover:shadow-md
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20
+                 active:scale-[0.99]"
+              >
+                <PostCard
+                  postId={p.postId}
+                  title={p.title}
+                  content={p.content}
+                  imageUrl={p.imageUrl}
+                  likes={p.likes}
+                  comments={p.comments}
+                  views={p.views}
+                  category={p.category}
+                />
+              </div>
             ))}
             {cards.length === 0 && (
               <p className="text-center text-[#808080]">

@@ -232,7 +232,7 @@ export default function MyLessonsPage() {
                           {lessonContent}
                         </p>
                         {lessonTags.length > 0 && (
-                          <div className="ml-[10px] flex gap-[6px] overflow-x-auto max-w={[45%]} whitespace-nowrap my-scroll-hide">
+                          <div className="ml-[10px] flex gap-[6px] overflow-x-auto max-w-[45%] whitespace-nowrap my-scroll-hide">
                             {lessonTags.map((t) => (
                               <span
                                 key={t}
