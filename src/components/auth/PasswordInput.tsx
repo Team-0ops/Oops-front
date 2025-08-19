@@ -50,7 +50,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           className="absolute right-[12px] top-1/2 -translate-y-1/2 text-[#B3B3B3]
                      hover:text-[#262626] focus:outline-none"
         >
-          {visible ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+          {visible ? <FiEye size={18} /> : <FiEyeOff size={18} />}
         </button>
       </div>
     );
