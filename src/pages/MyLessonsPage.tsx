@@ -275,34 +275,68 @@ export default function MyLessonsPage() {
                     )}
 
                     {/* 교훈 카드 */}
-                    <Link
-                      to={`${POST_DETAIL_BASE}/${lesson.postId}`}
-                      className="flex flex-col items-start gap-[10px] w-full px-[13px] py-[12px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] hover:brightness-95 transition"
-                    >
-                      <div className="flex items-center gap-[6px]">
-                        <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
-                        <h4 className="text-[14px] font-bold text-[#1D1D1D]">
-                          {lesson.lessonTitle}
-                        </h4>
+                    {lesson.isPostDeleted ? (
+                      // 삭제된 게시글은 이동할 수 없음
+                      <div
+                        className="flex flex-col items-start gap-[10px] w-full px-[13px] py-[12px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] select-text cursor-not-allowed"
+                        aria-disabled="true"
+                        title="원글이 삭제되어 이동할 수 없습니다."
+                      >
+                        <div className="flex items-center gap-[6px]">
+                          <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
+                          <h4 className="text-[14px] font-bold text-[#1D1D1D]">
+                            {lesson.lessonTitle}
+                          </h4>
+                        </div>
+                        <div className="w-full flex justify-between items-start">
+                          <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
+                            {lesson.lessonContent}
+                          </p>
+                          {lessonTags.length > 0 && (
+                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
+                              {lessonTags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="w-full flex justify-between items-start">
-                        <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
-                          {lesson.lessonContent}
-                        </p>
-                        {lessonTags.length > 0 && (
-                          <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
-                            {lessonTags.map((t) => (
-                              <span
-                                key={t}
-                                className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
-                              >
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </Link>
+                    ) : (
+                      // 삭제되지 않은 게시글만 클릭가능
+                      <Link
+                        to={`${POST_DETAIL_BASE}/${lesson.postId}`}
+                        className="flex flex-col items-start gap-[10px] w-full px-[13px] py-[12px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] hover:brightness-95 transition"
+                      >
+                        <div className="flex items-center gap-[6px]">
+                          <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
+                          <h4 className="text-[14px] font-bold text-[#1D1D1D]">
+                            {lesson.lessonTitle}
+                          </h4>
+                        </div>
+                        <div className="w-full flex justify-between items-start">
+                          <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
+                            {lesson.lessonContent}
+                          </p>
+                          {lessonTags.length > 0 && (
+                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
+                              {lessonTags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    )}
                   </div>
                 );
               })}
