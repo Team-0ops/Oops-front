@@ -8,6 +8,7 @@ import RedLike from "../assets/icons/RedLike.svg?react";
 import CommentList from "../components/comment/CommentList";
 import FeedbackView from "../components/modals/FeedbackView";
 import Report from "../components/modals/Report";
+import DeleteModal from "../components/modals/Delete";
 import type { ReportTarget } from "../components/modals/Report";
 import { usePostDetail } from "../hooks/PostPage/usePostDetail";
 import { useCheer } from "../hooks/PostPage/useCheer";
@@ -19,7 +20,6 @@ import { useDeletePost } from "../hooks/PostPage/useDeletePost";
 import { useGetRecommendations } from "../hooks/PostPage/useGetRecommendations";
 import { SituationRow } from "../components/common/Row";
 import { useCommentOptimistic } from "../hooks/Mutation/useCommentOptimistic";
-
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -87,6 +87,7 @@ const PostDetail = () => {
   //모달
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLessonView, setShowLessonView] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isLessonWritten, setIsLessonWritten] = useState(false);
 
@@ -352,11 +353,7 @@ const PostDetail = () => {
                           <>
                             <button
                               className="body2 text-[#ffffff] h-[30px] bg-[#262626] px-[12px] py-[5px] rounded-[4px]"
-                              onClick={() => {
-                                deletePost(Number(currentPostId));
-                                navigate("/");
-                                // 삭제 모달 들어가자
-                              }}
+                              onClick={() => setShowDeleteModal(true)}
                             >
                               삭제
                             </button>
@@ -600,6 +597,17 @@ const PostDetail = () => {
         <FeedbackView
           postId={currentPostId}
           onClose={() => setShowLessonView(false)}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteModal
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            if (currentPostId) {
+              deletePost(Number(currentPostId));
+              navigate("/");
+            }
+          }}
         />
       )}
     </>
