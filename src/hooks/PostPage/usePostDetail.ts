@@ -1,31 +1,36 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../apis/axios";
 import type {
   PostDetailResponse,
   DetailResultType,
 } from "../../types/post/PostDetail";
 
+/**
+ * Fetcher: returns only the payload (result) so react-query cache can be patched by useCheer
+ */
+const fetchPostDetail = async (
+  postId: number
+): Promise<DetailResultType | null> => {
+  const { data } = await axiosInstance.get<PostDetailResponse>(
+    `/posts/${postId}`
+  );
+  return data?.result ?? null;
+};
+
+/**
+ * React Query version — key is exactly ["postDetail", postId]
+ * so useCheer.ts can setQueryData/invalidate reliably.
+ */
 export const usePostDetail = (postId: number) => {
-  const [postDetail, setPostDetail] = useState<DetailResultType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const q = useQuery({
+    queryKey: ["postDetail", postId],
+    queryFn: () => fetchPostDetail(postId),
+    enabled: !!postId,
+    staleTime: Infinity, // keep fresh for a bit to avoid immediate refetch
+    refetchOnWindowFocus: false, // do not override optimistic overlay
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+  });
 
-  useEffect(() => {
-    const fetchPostDetail = async () => {
-      try {
-        const res = await axiosInstance.get<PostDetailResponse>(
-          `/posts/${postId}`
-        );
-        setPostDetail(res.data.result ?? null);
-        console.log("상세 조회 성공:", res.data.result);
-      } catch (error) {
-        console.error("상세 조회 실패:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPostDetail();
-  }, [postId]);
-
-  return { postDetail, loading };
+  return { postDetail: q.data ?? null, loading: q.isLoading || q.isFetching };
 };
