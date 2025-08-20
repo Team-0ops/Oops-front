@@ -11,7 +11,7 @@ import Report from "../components/modals/Report";
 import DeleteModal from "../components/modals/Delete";
 import type { ReportTarget } from "../components/modals/Report";
 import { usePostDetail } from "../hooks/PostPage/usePostDetail";
-import { useCheer } from "../hooks/PostPage/useCheer";
+import { useCheer, useIsCheered } from "../hooks/PostPage/useCheer";
 import { getLesson } from "../hooks/PostPage/useGetLesson";
 import { categoryData } from "./CategoryFeed";
 import { useSelector } from "react-redux";
@@ -56,13 +56,7 @@ const PostDetail = () => {
   );
 
   // 좋아요 기능 optimistic ui 적용
-  const { toggleCheer, isCheered } = useCheer();
-
-  const likedOptimistic = (post: any) =>
-    isCheered(post.postId) ? !post.liked : post.liked;
-
-  const likesOptimistic = (post: any) =>
-    post.likes + (isCheered(post.postId) ? (post.liked ? -1 : 1) : 0);
+  const { toggleCheer } = useCheer();
 
   //추천글 게시글로 보내기
   const goToPost = (id: number) => navigate(`/post/${id}`);
@@ -418,23 +412,14 @@ const PostDetail = () => {
                     )}
                   </div>
                   <div className="flex justify-between items-center w-full">
-                    <div className="flex items-center gap-[4px]">
-                      <button
-                        onClick={() =>
-                          currentPostId && toggleCheer(Number(post?.postId))
-                        }
-                        className="cursor-pointer"
-                      >
-                        {likedOptimistic(post) ? (
-                          <RedLike className=" cursor-pointer" />
-                        ) : (
-                          <Like className=" cursor-pointer" />
-                        )}
-                      </button>
-                      <span className="caption2 text-[#666]">
-                        응원해요 {likesOptimistic(post)}
-                      </span>
-                    </div>
+                    <CheerBlock
+                      postId={post.postId}
+                      liked={post.liked}
+                      likes={post.likes}
+                      onToggle={() => {
+                        toggleCheer(post.postId);
+                      }}
+                    />
                     <div className="flex items-center gap-[4px] ">
                       <CommentIcon className="cursor-pointer" />
                       <span className="caption2 text-[#666]">
@@ -615,3 +600,36 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+
+// 좋아요 블록 컴포넌트
+function CheerBlock({
+  postId,
+  liked,
+  likes,
+  onToggle,
+}: {
+  postId: number;
+  liked: boolean;
+  likes: number;
+  onToggle: () => void;
+}) {
+  // ✅ 훅을 컴포넌트 최상위에서 호출 (규칙 준수)
+  const cheered = useIsCheered(postId);
+
+  // 서버값 + overlay 합성
+  const shownLiked = cheered ? !liked : liked;
+  const shownLikes = cheered ? (liked ? likes - 1 : likes + 1) : likes;
+
+  return (
+    <div className="flex items-center gap-[4px]">
+      <button onClick={onToggle} className="cursor-pointer">
+        {shownLiked ? (
+          <RedLike className="cursor-pointer" />
+        ) : (
+          <Like className="cursor-pointer" />
+        )}
+      </button>
+      <span className="caption2 text-[#666]">응원해요 {shownLikes}</span>
+    </div>
+  );
+}

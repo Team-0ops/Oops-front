@@ -12,33 +12,54 @@ import type { LessonWithPostDto } from "../types/mypage";
 
 const POST_DETAIL_BASE = "/post";
 
-// 가로 스크롤바 숨김
+/* 스크롤바 숨김 */
 const HIDE_SCROLLBAR_CSS = `
-  .my-scroll-hide::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-  .my-scroll-hide { 
-    -ms-overflow-style: none;  /* IE/Edge */
-    scrollbar-width: none;     /* Firefox */
-  }
+  .my-scroll-hide::-webkit-scrollbar { display: none; }
+  .my-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 
-type LessonWithTags = LessonWithPostDto & {
-  tags?: string[] | null;
+type LessonServerDto = LessonWithPostDto & {
+  postStatus?: "ACTIVE" | "DELETED" | string | null;
+
+  postImageUrls?: string[] | null;
+  postImageUrl?: string | null;
+  imageUrls?: Array<
+    | string
+    | { url?: string; imageUrl?: string; thumbnailUrl?: string; src?: string }
+  > | null;
+
+  categoryName?: string | null;
+  thumbnailUrl?: string | null;
   title?: string | null;
   content?: string | null;
-  categoryName?: string | null;
-  postCategoryName?: string | null;
-  postThumbnailUrl?: string | null;
 };
-type LessonView = LessonWithTags & { _tags: string[] };
 
-// 태그 빈도
-function countFreq(lessons: LessonView[]): Map<string, number> {
-  const m = new Map<string, number>();
-  for (const t of lessons.flatMap((l) => l._tags)) {
-    m.set(t, (m.get(t) ?? 0) + 1);
-  }
-  return m;
-}
+type LessonView = LessonWithPostDto & {
+  _tags: string[];
+  isPostDeleted: boolean;
+  postThumbnailUrl?: string;
+};
+
+const toUrl = (v: any): string | undefined => {
+  if (!v) return undefined;
+  const s = String(v).trim();
+  if (!s) return undefined;
+  return /^https?:\/\//i.test(s) ? s : undefined;
+};
+
+const firstFrom = (arr: any[] | null | undefined): string | undefined => {
+  if (!Array.isArray(arr) || arr.length === 0) return undefined;
+  const s0 = toUrl(arr[0]);
+  if (s0) return s0;
+  const obj = arr[0] as any;
+  return (
+    toUrl(obj?.url) ||
+    toUrl(obj?.imageUrl) ||
+    toUrl(obj?.thumbnailUrl) ||
+    toUrl(obj?.src) ||
+    undefined
+  );
+};
 
 export default function MyLessonsPage() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -47,7 +68,7 @@ export default function MyLessonsPage() {
   const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // 로그인한 사용자의 교훈을 모든 페이지에서 모아오기
+  /* 서버에서 전체 교훈 로드 */
   const fetchAllLessons = useCallback(async () => {
     try {
       setLoading(true);
@@ -55,27 +76,58 @@ export default function MyLessonsPage() {
 
       const pageSize = 200;
       let page = 0;
-      const accMap = new Map<number, LessonView>();
+      const acc: LessonView[] = [];
 
       while (true) {
         const { items } = await getMyLessons({ page, size: pageSize });
-        const list = (items as unknown as LessonWithTags[]) ?? [];
+        const list = (items as unknown as LessonServerDto[]) ?? [];
 
-        const mapped: LessonView[] = list.map((it) => ({
-          ...it,
-          _tags: Array.isArray(it.tags)
+        const mapped: LessonView[] = list.map((it) => {
+          // 태그 정규화
+          const tags = Array.isArray(it.tags)
             ? it.tags.map(String).filter(Boolean)
-            : [],
-        }));
+            : [];
 
-        for (const it of mapped) {
-          accMap.set(Number(it.lessonId ?? Math.random()), it);
-        }
+          // 게시글 삭제 여부
+          const isPostDeleted =
+            (it.postStatus ?? "").toString().toUpperCase() === "DELETED" ||
+            !it.postId;
+
+          const lessonTitle = String(it.lessonTitle ?? it.title ?? "");
+          const lessonContent = String(it.lessonContent ?? it.content ?? "");
+
+          const postTitle = String(it.postTitle ?? "");
+          const postContent: string | undefined = it.postContent ?? undefined;
+
+          const postCategoryName: string | undefined =
+            it.postCategoryName ?? it.categoryName ?? undefined;
+
+          const postThumbnailUrl: string | undefined =
+            toUrl(it.postThumbnailUrl) ||
+            firstFrom(it.postImageUrls) ||
+            firstFrom(it.imageUrls) ||
+            toUrl(it.postImageUrl) ||
+            toUrl(it.thumbnailUrl) ||
+            undefined;
+
+          return {
+            ...it,
+            lessonTitle,
+            lessonContent,
+            postTitle,
+            postContent,
+            postCategoryName,
+            postThumbnailUrl,
+            _tags: tags,
+            isPostDeleted,
+          };
+        });
+
+        acc.push(...mapped);
         if (!items || list.length < pageSize) break;
         page += 1;
       }
 
-      const acc = Array.from(accMap.values());
       setAllLessons(acc);
     } catch (e: any) {
       setErr(e?.response?.data?.message || "교훈 목록을 불러오지 못했습니다.");
@@ -84,41 +136,25 @@ export default function MyLessonsPage() {
     }
   }, []);
 
-  // 마운트 시 1회 로드
   useEffect(() => {
     fetchAllLessons();
   }, [fetchAllLessons]);
 
-  // 탭 복귀,작성 완료 시 재조회
+  // 탭 복귀 시 재조회
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === "visible") fetchAllLessons();
     };
-    const onCreated = () => fetchAllLessons();
     document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("lesson:created", onCreated);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("lesson:created", onCreated);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchAllLessons]);
-
-  // 현재 로그인 사용자의 교훈으로부터만 태그 계산
-  const tagFreq = useMemo(() => countFreq(allLessons), [allLessons]);
 
   const chipTags = useMemo(() => {
     const set = new Set<string>(
       allLessons.flatMap((l) => l._tags).filter(Boolean)
     );
-    const arr = Array.from(set);
-    arr.sort((a, b) => {
-      const fb = tagFreq.get(b) ?? 0;
-      const fa = tagFreq.get(a) ?? 0;
-      if (fb !== fa) return fb - fa; // 빈도 내림차순
-      return a.localeCompare(b, "ko"); // 가나다 순
-    });
-    return arr.slice(0, 10); // 최대 10개까지만 보이도록
-  }, [allLessons, tagFreq]);
+    return Array.from(set);
+  }, [allLessons]);
 
   const visibleLessons = useMemo(() => {
     if (!selectedTag) return allLessons;
@@ -128,19 +164,27 @@ export default function MyLessonsPage() {
   const toggleTag = (t: string) =>
     setSelectedTag((prev) => (prev === t ? null : t));
 
-  const goPost = (postId?: number) => {
-    if (postId) navigate(`${POST_DETAIL_BASE}/${postId}`);
+  const navigatePost = (postId?: number, isPostDeleted?: boolean) => {
+    if (!postId || isPostDeleted) return;
+    navigate(`${POST_DETAIL_BASE}/${postId}`);
   };
-  const onKeyGoPost = (e: KeyboardEvent<HTMLDivElement>, postId?: number) => {
+
+  const onKeyGoPost = (
+    e: KeyboardEvent<HTMLDivElement>,
+    postId?: number,
+    isPostDeleted?: boolean
+  ) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      goPost(postId);
+      navigatePost(postId, isPostDeleted);
     }
   };
 
   return (
     <section className="p-4">
       <style>{HIDE_SCROLLBAR_CSS}</style>
+
+      {/* 태그 */}
       <div className="-mx-4 mb-4 px-4 overflow-x-auto whitespace-nowrap my-scroll-hide">
         <div className="inline-flex gap-[10px]">
           {chipTags.map((t) => {
@@ -153,8 +197,8 @@ export default function MyLessonsPage() {
                   active
                     ? "bg-[#1D1D1D] text-white"
                     : "bg-[#E6E6E6] text-[#1D1D1D]"
-                }`}
-                title={tagFreq.get(t) ? `${t} · ${tagFreq.get(t)}건` : t}
+                }
+                `}
               >
                 {t}
               </button>
@@ -172,79 +216,127 @@ export default function MyLessonsPage() {
             <div className="flex flex-col gap-[20px]">
               {visibleLessons.map((lesson) => {
                 const lessonTags = lesson._tags;
-                const lessonTitle =
-                  lesson.lessonTitle ?? lesson.title ?? "교훈 제목 없음";
-                const lessonContent =
-                  lesson.lessonContent ?? lesson.content ?? "";
                 const postCategory =
                   lesson.postCategoryName ??
-                  lesson.categoryName ??
-                  "카테고리 없음";
+                  (lesson as any).categoryName ??
+                  (lesson.isPostDeleted ? "" : "카테고리 없음");
 
                 return (
                   <div
                     key={lesson.lessonId}
-                    className="flex flex-col gap-0 w-full"
+                    className="flex flex-col gap-[0px] w-full"
                   >
                     {/* 게시글 카드 */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => goPost(lesson.postId)}
-                      onKeyDown={(e) => onKeyGoPost(e, lesson.postId)}
-                      className="flex items-center justify-between gap-[12px] rounded-[10px] bg-[#F0E7E0] px-[14px] py-[16px] w-full cursor-pointer hover:brightness-95 transition"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="truncate text-[14px] font-bold text-[#1D1D1D]">
-                            {lesson.postTitle || "제목 없음"}
-                          </h4>
-                          <span className="text-[12px] text-[#999999] flex-shrink-0">
-                            {postCategory}
-                          </span>
+                    {lesson.isPostDeleted ? (
+                      <div className="flex items-center justify-between gap-[14px] w-full px-[14px] py-[10px] rounded-[10px] bg-[#F0E7E0]">
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <p className="text-left text-[12px] font-normal text-[#1D1D1D] font-pretendard">
+                            삭제된 게시글입니다.
+                          </p>
                         </div>
-                        <p className="mt-[4px] truncate text-[13px] text-[#1D1D1D]">
-                          {lesson.postContent}
-                        </p>
+                        <div className="w-[50px] h-[50px] flex-shrink-0" />
                       </div>
-                      {lesson.postThumbnailUrl && (
-                        <img
-                          src={lesson.postThumbnailUrl}
-                          alt="썸네일"
-                          className="w-[50px] h-[50px] rounded-[4px] object-cover flex-shrink-0"
-                        />
-                      )}
-                    </div>
-
-                    {/* 교훈 카드 */}
-                    <Link
-                      to={`${POST_DETAIL_BASE}/${lesson.postId}`}
-                      className="flex flex-col gap-[8px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] px-[13px] py-[6px] w-full hover:brightness-95 transition"
-                    >
-                      <div className="flex items-center gap-[6px]">
-                        <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
-                        <h4 className="text-[13px] font-bold text-[#1D1D1D]">
-                          {lessonTitle}
-                        </h4>
-                      </div>
-                      <div className="flex justify-between items-start w-full">
-                        <p className="text-[13px] text-[#1D1D1D] whitespace-pre-line flex-1">
-                          {lessonContent}
-                        </p>
-                        {lessonTags.length > 0 && (
-                          <div className="ml-[10px] flex gap-[6px] overflow-x-auto max-w-[45%] whitespace-nowrap my-scroll-hide">
-                            {lessonTags.map((t) => (
-                              <span
-                                key={t}
-                                className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
-                              >
-                                {t}
-                              </span>
-                            ))}
+                    ) : (
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() =>
+                          navigatePost(lesson.postId, lesson.isPostDeleted)
+                        }
+                        onKeyDown={(e) =>
+                          onKeyGoPost(e, lesson.postId, lesson.isPostDeleted)
+                        }
+                        className="flex items-center justify-between gap-[14px] w-full px-[14px] py-[10px] rounded-[10px] bg-[#F0E7E0] cursor-pointer hover:brightness-95 transition"
+                      >
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="truncate text-[16px] font-bold text-[#1D1D1D]">
+                              {lesson.postTitle || "제목 없음"}
+                            </h4>
+                            <span className="text-[12px] text-[#999999] flex-shrink-0">
+                              {postCategory}
+                            </span>
                           </div>
+                          <p className="mt-[4px] truncate text-[12px] text-[#1D1D1D]">
+                            {lesson.postContent ?? ""}
+                          </p>
+                        </div>
+
+                        {lesson.postThumbnailUrl ? (
+                          <img
+                            src={lesson.postThumbnailUrl}
+                            alt="썸네일"
+                            className="w-[50px] h-[50px] rounded-[4px] object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-[50px] h-[50px]" />
                         )}
                       </div>
-                    </Link>
+                    )}
+
+                    {/* 교훈 카드 */}
+                    {lesson.isPostDeleted ? (
+                      // 삭제된 게시글은 이동할 수 없음
+                      <div
+                        className="flex flex-col items-start gap-[10px] w-full px-[13px] py-[12px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] select-text cursor-not-allowed"
+                        aria-disabled="true"
+                        title="원글이 삭제되어 이동할 수 없습니다."
+                      >
+                        <div className="flex items-center gap-[6px]">
+                          <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
+                          <h4 className="text-[14px] font-bold text-[#1D1D1D]">
+                            {lesson.lessonTitle}
+                          </h4>
+                        </div>
+                        <div className="w-full flex justify-between items-start">
+                          <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
+                            {lesson.lessonContent}
+                          </p>
+                          {lessonTags.length > 0 && (
+                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
+                              {lessonTags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      // 삭제되지 않은 게시글만 클릭가능
+                      <Link
+                        to={`${POST_DETAIL_BASE}/${lesson.postId}`}
+                        className="flex flex-col items-start gap-[10px] w-full px-[13px] py-[12px] rounded-[10px] border border-[#A2E256] bg-[#B3E378] hover:brightness-95 transition"
+                      >
+                        <div className="flex items-center gap-[6px]">
+                          <ArrowIcon className="w-[14px] h-[14px] text-[#1D1D1D]" />
+                          <h4 className="text-[14px] font-bold text-[#1D1D1D]">
+                            {lesson.lessonTitle}
+                          </h4>
+                        </div>
+                        <div className="w-full flex justify-between items-start">
+                          <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
+                            {lesson.lessonContent}
+                          </p>
+                          {lessonTags.length > 0 && (
+                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
+                              {lessonTags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-[4px] bg-[#1D1D1D] px-[7px] py-[3px] text-[11px] font-semibold text-white flex-shrink-0 h-fit"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    )}
                   </div>
                 );
               })}

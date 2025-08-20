@@ -9,37 +9,21 @@ import type {
 
 function normalizeUrl(u?: string | null) {
   if (!u) return u ?? null;
-
-  // 절대 URL이면 그대로
   if (/^https?:\/\//i.test(u)) return u;
-  if (u.startsWith("user_profile/")) {
-    return `${location.origin}/${u}`;
-  }
-
+  if (u.startsWith("user_profile/")) return `${location.origin}/${u}`;
   if (u.startsWith("/")) return `${location.origin}${u}`;
-
   return `${location.origin}/${u}`;
 }
-
 function addBust(u?: string | null) {
   if (!u) return u ?? null;
   const sep = u.includes("?") ? "&" : "?";
   return `${u}${sep}v=${Date.now()}`;
 }
+
 export const getMyProfile = async (): Promise<MyProfileRes> => {
   const { data } =
     await instance.get<ApiResponse<MyProfileRes>>("/my-page/profile");
-
-  console.log("마이페이지", data);
-
   const raw: any = data.result;
-
-  // raw.profileImageUrl =
-  //   raw.profileImageUrl ?? raw.profileImage ?? raw.imageUrl ?? null;
-
-  // if (raw.profileImageUrl) {
-  //   raw.profileImageUrl = normalizeUrl(addBust(raw.profileImageUrl));
-  // }
   return raw as MyProfileRes;
 };
 
@@ -51,13 +35,11 @@ export const patchMyProfile = async ({
   file?: File | null;
 }): Promise<MyProfileRes | null> => {
   const form = new FormData();
-
   if (userName === undefined || userName === null || userName === "") {
     form.append("data", "null");
   } else {
     form.append("data", JSON.stringify({ userName }));
   }
-
   if (file) form.append("profileImage", file);
 
   const res = await instance.patch<ApiResponse<any>>("/my-page/profile", form, {
@@ -77,10 +59,7 @@ export const patchMyProfile = async ({
     if (fresh) {
       fresh.profileImageUrl =
         fresh.profileImageUrl ?? fresh.profileImage ?? fresh.imageUrl ?? null;
-
-      if (!fresh.profileImageUrl) {
-        fresh.profileImageUrl = locationHeader;
-      }
+      if (!fresh.profileImageUrl) fresh.profileImageUrl = locationHeader;
       fresh.profileImageUrl = normalizeUrl(addBust(fresh.profileImageUrl));
       return fresh as MyProfileRes;
     }
@@ -146,7 +125,6 @@ function sanitizeParams(input?: {
   ) {
     out.categoryId = Number(input.categoryId);
   }
-
   if (input?.situation) out.situation = input.situation;
   return out;
 }
@@ -185,21 +163,42 @@ function pickList(result: any): any[] {
   if (result?.lessons && Array.isArray(result.lessons)) return result.lessons;
   return [];
 }
+// 첫이미지를 썸네일ㄹ로 뽑기
+function pickFirstImage(x: any): string | null {
+  const arr = x?.postImageUrls ?? x?.imageUrls ?? x?.images ?? null;
+  if (!Array.isArray(arr) || arr.length === 0) return null;
+  if (typeof arr[0] === "string") return arr[0] || null;
+
+  const obj = arr[0] as any;
+  return obj?.url ?? obj?.imageUrl ?? obj?.thumbnailUrl ?? obj?.src ?? null;
+}
 
 export async function getMyLessons(params?: { page?: number; size?: number }) {
-  const query = { page: params?.page, size: params?.size };
+  const query = {
+    page: params?.page,
+    size: params?.size,
+    includeDeletedPosts: true, // 삭제된 게시글의 교훈도 포함
+  };
+
   const mapLessons = (list: any[]): LessonWithPostDto[] =>
     list.map((x: any): LessonWithPostDto => {
-      //const tags: string[] = Array.isArray(x.tags) ? x.tags.map(String) : [];
       const tags: string[] = Array.isArray(x.tags)
         ? (x.tags as (string | null | undefined)[]).filter(
             (t): t is string => !!t && t.trim() !== ""
           )
         : [];
       const firstTag =
-        (Array.isArray(x.tags) && x.tags.length ? String(x.tags[0]) : null) ??
+        (tags.length ? tags[0] : null) ??
         (typeof x.tag === "string" ? x.tag : "") ??
         "";
+
+      const rawThumb =
+        x.postThumbnailUrl ??
+        pickFirstImage(x) ??
+        x.postImageUrl ??
+        x.thumbnailUrl ??
+        null;
+      const thumb = rawThumb ? normalizeUrl(rawThumb) : null;
 
       return {
         lessonId: x.lessonId ?? 0,
@@ -212,7 +211,7 @@ export async function getMyLessons(params?: { page?: number; size?: number }) {
         postTitle: x.postTitle ?? "",
         postContent: x.postContent ?? "",
         postCategoryName: x.categoryName ?? "",
-        postThumbnailUrl: x.postThumbnailUrl ?? null,
+        postThumbnailUrl: thumb,
 
         bestComment: x.bestComment ?? undefined,
         bestCommentWriter: x.bestCommentWriter ?? undefined,
@@ -232,7 +231,9 @@ export async function getMyLessons(params?: { page?: number; size?: number }) {
       if (userId) {
         const { data } = await instance.get<ApiResponse<any>>(
           "/my-page/lessons",
-          { params: { ...query, userId } }
+          {
+            params: { ...query, userId },
+          }
         );
         const list = pickList(data.result);
         return { items: mapLessons(list), pageInfo: (data as any).pageInfo };

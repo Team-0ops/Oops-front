@@ -25,21 +25,38 @@ function statusToParam(s: MyStatus): MyPostStatus {
   }
 }
 
+function nonEmpty(x?: string | null): string | undefined {
+  if (!x) return undefined;
+  const s = String(x).trim();
+  return s ? s : undefined;
+}
+
+function firstFromArray(arr: any[]): string | undefined {
+  if (!Array.isArray(arr) || arr.length === 0) return undefined;
+  const first = arr[0];
+  if (!first) return undefined;
+  if (typeof first === "string") return first;
+  if (typeof first === "object") {
+    return (
+      nonEmpty(first.url) ||
+      nonEmpty(first.imageUrl) ||
+      nonEmpty(first.thumbnailUrl) ||
+      nonEmpty(first.src) ||
+      undefined
+    );
+  }
+  return undefined;
+}
+
 function pickImage(d: any): string | undefined {
   return (
     nonEmpty(d?.image) ||
     nonEmpty(d?.thumbnailUrl) ||
     nonEmpty(d?.imageUrl) ||
-    (Array.isArray(d?.images) &&
-      nonEmpty(d.images[0]?.url || d.images[0]?.imageUrl)) ||
+    (Array.isArray(d?.imageUrls) && nonEmpty(firstFromArray(d.imageUrls))) ||
+    (Array.isArray(d?.images) && nonEmpty(firstFromArray(d.images))) ||
     undefined
   );
-}
-
-function nonEmpty(x?: string | null): string | undefined {
-  if (!x) return undefined;
-  const s = String(x).trim();
-  return s ? s : undefined;
 }
 
 export default function MyFailuresPage() {
@@ -47,7 +64,7 @@ export default function MyFailuresPage() {
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [categories, setCategories] = useState<CategoryVM[]>([]);
   const [cards, setCards] = useState<MyPostCardVM[]>([]);
-  const [page, setPage] = useState(0); // 0 or 1 기반은 pageInfo 확인 후 조정
+  const [page, setPage] = useState(0);
   const [size] = useState(10);
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -61,8 +78,6 @@ export default function MyFailuresPage() {
     setCards([]);
     setHasNext(true);
   };
-
-  console.log(hasNext);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -88,7 +103,8 @@ export default function MyFailuresPage() {
 
   useEffect(() => {
     if (page > 0 && !hasNext) return;
-    const fetchList = async (reset: boolean) => {
+
+    const fetchList = async () => {
       try {
         setLoading(true);
         setErr(null);
@@ -107,9 +123,9 @@ export default function MyFailuresPage() {
         setHasNext(next);
 
         const mapped: MyPostCardVM[] = result.map(mapToCardVM);
-        setCards((prev) => (reset ? mapped : [...prev, ...mapped]));
+        setCards((prev) => (page === 0 ? mapped : [...prev, ...mapped]));
       } catch (e: any) {
-        if (e?.name === "CanceledError" || e?.code === "ERR_CANCELED") return; // ✅ 취소 시 무시
+        if (e?.name === "CanceledError" || e?.code === "ERR_CANCELED") return;
         console.error(e);
         setErr(e?.response?.data?.message ?? "목록을 불러오지 못했습니다.");
       } finally {
@@ -117,16 +133,14 @@ export default function MyFailuresPage() {
       }
     };
 
-    fetchList(page === 0);
+    fetchList();
   }, [page, categoryId, tabStatus, size]);
 
   const categoryNames = useMemo(
-    () => [
-      "전체",
-      ...categories.filter((c) => c.key !== "all").map((c) => c.name),
-    ],
+    () => categories.map((c) => c.name),
     [categories]
   );
+
   const currentCategoryName = useMemo(() => {
     if (categoryId === undefined) return "전체";
     const found = categories.find((c) => c.id === categoryId);
@@ -141,7 +155,6 @@ export default function MyFailuresPage() {
     });
   }, [cards, tabStatus]);
 
-  // 카테고리 변경
   const onChangeCategory = (name: string) => {
     if (name === "전체") {
       setCategoryId(undefined);
@@ -158,7 +171,6 @@ export default function MyFailuresPage() {
     <section className="space-y-2 px-4 pt-2 pb-4">
       <div className="flex items-center gap-[6px]">
         <MyStatusTab value={tabStatus} onChange={handleChangeTab} />
-
         <CategoryDropdown
           categories={categoryNames}
           value={currentCategoryName}
@@ -170,21 +182,17 @@ export default function MyFailuresPage() {
       {catErr && <div className="text-red-500">{catErr}</div>}
       {err && <div className="text-red-500">{err}</div>}
 
-      {/* 게시물 목록 */}
       <div className="flex flex-col gap-[12px]">
         {displayCards.map((p: MyPostCardVM) => {
           const img =
-            pickImage((p as any).raw ?? p) ??
-            nonEmpty((p as any).imageUrl) ??
-            "null";
+            pickImage((p as any).raw ?? p) ?? nonEmpty((p as any).imageUrl);
 
           return (
             <div
               key={p.id}
-              className="cursor-pointer transition hover:scale-[1.01] hover:shadow-md rounded-lg" // ✅ 추가된 부분
+              className="cursor-pointer transition hover:scale-[1.01] hover:shadow-md rounded-lg"
             >
               <PostCard
-                //key={p.id}
                 postId={p.id}
                 title={p.title}
                 content={p.content}
@@ -201,25 +209,10 @@ export default function MyFailuresPage() {
         {loading && <div className="text-center py-4">불러오는 중...</div>}
       </div>
 
-      {/* {!loading && hasNext && (
-        <div className="flex justify-center py-4">
-          <button
-            type="button"
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded border px-4 py-2 text-sm"
-          >
-            더 보기
-          </button>
-        </div>
-      )} */}
-
       {!loading && !hasNext && displayCards.length > 0 && (
-        <div className="text-center text-gray-400 py-4">
-          {/* 마지막 페이지입니다. */}
-        </div>
+        <div className="text-center text-gray-400 py-4"></div>
       )}
 
-      {/* 결과 없음 */}
       {!loading && displayCards.length === 0 && !err && (
         <div className="text-center text-gray-500 py-10">
           작성한 실패담이 없습니다.
@@ -230,17 +223,11 @@ export default function MyFailuresPage() {
 }
 
 function mapToCardVM(d: MyPostDto): MyPostCardVM {
-  // const id = (d as any).postId ?? (d as any).id;
-  // const title = (d as any).title ?? "(제목 없음)";
-  // const content = (d as any).content ?? (d as any).contentPreview ?? "";
-  //const imageUrl = (d as any).thumbnailUrl ?? (d as any).imageUrl ?? undefined;
   const anyD: any = d ?? {};
   const id = anyD.postId ?? anyD.id;
   const title = anyD.title ?? "(제목 없음)";
   const content = anyD.content ?? anyD.contentPreview ?? "";
-
   const imageUrl = pickImage(anyD);
-
   const status: MyPostStatus | undefined =
     anyD.status ?? anyD.situation ?? anyD.situationType ?? undefined;
 
@@ -252,8 +239,8 @@ function mapToCardVM(d: MyPostDto): MyPostCardVM {
     title,
     content,
     imageUrl,
-    likes: (d as any).likes ?? (d as any).likeCount ?? 0,
-    comments: (d as any).comments ?? (d as any).commentCount ?? 0,
+    likes: anyD.likes ?? anyD.likeCount ?? 0,
+    comments: anyD.comments ?? anyD.commentCount ?? 0,
     views,
     category,
     status,
