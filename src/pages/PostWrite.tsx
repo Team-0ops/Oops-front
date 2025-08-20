@@ -79,6 +79,7 @@ const PostWrite = () => {
   // 실제 서버로 보낼 ID — 라벨 매핑에 의해 자동 결정
   const [categoryId, setCategoryId] = useState<number | null>(null); // 1~15
   const [topicId, setTopicId] = useState<number | null>(null); // 토픽에 매칭되면 세팅
+  const isTopicLocked = topicId !== null;
 
   const [categories] = useState<string[]>([
     "일상",
@@ -495,8 +496,12 @@ const PostWrite = () => {
             <button
               type="button"
               ref={categoryRef}
+              disabled={isTopicLocked}
               className="body4 w-full flex justify-between h-[30px] z-10 px-[10px] py-[6px] rounded-[20px] cursor-pointer bg-[#E6E6E6] outline-none select-none"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              onClick={() => {
+                if(isTopicLocked) return;
+                setIsDropdownOpen((prev) => !prev);
+              }}
             >
               {selectedLabel ?? "카테고리 선택"}
               {isDropdownOpen ? (
@@ -525,6 +530,7 @@ const PostWrite = () => {
                     <li
                       key={`${label}-${idx}`}
                       onClick={() => {
+                        if(isTopicLocked) return;
                         applySelection(label);
                         setIsDropdownOpen(false);
                       }}
