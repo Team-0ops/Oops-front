@@ -13,7 +13,7 @@ import { SituationRow, type Situation } from "../components/common/Row";
 import instance from "../apis/instance";
 import type { ApiResponse } from "../types/api";
 
-type Props = { avatar?: string | null; nickname: string };
+//type Props = { avatar?: string | null; nickname: string };
 
 type BestFailer = { postId: number; title: string; situation: Situation };
 function toCard(p: any) {
