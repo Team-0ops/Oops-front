@@ -257,7 +257,10 @@ export default function MyLessonsPage() {
                               {postCategory}
                             </span>
                           </div>
-                          <p className="mt-[4px] truncate text-[12px] text-[#1D1D1D]">
+                          <p
+                            className="mt-[4px] text-[12px] text-[#1D1D1D] break-words break-all overflow-hidden"
+                            title={lesson.postContent ?? ""}
+                          >
                             {lesson.postContent ?? ""}
                           </p>
                         </div>
@@ -288,12 +291,15 @@ export default function MyLessonsPage() {
                             {lesson.lessonTitle}
                           </h4>
                         </div>
-                        <div className="w-full flex justify-between items-start">
-                          <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line">
-                            {lesson.lessonContent}
-                          </p>
+                        <div className="w-full flex items-start">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <p className="text-[12px] text-[#1D1D1D] whitespace-pre-line break-words break-all [overflow-wrap:anywhere] overflow-hidden max-w-full">
+                              {lesson.lessonContent}
+                            </p>
+                          </div>
+
                           {lessonTags.length > 0 && (
-                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide">
+                            <div className="ml-[10px] flex gap-[6px] overflow-x-auto whitespace-nowrap my-scroll-hide flex-shrink-0">
                               {lessonTags.map((t) => (
                                 <span
                                   key={t}
