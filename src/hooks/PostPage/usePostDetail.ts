@@ -14,6 +14,7 @@ const fetchPostDetail = async (
   const { data } = await axiosInstance.get<PostDetailResponse>(
     `/posts/${postId}`
   );
+  console.log("상세조회 성공!", data.result)
   return data?.result ?? null;
 };
 
