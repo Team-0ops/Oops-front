@@ -4,6 +4,7 @@ import Like from "../assets/icons/GrayLike.svg?react";
 import CommentIcon from "../assets/icons/CommentIcon.svg?react";
 import EyeIcon from "../assets/icons/EyeIcon.svg?react";
 import RedLike from "../assets/icons/RedLike.svg?react";
+import Icon from "../assets/icons/BasicIcon.svg?react";
 
 import CommentList from "../components/comment/CommentList";
 import FeedbackView from "../components/modals/FeedbackView";
@@ -88,6 +89,9 @@ const PostDetail = () => {
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // 이미지 에러 처리
+  const [imgError, setImgError] = useState(false);
 
   // 댓글 입력과 optimistic ui적용
   const [commentInput, setCommentInput] = useState("");
@@ -307,19 +311,17 @@ const PostDetail = () => {
                       className="w-[42px] h-[42px] rounded-[4px] overflow-hidden bg-[#9a9a9a] shrink-0"
                       aria-label="작성자 프로필로 이동"
                     >
-                      {post?.profileImage ? (
+                      {post?.profileImage && !imgError ? (
                         <img
                           src={post.profileImage}
                           alt=""
                           className="w-full h-full object-cover"
                           loading="lazy"
                           referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
+                          onError={() => setImgError(true)}
                         />
                       ) : (
-                        <span className="w-full h-full bg-[#9a9a9a]" />
+                        <Icon className="w-full h-full" />
                       )}
                     </button>
                     <div className="flex justify-between w-full items-center">
