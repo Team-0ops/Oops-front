@@ -89,18 +89,24 @@ const PostCard = ({
               {title}
             </h3>
             {category && (
-              <span className="text-[12px] text-[#999999] absolute right-[85px]">
+              <span
+                className={`text-[12px] text-[#999999] absolute top-[11.5px] ${
+                  showThumb ? "right-[85px]" : "right-[12px]"
+                }`}
+              >
                 {category}
               </span>
             )}
           </div>
+
           <p
-  className={`text-[12px] font-regular mb-[10px] line-clamp-1 leading-tight ${
-    showThumb ? "pr-[70px]" : "pr-[20px]"
-  }`}
->
-  {content}
-</p>
+            className={`text-[12px] font-regular mb-[10px] line-clamp-1 leading-tight ${
+              showThumb ? "pr-[70px]" : "pr-[20px]"
+            }`}
+          >
+            {content}
+          </p>
+
           <PostStats likes={likes} comments={comments} views={views} />
         </div>
       </div>
