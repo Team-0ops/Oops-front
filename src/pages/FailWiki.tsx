@@ -58,9 +58,12 @@ const FailWiki = () => {
                     aiTip={resultList?.aiTip || null}
                   />
                   <Link
-                    to={navKey ? `/category-feed/${navKey}` : location.pathname}
-                    className={`body5 px-[13px] py-[3px] rounded-[20px] border border-[#B3B3B3]
-          ${navKey ? "text-[#999] hover:underline" : "cursor-not-allowed"}`}
+                    to={
+                      navKey
+                        ? `/category-feed/${navKey}`
+                        : `/search?keyword=${inputValue}`
+                    }
+                    className={`body5 px-[13px] py-[3px] rounded-[20px] border border-[#B3B3B3]`}
                     aria-disabled={!navKey}
                   >
                     관련 실패담 보러가기

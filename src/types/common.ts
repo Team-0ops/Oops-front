@@ -25,6 +25,6 @@ export const categoryMap: Record<string, string> = {
   marriage: "결혼",
   travel: "여행",
   realestate: "부동산",
-  mental: "정신건강",
+  mental: "정신 건강",
   free: "자유",
 };
