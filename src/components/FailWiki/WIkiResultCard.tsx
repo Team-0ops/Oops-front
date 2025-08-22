@@ -31,11 +31,6 @@ const WikiResultCard = ({ keyword, summary, aiTip }: WikiResultProps) => {
             <div className="body4 text-[#FFF] px-[13px] py-[6px] bg-[#1D1D1D] rounded-[20px]">
               {keyword} 실패 위키
             </div>
-            <div className="caption3 text-[#666] flex justify-center gap-[11px]">
-              <p>#혼자만의 시간</p>
-              <p>#자유</p>
-              <p>#자기계발</p>
-            </div>
           </div>
           <div className="flex-1 flex flex-col gap-[42px] w-full items-center pt-[28px] rounded-[4px] border border-[#F6EBE6] bg-[#FFFBF8] shadow-[inset_0_0_5px_rgba(0,0,0,0.25)]">
             <div>
