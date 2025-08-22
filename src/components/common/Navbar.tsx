@@ -15,9 +15,15 @@ const Navbar = () => {
     <>
       <nav className="flex justify-between items-center px-[20px] py-[12px] bg-[#FFF] border-neutral-700 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.05)]">
         <div className="flex gap-[8px] items-center">
-          <button onClick={() => setIsDrawerOpen(true)}>
-            <Bugger className="w-[24px] h-[24px]" />
-          </button>
+          {!accessToken ? (
+            <Link to="/signin">
+              <Bugger className="w-[24px] h-[24px]" />
+            </Link>
+          ) : (
+            <button onClick={() => setIsDrawerOpen(true)}>
+              <Bugger className="w-[24px] h-[24px]" />
+            </button>
+          )}
 
           <Link to="/">
             <Logo className="w-[49.498px] h-[20px]" />
