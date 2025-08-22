@@ -12,7 +12,7 @@ const TopBanner = ({ lastTopicInfo }: LastTopicProps) => {
   }
   return (
     <div
-      onClick={() => navigate(`/random-feed`)}
+      onClick={() => navigate(`/exrandom-feed`)}
       className="relative w-full h-full"
     >
       <Banner className="w-full h-auto" />
