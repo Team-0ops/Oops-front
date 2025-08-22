@@ -26,6 +26,9 @@ const Carousel = () => {
 
   console.log("베너", lastTopinInfo);
 
+  if (loading) return <div>로딩중...</div>;
+  if (error) return <div>에러 발생</div>;
+
   return (
     <div className="w-full mt-[26px] flex flex-col items-center">
       {/* ✅ Swiper를 감싸는 상대 위치 div */}
