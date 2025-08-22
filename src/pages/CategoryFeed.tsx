@@ -1,4 +1,4 @@
-  import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPostListByCategoryId } from "../apis/categoryPost";
 import type { Post } from "../types/post";
@@ -38,6 +38,11 @@ const CategoryFeed = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const baseUrl = import.meta.env.VITE_FILE_BASE?.replace(/\/+$/, "") || "";
+
+  //  페이지로 들어올 때 항상 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" }); 
+  }, [categoryName]);
 
   useEffect(() => {
     const fetchPosts = async () => {
