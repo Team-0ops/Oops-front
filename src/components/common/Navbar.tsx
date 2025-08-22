@@ -3,7 +3,6 @@ import Logo from "../../assets/icons/navbar.svg?react";
 import SearchLogo from "../../assets/icons/search.svg?react";
 import WriteLogo from "../../assets/icons/write.svg?react";
 import Profile from "../../assets/icons/profile.svg?react";
-import My from "../../assets/icons/my.svg?react";
 import { useState } from "react";
 import CategoryDrawer from "../common/CategoryDrawer";
 import { Link } from "react-router-dom";
