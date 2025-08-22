@@ -65,7 +65,7 @@ const ExRandomFeed = () => {
         </button>
         <h2 className="text-[20px] font-semibold">{topicName || "랜덤 주제"}</h2>
         <div className="absolute right-0 text-[#999999] text-[12px]">
-          5월 셋째주 랜덤주제
+          8월 셋째주 랜덤주제
         </div>
       </div>
 
