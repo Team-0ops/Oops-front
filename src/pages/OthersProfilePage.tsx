@@ -4,13 +4,16 @@ import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import PostCard from "../components/common/PostCard";
 import LeftArrow from "../assets/icons/left-point.svg?react";
-import othersProfile from "../assets/icons/othersprofile.svg";
+//import othersProfile from "../assets/icons/othersprofile.svg";
+import BasicIconUrl from "../assets/icons/BasicIcon.svg";
 
 import type { OthersProfileResult } from "../types/mypage";
 import { getOthersProfile } from "../apis/othersApi";
 import { SituationRow, type Situation } from "../components/common/Row";
 import instance from "../apis/instance";
 import type { ApiResponse } from "../types/api";
+
+//type Props = { avatar?: string | null; nickname: string };
 
 type BestFailer = { postId: number; title: string; situation: Situation };
 function toCard(p: any) {
@@ -85,9 +88,10 @@ export default function OthersProfilePage() {
   }, [userId]);
 
   const nickname = data?.profile.nickname ?? preload.nickname ?? "사용자";
+  const avatarRaw =
+    data?.profile.profileImageUrl ?? preload.profileImageUrl ?? "";
   const avatar =
-    data?.profile.profileImageUrl ?? preload.profileImageUrl ?? othersProfile;
-
+    avatarRaw && avatarRaw.trim().length > 0 ? avatarRaw : BasicIconUrl;
   const cards = (data?.posts ?? []).map(toCard);
 
   console.log("[others] raw posts", data?.posts);
@@ -122,11 +126,12 @@ export default function OthersProfilePage() {
               loading="lazy"
               referrerPolicy="no-referrer"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-                e.currentTarget.insertAdjacentHTML(
-                  "afterend",
-                  `<div style="width:100px;height:100px;border-radius:50%;background:#D9D9D9;"></div>`
-                );
+                const img = e.currentTarget as HTMLImageElement;
+                if ((img as any)._fallbackApplied || img.src === BasicIconUrl)
+                  return;
+                img.onerror = null;
+                (img as any)._fallbackApplied = true;
+                img.src = BasicIconUrl;
               }}
             />
             <p className="text-[20px] font-semibold text-[#1D1D1D]">

@@ -2,7 +2,7 @@ import Bugger from "../../assets/icons/Vector.svg?react";
 import Logo from "../../assets/icons/navbar.svg?react";
 import SearchLogo from "../../assets/icons/search.svg?react";
 import WriteLogo from "../../assets/icons/write.svg?react";
-import My from "../../assets/icons/my.svg?react";
+import Profile from "../../assets/icons/profile.svg?react";
 import { useState } from "react";
 import CategoryDrawer from "../common/CategoryDrawer";
 import { Link } from "react-router-dom";
@@ -34,7 +34,12 @@ const Navbar = () => {
             </Link>
 
             <Link to="/signin">
-              <My />
+              <div
+                className="body5 px-[13px] py-[3px] justify-center items-center
+            rounded-[20px] border border-[#1D1D1D]"
+              >
+                로그인/회원가입
+              </div>
             </Link>
           </div>
         )}
@@ -56,7 +61,7 @@ const Navbar = () => {
                   className="w-6 h-6 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-6 h-6 rounded-full bg-gray-300" />
+                <Profile className="w-6 h-6" />
               )}
             </Link>
           </div>

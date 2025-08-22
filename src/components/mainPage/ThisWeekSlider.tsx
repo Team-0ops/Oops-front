@@ -1,5 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import Banner from "../../assets/icons/banner.svg?react";
-const ThisWeekSlider = () => {
+import type { bannerData } from "../../types/banner";
+interface CurrentTopicProps {
+  currentTopicInfo: bannerData | boolean;
+}
+const ThisWeekSlider = ({ currentTopicInfo }: CurrentTopicProps) => {
+  const navigate = useNavigate();
   // return (
   //   <>
   //     <div className="w-full h-full bg-[#B3E378]">
@@ -13,9 +19,24 @@ const ThisWeekSlider = () => {
   //     </div>
   //   </>
   // );
+
+  if (typeof currentTopicInfo === "boolean") {
+    // boolean이면 아무 것도 렌더링하지 않음
+    return <></>;
+  }
+
   return (
-    <div className="w-full h-full">
-      <Banner />
+    <div
+      onClick={() => navigate(`/random-feed`)}
+      className="relative w-full h-full"
+    >
+      <Banner className="w-full h-auto" />
+      <p
+        className="waguri absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 
+                  text-black text-[68.384px] font-normal leading-normal"
+      >
+        {currentTopicInfo.topicName}
+      </p>
     </div>
   );
 };
