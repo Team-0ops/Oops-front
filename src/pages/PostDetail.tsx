@@ -371,7 +371,7 @@ const PostDetail = () => {
                                 교훈 작성
                               </button>
                             )}
-                            <div className="w-[30px] h-[30px] p-[4px] cursor-pointer rounded-[4px] bg-black">
+                            <div className="w-[30px] h-[30px] p-[6px] cursor-pointer rounded-[4px] bg-black">
                               <ReportIcon
                                 className="w-full h-full"
                                 onClick={() => setShowReportModal(true)}
@@ -385,7 +385,7 @@ const PostDetail = () => {
                   <div className="body1 w-full mt-[20px] mb-[16px]">
                     {post?.title}
                   </div>
-                  <div className="body5 whitespace-pre-line w-full mb-[16px] text-[#4d4d4d] break-words">
+                  <div className="body6 whitespace-pre-line w-full mb-[16px] text-[#4d4d4d] break-words">
                     {post?.content}
                   </div>
                   <div>
