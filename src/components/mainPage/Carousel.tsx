@@ -25,6 +25,8 @@ const Carousel = () => {
   const lastTopinInfo = data?.result.lastTopicInfo;
 
   console.log("베너", lastTopinInfo);
+  if (loading) return <div>로딩중...</div>;
+  if (error) return <div>에러 발생</div>;
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;
