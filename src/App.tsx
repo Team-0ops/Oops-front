@@ -15,7 +15,7 @@ import HomeLayout from "./layout/HomeLayout";
 import MainPage from "./pages/MainPage";
 
 // 피드 관련 페이지
-import PostDetail from "./pages/PostDetail";
+import PostDetail from "./pages/PostPage/PostDetail";
 import CategoryFeed from "./pages/CategoryFeed";
 import FavoriteFeed from "./pages/FavoriteFeed";
 import RandomFeed from "./pages/RandomFeed";
@@ -30,8 +30,8 @@ import FindIdPwPage from "./pages/FindIdPw";
 import TermsPage from "./pages/TermsPage";
 
 // 글쓰기, 완료, 교훈 모달
-import PostWrite from "./pages/PostWrite";
-import PostSuccess from "./pages/PostSuccess";
+import PostWrite from "./pages/PostPage/PostWrite";
+import PostSuccess from "./pages/PostPage/PostSuccess";
 import SearchPage from "./pages/SearchPage";
 
 //마이페이지

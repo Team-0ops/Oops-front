@@ -1,37 +1,41 @@
 import X from "../../assets/icons/X.svg?react";
 import { useEffect, useState } from "react";
-import { useReportPost } from "../../hooks/PostPage/useReportPost";
-import { useReportComment } from "../../hooks/PostPage/useReportComment";
+import { useReportPost } from "../../hooks/PostPage/PostHook/useReportPost";
+import { useReportComment } from "../../hooks/PostPage/PostHook/useReportComment";
 
 export type ReportTarget = {
-  type: "post" | "comment" | "reComment";
-  id: string;
-  author: string;
-  content: string;
+  type: "post" | "comment" | "reComment"; // 신고 대상 구분
+  id: string; // 대상 id
+  author: string; // 작성자 이름
+  content: string; // 신고 대상 내용 (일부만 표시)
 };
 
 interface ReportProps {
-  comment: ReportTarget;
-  onClose: () => void;
+  comment: ReportTarget; // 신고 대상 정보
+  onClose: () => void; // 모달 닫기 클릭
 }
 
+/**
+ * Report 컴포넌트
+ * - 게시글/댓글/대댓글을 신고할 수 있는 모달
+ * - 신고 사유를 입력받아 api 호출
+ * - 성공 시 알림 후 자동 닫힘
+ */
 const Report = ({ onClose, comment }: ReportProps) => {
-  const [reason, setReson] = useState("");
+  const [reason, setReson] = useState(""); // 신고 사유 입력값
 
   const postId = comment.id;
   const commentId = comment.id;
 
-  const {
-    reportPost,
-    success: postSuccess,
-  } = useReportPost(postId);
+  // 게시글 신고 훅
+  const { reportPost, success: postSuccess } = useReportPost(postId);
 
-  const {
-    reportComment,
-    success: commentSuccess,
-  } = useReportComment(commentId);
+  // 댓글/대댓글 신고 훅
+  const { reportComment, success: commentSuccess } =
+    useReportComment(commentId);
 
   // type별로 함수/상태 분기
+  // 신고 사유가 없으면 알림
   const handleReport = async () => {
     if (!reason.trim()) return alert("신고 사유를 입력해주세요!");
     if (comment.type === "post") {
@@ -41,22 +45,22 @@ const Report = ({ onClose, comment }: ReportProps) => {
     }
   };
 
-  // 신고 성공시 모달 닫기
+  // 신고 성공시 알림 후 모달 닫기
   useEffect(() => {
     if (
       (comment.type === "post" && postSuccess) ||
-      ((comment.type === "comment" || comment.type === "reComment") && commentSuccess)
+      ((comment.type === "comment" || comment.type === "reComment") &&
+        commentSuccess)
     ) {
       alert("신고가 완료되었습니다.");
       onClose();
     }
   }, [postSuccess, commentSuccess, comment.type, onClose]);
 
-
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
-      onClick={onClose}
+      onClick={onClose} // 바깥 클릭 시 모달 닫기
     >
       <div
         className="
@@ -68,6 +72,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
         "
         onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
       >
+        {/* 모달 헤더 */}
         <section className="flex justify-center items-center">
           <div
             className="
@@ -81,6 +86,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
           </div>
         </section>
 
+        {/* 신고 대상 정보 */}
         <section
           className="
           flex flex-col items-center justify-center gap-[6px]
@@ -98,6 +104,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
           <div className="caption2 text-[#666666]">"{comment.content}"</div>
         </section>
 
+        {/* 신고 사유 입력 */}
         <section
           className="
             flex flex-col justify-center items-center gap-[16px]
@@ -121,6 +128,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
           />
         </section>
 
+        {/* 주의 문구 */}
         <h6
           className="
         caption2  
@@ -132,6 +140,7 @@ const Report = ({ onClose, comment }: ReportProps) => {
           사용자님의 계정 정지의 위험이 있습니다.
         </h6>
 
+        {/* 신고하기 버튼 */}
         <button
           className="
         body2 text-[#000000]  

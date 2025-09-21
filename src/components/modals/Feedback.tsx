@@ -2,17 +2,24 @@ import X from "../../assets/icons/X.svg?react";
 import Arrow from "../../assets/icons/Arrow.svg?react";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
-import { submitLesson } from "../../hooks/PostPage/useSubmitLesson";
+import { submitLesson } from "../../hooks/PostPage/PostHook/useSubmitLesson";
 
 interface FeedbackProps {
-  postId: number;
-  onClose: () => void;
-  onSuccess?: () => void;
-  category: string;
-  author: string;
-  title: string;
-  content: string;
+  postId: number; // 교훈이 달릴 게시글 id
+  onClose: () => void; // 모달 닫기 콜백
+  onSuccess?: () => void; // 교훈 등록 성공 후 실행 콜백
+  category: string; // 게시글 카테고리
+  author: string; // 게시글 작성자
+  title: string; // 게시글 제목
+  content: string; // 게시글 내용
 }
+
+/**
+ * Feedback 컴포넌트
+ * - 특정 게시글에 대해 "교훈"을 작성하는 모달 ui
+ * - 교훈 제목, 교훈 내용, 태그 선택/추가 기능 포함
+ * - 등록 시 "submitLesson" 훅을 호출해 서버에 저장
+ */
 
 const Feedback = ({
   postId,
@@ -23,10 +30,13 @@ const Feedback = ({
   title: postTitle,
   content: postContent,
 }: FeedbackProps) => {
-  const [customTags, setCustomTags] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  // 상태 관리
+  const [customTags, setCustomTags] = useState<string[]>([]); // 사용자가 직접 추가한 태그
+  const [selectedTags, setSelectedTags] = useState<string[]>([]); // 선택된 태그들
+  const [title, setTitle] = useState(""); // 교훈 제목
+  const [content, setContent] = useState(""); // 교훈 내용
+
+  // 태그 입력창 크기 조절을 위한 ref
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -48,13 +58,14 @@ const Feedback = ({
     });
   }, [customTags]);
 
-  // 태그 선택/해제
+  // 태그 선택/해제 토글
   const handleTagClick = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
+  // 교훈 등록 api 호출
   const handleSubmit = async () => {
     try {
       await submitLesson(postId, title, content, selectedTags);
@@ -76,21 +87,20 @@ const Feedback = ({
         className="flex flex-col items-center w-[302px] rounded-[10px] px-[20px] pt-[21px] pb-[17px] bg-[#ffffff]"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 모달 헤더 */}
         <div className="h2 flex ml-[86px] justify-between gap-[62px] ">
           교훈 작성
           <X className="w-[24px] h-[24px] cursor-pointer" onClick={onClose} />
         </div>
-        {/* 카테고리는 props로 가져와야할 듯 */}
         <div className="caption2 flex justify-center mt-[8px] items-center text-[#666666]">
           {category}
         </div>
 
-        {/* 다 props로 가져와야할 것들 */}
+        {/* 게시글 미리보기 */}
         <section className="mt-[20px] mb-[18px] w-full">
           <h6 className="caption1 flex w-full h-[14px] justify-start">
             {author}님의 게시글
           </h6>
-          {/* 게시글 들어올곳 */}
           <div className="flex flex-col bg-[#f0e7e0] px-[14px] py-[10px] mt-[10px] rounded-[10px] gap-[4px] font-['Pretendard'] w-full">
             <div className="w-full flex justify-between ">
               <span className="body4">
@@ -107,6 +117,7 @@ const Feedback = ({
             </span>
           </div>
 
+          {/* 교훈 제목 입력 */}
           <div className="flex justify-center gap-[10px] ml-[36px] mt-[8px]">
             <Arrow className="w-[24px] h-[24px]" />
             <input
@@ -125,6 +136,7 @@ const Feedback = ({
             />
           </div>
 
+          {/* 교훈 내용 입력 */}
           <div className="flex justify-center gap-[10px] ml-[36px] mt-[8px]">
             <Arrow className="w-[24px] h-[24px]" />
             <textarea
@@ -154,7 +166,7 @@ const Feedback = ({
           </div>
 
           <div className="flex w-full flex-wrap min-w-0 justify-start gap-[12px]">
-            {/* 기존 버튼들 */}
+            {/* 기존 태그들 */}
             {["면접", "인생교훈", "친구", "먹을 거", "위로"].map((tag) => (
               <button
                 key={tag}

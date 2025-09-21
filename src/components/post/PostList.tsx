@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import type { PreviousPost } from "../../hooks/PostPage/usePreviousPosts";
+import type { PreviousPost } from "../../hooks/PostPage/GetHook/usePreviousPosts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 

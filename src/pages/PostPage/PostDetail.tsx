@@ -1,26 +1,26 @@
-import ReportIcon from "../assets/icons/ReportIcon.svg?react";
-import LeftIcon from "../assets/icons/left-point.svg?react";
-import Like from "../assets/icons/GrayLike.svg?react";
-import CommentIcon from "../assets/icons/CommentIcon.svg?react";
-import EyeIcon from "../assets/icons/EyeIcon.svg?react";
-import RedLike from "../assets/icons/RedLike.svg?react";
-import Icon from "../assets/icons/BasicIcon.svg?react";
+import ReportIcon from "../../assets/icons/ReportIcon.svg?react";
+import LeftIcon from "../../assets/icons/left-point.svg?react";
+import Like from "../../assets/icons/GrayLike.svg?react";
+import CommentIcon from "../../assets/icons/CommentIcon.svg?react";
+import EyeIcon from "../../assets/icons/EyeIcon.svg?react";
+import RedLike from "../../assets/icons/RedLike.svg?react";
+import Icon from "../../assets/icons/BasicIcon.svg?react";
 
-import CommentList from "../components/comment/CommentList";
-import FeedbackView from "../components/modals/FeedbackView";
-import Report from "../components/modals/Report";
-import DeleteModal from "../components/modals/Delete";
-import type { ReportTarget } from "../components/modals/Report";
-import { usePostDetail } from "../hooks/PostPage/usePostDetail";
-import { useCheer, useIsCheered } from "../hooks/PostPage/useCheer";
-import { getLesson } from "../hooks/PostPage/useGetLesson";
-import { categoryData } from "./CategoryFeed";
+import CommentList from "../../components/comment/CommentList";
+import FeedbackView from "../../components/modals/FeedbackView";
+import Report from "../../components/modals/Report";
+import DeleteModal from "../../components/modals/Delete";
+import type { ReportTarget } from "../../components/modals/Report";
+import { usePostDetail } from "../../hooks/PostPage/PostHook/usePostDetail";
+import { useCheer, useIsCheered } from "../../hooks/PostPage/PostHook/useCheer";
+import { getLesson } from "../../hooks/PostPage/GetHook/useGetLesson";
+import { categoryData } from "../CategoryFeed";
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/store";
-import { useDeletePost } from "../hooks/PostPage/useDeletePost";
-import { useGetRecommendations } from "../hooks/PostPage/useGetRecommendations";
-import { SituationRow } from "../components/common/Row";
-import { useCommentOptimistic } from "../hooks/Mutation/useCommentOptimistic";
+import type { RootState } from "../../store/store";
+import { useDeletePost } from "../../hooks/PostPage/DeleteHook/useDeletePost";
+import { useGetRecommendations } from "../../hooks/PostPage/GetHook/useGetRecommendations";
+import { SituationRow } from "../../components/common/Row";
+import { useCommentOptimistic } from "../../hooks/Mutation/useCommentOptimistic";
 import { useParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -29,8 +29,9 @@ import { useNavigate } from "react-router-dom";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/pagination";
-import Feedback from "../components/modals/Feedback";
+import Feedback from "../../components/modals/Feedback";
 
+// 상황 키와 라벨 매핑
 const SITUATION_ORDER = [
   "postFailure",
   "postOvercoming",
@@ -43,34 +44,38 @@ const SITUATION_LABEL: Record<(typeof SITUATION_ORDER)[number], string> = {
   postOvercome: "극복 완료",
 };
 
+/**
+ * PostDetail 컴포넌트
+ * - 게시글 상세 조회 / 댓글 / 교훈 / 신고 / 삭제 / 추천글까지 포함하는 페이지
+ * - Swiper를 활용해 "웁스 중 → 극복 중 → 극복 완료" 게시글을 슬라이드로 전환
+ * - Optimistic UI를 통한 댓글/좋아요 반영
+ */
 const PostDetail = () => {
   const navigate = useNavigate();
   const { postId } = useParams<{
     postId: string;
   }>();
 
-  //api 관련 훅
-  const { postDetail, loading } = usePostDetail(Number(postId));
-  const { deletePost } = useDeletePost();
+  const { postDetail, loading } = usePostDetail(Number(postId)); // 게시글 상세 조회
+  const { deletePost } = useDeletePost(); // 게시글 삭제
   const { data, loadingRecommendation, error } = useGetRecommendations(
     Number(postId)
-  );
+  ); // 추천 글
+  const { toggleCheer } = useCheer(); // 좋아요(응원) 토글
 
-  // 좋아요 기능 optimistic ui 적용
-  const { toggleCheer } = useCheer();
-
-  //추천글 게시글로 보내기
+  // 추천글리스트에 해당하는 게시글로 페이지 전환
   const goToPost = (id: number) => navigate(`/post/${id}`);
 
-  //userId 뽑아오기 (내 게시글인지 인식표)
+  // Redux에서 내 userId 확인 (내 게시글 여부 판단용)
   const userId = useSelector((state: RootState) => state.user.userId);
 
+  // 프로필 클릭시 해당 프로필로 이동하기 위한 로직
   const goAuthorProfile = (u: {
     userId?: number;
     nickname?: string;
     profileImage?: string;
   }) => {
-    if (!u?.userId) return;
+    if (!u?.userId) return; //uerId값이 없다면 함수 종료
     navigate(`/users/${u.userId}`, {
       state: {
         nickname: u?.nickname ?? "",
@@ -79,13 +84,18 @@ const PostDetail = () => {
     });
   };
 
-  //모달
+  // 교훈을 작성하기 위한 모달을 띄우기 위한 state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [showLessonView, setShowLessonView] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
+  // 교훈을 작성했는지 안했는지 판단을 하기위한 state
   const [isLessonWritten, setIsLessonWritten] = useState(false);
+  // 작성한 교훈 모달을 띄우기 위한 state
+  const [showLessonView, setShowLessonView] = useState(false);
+  // 삭제 모달을 띄우기 위한 state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  // 신고 모달을 띄우기 위한 state
+  const [showReportModal, setShowReportModal] = useState(false);
 
+  // Swiper 라이브러리를 통해 버튼과 본문의 현재위치를 알기위함
   const buttonSwiperRef = useRef<SwiperCore | null>(null);
   const contentSwiperRef = useRef<SwiperCore | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -101,7 +111,8 @@ const PostDetail = () => {
     setLocalComments,
     setInput: setCommentInput, // 일반 댓글 입력창 비우기용
   });
-  // 댓글 추가
+
+  // 댓글 작성 버튼 핸들러
   const handleAddComment = () => {
     if (!commentInput.trim() || !currentPostId) return;
     addComment({
@@ -111,9 +122,12 @@ const PostDetail = () => {
     });
   };
 
+  // 현재 슬라이드에서 표시할 게시글
   const validPosts = SITUATION_ORDER.map((key) => postDetail?.[key]).filter(
     (p): p is NonNullable<typeof p> => !!p
   );
+
+  // 슬라이드 전환 시 postId 변환 핸들러
   const handleSlideChange = (index: number) => {
     setActiveIndex(index);
     buttonSwiperRef.current?.slideTo(index);
@@ -122,8 +136,11 @@ const PostDetail = () => {
     const nextPostId = validPosts[index]?.postId;
     if (nextPostId) navigate(`/post/${nextPostId}`, { replace: false });
   };
+
   const currentPost = validPosts[activeIndex];
   const currentPostId = currentPost?.postId;
+
+  // 현재 게시글의 댓글들
   const currentComments =
     (currentPost?.comments ?? []).map((comment: any) => ({
       id: comment.commentId,
@@ -136,13 +153,14 @@ const PostDetail = () => {
       userId: comment.userId,
     })) || [];
 
-  //작성된 교훈이 있는지 없는지 확인
+  // 교훈 존재 여부 확인
   useEffect(() => {
     const checkLessonExists = async () => {
       if (!currentPostId) return;
       try {
         const result = await getLesson(currentPostId);
         if (result) setIsLessonWritten(true);
+        console.log("교훈 결과", result, isLessonWritten, currentPostId);
       } catch (e) {
         setIsLessonWritten(false);
         console.log("교훈이 아직 없음");
@@ -153,10 +171,12 @@ const PostDetail = () => {
     checkLessonExists();
   }, [currentPostId]);
 
+  // 댓글 리스트 동기화
   useEffect(() => {
     setLocalComments(currentComments);
   }, [activeIndex, postDetail]);
 
+  // 게시글 신고 대상 정의
   const reportTarget: ReportTarget = {
     type: "post",
     id: String(currentPost?.postId),
@@ -164,6 +184,7 @@ const PostDetail = () => {
     content: currentPost?.content ?? "",
   };
 
+  // 카테고리 key 매핑 
   const getCategoryKeyByLabel = (label: string) => {
     const entry = Object.entries(categoryData).find(
       ([, value]) => value.label === label
@@ -171,7 +192,7 @@ const PostDetail = () => {
     return entry ? entry[0] : null;
   };
 
-  // 시간표현 ~~시간 전과 같이 표현하기
+  // 시간표현 "~~시간 전"과 같이 표현하기
   const formatRelativeTime = (createdAt: string) => {
     const now = new Date();
     const createdDate = new Date(createdAt);
@@ -559,6 +580,8 @@ const PostDetail = () => {
           </section>
         )}
       </div>
+
+
       {showReportModal && (
         <Report
           onClose={() => setShowReportModal(false)}
@@ -603,7 +626,11 @@ const PostDetail = () => {
 
 export default PostDetail;
 
-// 좋아요 블록 컴포넌트
+/**
+ * CheerBlock 서브컴포넌트
+ * - 좋아요(응원) 버튼과 수치 표시
+ * - useIsCheered 훅을 통해 Optimistic 상태와 서버 상태를 합성하여 표시
+ */
 function CheerBlock({
   postId,
   liked,
@@ -615,7 +642,7 @@ function CheerBlock({
   likes: number;
   onToggle: () => void;
 }) {
-  // ✅ 훅을 컴포넌트 최상위에서 호출 (규칙 준수)
+  // 훅을 컴포넌트 최상위에서 호출 (규칙 준수)
   const cheered = useIsCheered(postId);
 
   // 서버값 + overlay 합성
