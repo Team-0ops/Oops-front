@@ -1,6 +1,10 @@
 import type { Post } from "../../types/post";
 import PostCard from "../common/PostCard";
 import ToSeeButton from "./ToSeeButton";
+/*
+  베스트 Failer 컴포넌트
+  공통 컴포넌트인 PostCard 사용 -> props로 값 넘겨줌
+*/
 interface BestFailerListProps {
   bestPosts: Post[];
 }
