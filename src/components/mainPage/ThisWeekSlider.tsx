@@ -24,7 +24,13 @@ const ThisWeekSlider = ({ currentTopicInfo }: CurrentTopicProps) => {
     // boolean이면 아무 것도 렌더링하지 않음
     return <></>;
   }
-
+  // topicName 길이에 따라 폰트 크기 조절
+  const fontSizeClass = (() => {
+    if (currentTopicInfo.topicName.length <= 2) return "text-[68px]";
+    if (currentTopicInfo.topicName.length <= 8) return "text-[50px]";
+    if (currentTopicInfo.topicName.length <= 12) return "text-[32px]";
+    return "text-[24px]";
+  })();
   return (
     <div
       onClick={() => navigate(`/random-feed`)}
@@ -32,8 +38,8 @@ const ThisWeekSlider = ({ currentTopicInfo }: CurrentTopicProps) => {
     >
       <Banner className="w-full h-auto" />
       <p
-        className="waguri absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 
-                  text-black text-[68.384px] font-normal leading-normal"
+        className={`waguri absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 
+                  text-black ${fontSizeClass} font-normal leading-normal`}
       >
         {currentTopicInfo.topicName}
       </p>
