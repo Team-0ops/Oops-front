@@ -10,6 +10,12 @@ import TopBanner from "./TopBanner";
 import LuckBanner from "./LuckBanner";
 import BestUserBanner from "./BestUserBanner";
 
+/*
+  Carousel 컴포넌트
+  Swiper 라이브러리 사용
+  - 로그인 전 : 이번주 주제, 지난주 주제
+  - 로그인 후 : 이번주 주제, 지난주 주제, 행운의 Failer, 베스트 유저
+*/
 const Carousel = () => {
   const { accessToken } = useAuth();
   const isAuthed = !!accessToken;
@@ -24,7 +30,6 @@ const Carousel = () => {
   const bestUser = data?.result.bestUser;
   const lastTopinInfo = data?.result.lastTopicInfo;
 
-  console.log("베너", lastTopinInfo);
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;
 

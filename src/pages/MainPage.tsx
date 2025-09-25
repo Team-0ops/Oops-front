@@ -2,6 +2,14 @@ import Carousel from "../components/mainPage/Carousel";
 import FeedButton from "../components/mainPage/FeedButton";
 import MainFeedList from "../components/mainPage/MainFeedList";
 
+/*
+  MainPage 컴포넌트
+  homelayout과 protextedLayout 안에서 사용됨
+  - carousel : 이미지 슬라이더 컴포넌트
+  - feedButton : 피드 필터 버튼 컴포넌트
+  - mainFeedList : 메인 피드 리스트 컴포넌트 (베스트 Failer, 즐겨찾기, 카테고리 목록)
+*/
+
 const MainPage = () => {
   return (
     <>
@@ -12,7 +20,6 @@ const MainPage = () => {
         </div>
         <div className="flex flex-col w-full items-center">
           <MainFeedList />
-          {/* component를 어떻게 나눌지 고민중... 이후 수정할수도 있어용 베스트 failer랑 즐겨찾기 한 카테고리 부분을 묶을까 나눌까?*/}
         </div>
       </div>
     </>
