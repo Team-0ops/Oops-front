@@ -5,7 +5,15 @@ import ToSeeButton from "./ToSeeButton";
 interface EachCategoryCardProps {
   post: Post;
 }
+/*
+  EachCategoryCard 컴포넌트
+  각 카테고리 별 post를 하나씩 띄움.
 
+  '보러가기'를 눌렀을 경우 해당 카테고리로 이동하기 위해 common의 categoryMap을 사용하여 navKey를 찾음
+  ex) categoryMap = { "study": "스터디", "hobby": "취미" } -> key : url에 사용, value : 화면에 표시되는 카테고리 이름
+  PostCard 컴포넌트 사용 -> props로 값 넘겨줌
+
+*/
 const EachCategoryCard = ({ post }: EachCategoryCardProps) => {
   const navKey = Object.keys(categoryMap).find(
     (key) => categoryMap[key] === post.categoryOrTopicName

@@ -2,6 +2,11 @@ import { Link } from "react-router-dom";
 import FailWiki from "../../assets/icons/failwiki.svg?react";
 import LuckyAmulet from "../../assets/icons/luckyamulet.svg?react";
 import RandomFeed from "../../assets/icons/randomfeed.svg?react";
+/*
+  피드 버튼 컴포넌트
+  3개의 버튼을 가로로 배치
+  Link 컴포넌트를 사용하여 각 버튼 클릭 시 해당 경로로 이동
+*/
 const FeedButton = () => {
   return (
     <>
