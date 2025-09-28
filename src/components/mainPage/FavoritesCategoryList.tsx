@@ -6,6 +6,11 @@ import ToSeeButton from "./ToSeeButton";
 interface FavoritesCategoryListProps {
   favoritesPosts: Post[];
 }
+/*
+  즐겨찾기한 카테고리 컴포넌트
+  공통 컴포넌트인 PostCard 사용 -> props로 값 넘겨줌
+  로그인 전 OR 즐겨찾기 한 카테고리가 없을 경우 -> "즐겨찾기한 카테고리가 없습니다." 문구 노출
+*/
 const FavoritesCategoryList = ({
   favoritesPosts,
 }: FavoritesCategoryListProps) => {
