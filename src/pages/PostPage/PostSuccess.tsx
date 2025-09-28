@@ -1,22 +1,30 @@
-import Logo from "../assets/icons/newLogo.svg?react";
+import Logo from "../../assets/icons/newLogo.svg?react";
 
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useGetRecommendations } from "../hooks/PostPage/useGetRecommendations";
-import { SituationRow } from "../components/common/Row";
-import { usePostDetail } from "../hooks/PostPage/usePostDetail";
+import { useGetRecommendations } from "../../hooks/PostPage/GetHook/useGetRecommendations";
+import { SituationRow } from "../../components/common/Row";
+import { usePostDetail } from "../../hooks/PostPage/PostHook/usePostDetail";
 
+/**
+ * PostSuccess 컴포넌트
+ * - 글 작성 완료 후 보여지는 페이지
+ * - 방금 작성한 글 상세보기 이동 / 메인 피드 이동 버튼 제공
+ * - 추천 글 및 베스트 Failers 목록 표시
+ */
 const PostSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const postId = location.state?.postId;
-  const {postDetail} = usePostDetail(Number(postId));
+  const postId = location.state?.postId; // 방금 작성한 게시글 id
+  const { postDetail } = usePostDetail(Number(postId)); // 상세 데이터 조회
 
+  // 상세보기 이동
   const goToDetail = () => {
     if (!postId) return alert("방금 작성한 게시글이 없습니다.");
     navigate(`/post/${postId}`);
   };
 
+  // 메인 피드 이동
   const handleMain = () => {
     navigate("/");
   };
@@ -25,22 +33,24 @@ const PostSuccess = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { data, loadingRecommendation, error } = useGetRecommendations(postId ?? 0);
-
+  // 추천 글 불러오기
+  const { data, loadingRecommendation, error } = useGetRecommendations(
+    postId ?? 0
+  );
   const goToPost = (id: number) => navigate(`/post/${id}`);
 
   return (
     <div className="flex justify-center items-center ">
       <div className="w-full h-full ">
-        {/* 첫번째 섹션 */}
-        {/* 로고 ~ 버튼 */}
+        {/* 작성 완료 안내 및 버튼 */}
         <section className="bg-[#FFFBF8] flex flex-col items-center mt-[1px] mb-[30px] px-[20px]">
           <Logo className="mt-[81px] w-[94px] h-[127px]" />
           <div className="h1 mt-[54px] w-auto h-[29px]">작성 완료!</div>
           <div className="body3 mt-[12px] w-auto h-[19px]">
             10포인트 제공 완료
           </div>
-          {/* 버튼 */}
+
+          {/* 버튼 영역*/}
           <div className="flex justify-center items-center mb-[10px] mt-[60px]">
             <button
               onClick={goToDetail}
@@ -72,7 +82,7 @@ const PostSuccess = () => {
           </div>
         )}
 
-        {/* 두번째 섹션 — 추천 글 */}
+        {/* 추천 글 */}
         {!loadingRecommendation && !error && (
           <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen mb-[20px]">
             <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
@@ -98,7 +108,7 @@ const PostSuccess = () => {
           </section>
         )}
 
-        {/* 세번째 섹션 — 베스트 글 */}
+        {/* 베스트 글 */}
         {!loadingRecommendation && !error && (
           <section className="bg-[#FFFBF8] -mx-[20px] flex flex-col items-center w-screen ">
             <div className="body2 flex justify-start items-center bg-[#fbf3ec] border-b-[1px] border-[#e9e5e2] w-full h-[39px] pl-[38px]">
