@@ -4,7 +4,7 @@ export type Post = {
   postId: number;
   title: string;
   content: string;
-  categoryName: string;
+  categoryOrTopicName: string;
   likes: number;
   comments: number;
   views: number;
@@ -24,3 +24,9 @@ export type ResponseCategoryPostListDTO = CommonResponse<{
   posts: Post[];
   last: boolean;
 }>;
+
+export type BestFailers = {
+  postId: number;
+  title: string;
+  situation: string;
+};

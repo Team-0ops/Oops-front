@@ -41,12 +41,12 @@ const RandomFeed = () => {
         </button>
         <h2 className="text-[20px] font-semibold">{topicName}</h2>
         <button
-          className="absolute right-[10px] text-[12px] text-[#B3E378] bg-[#262626] rounded-[8px] px-[9px] py-[8px]"
+          className="absolute right-[1px] text-[12px] text-[#B3E378] bg-[#262626] rounded-[8px] px-[9px] py-[8px]"
           onClick={() =>navigate("/post", {state: { topicName }, 
   })
 }
         >
-          '{topicName}' 주제로 글 작성하기
+          <span className="font-semibold">'{topicName}'</span> 주제로 글 작성하기
         </button>
       </div>
 
@@ -68,7 +68,7 @@ const RandomFeed = () => {
               likes={post.likes}
               comments={post.comments}
               views={post.views}
-              category={post.categoryName}
+              category={post.categoryOrTopicName}
             />
           ))
         )}

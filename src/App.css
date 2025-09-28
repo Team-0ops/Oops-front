@@ -131,6 +131,14 @@
   letter-spacing: 0;
 }
 
+/* 본문에서 사용될 스타일링 */
+.body6 {
+  font-size: 14px;
+  font-weight: 500; /* Medium */
+  line-height: 1.3rem;
+  letter-spacing: 0;
+}
+
 /* Caption */
 .caption1 {
   font-size: 12px;

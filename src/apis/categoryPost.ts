@@ -8,20 +8,21 @@ import type { PostStatus } from "../components/FeedPage/PostStatusTab";
 
 //저번주 랜덤주제 리스트 조회
 
-interface LastWeekRandomTopicResponse {
+export interface LastWeekRandomTopicResponse {
   name: string;
   posts: Post[];
+  last: boolean;
 }
 
 export const getLastWeekRandomTopicPosts = async (
   situation: PostStatus,
   page: number = 0,
   limit: number = 10
-): Promise<LastWeekRandomTopicResponse> => {
+): Promise<LastWeekRandomTopicResponse[]> => {
   const { data } = await axiosInstance.get("/feeds/randomTopic/last/all", {
     params: { situation, page, limit },
   });
-  return data.result;
+  return data.result; 
 };
 
 

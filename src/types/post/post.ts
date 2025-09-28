@@ -7,4 +7,5 @@ export interface Post {
   comments: number;
   views: number;
   image: string | null;
+  categoryOrTopicName: string;
 }

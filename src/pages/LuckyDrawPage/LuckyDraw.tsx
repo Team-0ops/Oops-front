@@ -11,10 +11,23 @@ import type { CustomAxiosError } from "../../types/AxiosError";
 import octoImg from "../../assets/icons/LuckyDraw/octo.png";
 import bunnyImg from "../../assets/icons/LuckyDraw/bunny.png";
 import whaleImg from "../../assets/icons/LuckyDraw/whale.png";
+import penguinImg from "../../assets/icons/LuckyDraw/penguin.png"
+import catImg from "../../assets/icons/LuckyDraw/cat.png"
+import puppyImg from "../../assets/icons/LuckyDraw/puppy.png"
+import turtleImg from "../../assets/icons/LuckyDraw/turtle.png"
+import bearImg from "../../assets/icons/LuckyDraw/bear.png"
+import crocoImg from "../../assets/icons/LuckyDraw/croco.png"
 
 const Octo = () => <img src={octoImg} alt="문어" className="w-full h-full object-contain" />;
 const Bunny = () => <img src={bunnyImg} alt="토끼" className="w-full h-full object-contain" />;
 const Whale = () => <img src={whaleImg} alt="고래" className="w-full h-full object-contain" />;
+const Penguin = () => <img src={penguinImg} alt="펭귄" className="w-full h-full object-contain" />;
+const Cat = () => <img src={catImg} alt="고양이" className="w-full h-full object-contain" />;
+const Puppy = () => <img src={puppyImg} alt="강아지" className="w-full h-full object-contain" />;
+const Turtle = () => <img src={turtleImg} alt="거북이" className="w-full h-full object-contain" />;
+const Bear = () => <img src={bearImg} alt="곰" className="w-full h-full object-contain" />;
+const Croco = () => <img src={crocoImg} alt="악어" className="w-full h-full object-contain" />;
+
 
 const LuckyDraw = () => {
   const [forceStop, setForceStop] = useState(false);
@@ -25,7 +38,7 @@ const LuckyDraw = () => {
   const [userPoint, setUserPoint] = useState<number>(0);
   const navigate = useNavigate();
 
-  const cardList = [Octo, Bunny, Whale, Octo, Octo, Octo, Octo, Octo, Octo];
+  const cardList = [Octo, Bunny, Whale, Penguin, Cat, Puppy , Turtle, Bear, Croco];
 
   useEffect(() => {
     const fetchPoint = async () => {
@@ -46,7 +59,7 @@ const LuckyDraw = () => {
     if (name.includes("펭")) return 3;
     if (name.includes("냥")) return 4;
     if (name.includes("강아지") || name.includes("멍")) return 5;
-    if (name.includes("느려") || name.includes("늘보")) return 6;
+    if (name.includes("꾸준") || name.includes("거북이")) return 6;
     if (name.includes("곰")) return 7;
     if (name.includes("악어") || name.includes("아거")) return 8;
     return 0;

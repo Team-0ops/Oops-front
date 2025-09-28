@@ -37,6 +37,13 @@ const CategoryFeed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const baseUrl = import.meta.env.VITE_FILE_BASE?.replace(/\/+$/, "") || "";
+
+  //  페이지로 들어올 때 항상 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" }); 
+  }, [categoryName]);
+
   useEffect(() => {
     const fetchPosts = async () => {
       if (!categoryId) {
@@ -47,7 +54,19 @@ const CategoryFeed = () => {
       setIsLoading(true);
       try {
         const res = await getPostListByCategoryId(categoryId, selectedStatus);
-        setPosts(res.result?.posts ?? []);
+        console.log("[CategoryFeed] API raw response:", res);
+
+        const rawPosts = res.result?.posts ?? [];
+        const processed = rawPosts.map((p) => ({
+          ...p,
+          image:
+            p.image && !/^https?:\/\//.test(p.image)
+              ? `${baseUrl}/${p.image.replace(/^\/+/, "")}`
+              : p.image || "",
+        }));
+
+        console.log("[CategoryFeed] 변환된 posts:", processed);
+        setPosts(processed);
       } catch (error) {
         console.error("게시글 로딩 실패", error);
         setPosts([]);
@@ -57,7 +76,7 @@ const CategoryFeed = () => {
     };
 
     fetchPosts();
-  }, [categoryId, selectedStatus, categoryName]);
+  }, [categoryId, selectedStatus, categoryName, baseUrl]);
 
   return (
     <div className="w-full min-h-screen mx-auto bg-[#FFFBF8] pt-[17px] mb-[50px]">
@@ -69,7 +88,6 @@ const CategoryFeed = () => {
       </div>
 
       <PostStatusTab selected={selectedStatus} onSelect={setSelectedStatus} />
-
 
       <div className="flex flex-col gap-[12px] mt-[16px]">
         {isLoading ? (
@@ -83,11 +101,11 @@ const CategoryFeed = () => {
               postId={post.postId}
               title={post.title}
               content={post.content}
-              imageUrl={post.image ?? ""}
+              imageUrl={post.image}
               likes={post.likes}
               comments={post.comments}
               views={post.views}
-              category={post.categoryName}
+              category={post.categoryOrTopicName}
             />
           ))
         )}

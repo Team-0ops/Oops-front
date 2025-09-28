@@ -104,13 +104,19 @@ const CategoryDrawer = ({ onClose }: Props) => {
           .map((cat) => (
             <div
               key={cat.id}
+           
+              onClick={() => toggleStar(cat.id, cat.name, cat.active)}
               className={`flex justify-between items-center w-full h-[48px] mb-[16px] rounded-[4px] py-[9px] px-[10px] ${
                 cat.active ? "bg-[#B3E378]" : "bg-[#F0E3E0]"
               }`}
             >
               <div className="flex items-center justify-center">
                 <button
-                  onClick={() => toggleStar(cat.id, cat.name, cat.active)}
+
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleStar(cat.id, cat.name, cat.active);
+                  }}
                   className="pl-[10px] pr-[6px]"
                 >
                   {cat.active ? (
@@ -123,7 +129,11 @@ const CategoryDrawer = ({ onClose }: Props) => {
               </div>
               <button
                 className="w-[75px] h-[26px] bg-white rounded-[20px] text-[#999] text-[14px]"
-                onClick={() => goToCategory(cat.key)}
+
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToCategory(cat.key);
+                }}
               >
                 보러가기
               </button>

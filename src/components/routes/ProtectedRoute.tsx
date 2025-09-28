@@ -1,20 +1,18 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const { accessToken } = useAuth();
   const location = useLocation();
 
-  // 예: localStorage에 accessToken이 있으면 로그인 상태로 간주
-  const isAuthenticated = !!localStorage.getItem("accessToken");
-
-  if (!isAuthenticated) {
+  if (!accessToken) {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
-
   return <>{children}</>;
 };
 

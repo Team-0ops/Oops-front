@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
-  userId: string | null;
+  userId: string|null;
   // 필요한 추가 정보도 여기에 (예: nickname, email 등)
 }
 
@@ -24,5 +24,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUserId, logout } = userSlice.actions;
+export const { setUserId } = userSlice.actions;
 export default userSlice.reducer;
