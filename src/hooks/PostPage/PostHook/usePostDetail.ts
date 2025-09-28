@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "../../apis/axios";
+import { axiosInstance } from "../../../apis/axios";
 import type {
   PostDetailResponse,
   DetailResultType,
-} from "../../types/post/PostDetail";
+} from "../../../types/post/PostDetail";
 
 /**
- * Fetcher: returns only the payload (result) so react-query cache can be patched by useCheer
+ * fetchPostDetail
+ * - 게시글 상세 데이터 불러오기 (payload만 반환)
  */
 const fetchPostDetail = async (
   postId: number
@@ -14,21 +15,22 @@ const fetchPostDetail = async (
   const { data } = await axiosInstance.get<PostDetailResponse>(
     `/posts/${postId}`
   );
-  console.log("상세조회 성공!", data.result)
+  console.log("상세조회 성공!", data.result);
   return data?.result ?? null;
 };
 
 /**
- * React Query version — key is exactly ["postDetail", postId]
- * so useCheer.ts can setQueryData/invalidate reliably.
+ * usePostDetail 훅
+ * - 게시글 상세 데이터를 react-query 캐시에 저장/관리
+ * - key: ["postDetail", postId]
  */
 export const usePostDetail = (postId: number) => {
   const q = useQuery({
     queryKey: ["postDetail", postId],
     queryFn: () => fetchPostDetail(postId),
     enabled: !!postId,
-    staleTime: Infinity, // keep fresh for a bit to avoid immediate refetch
-    refetchOnWindowFocus: false, // do not override optimistic overlay
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,
   });

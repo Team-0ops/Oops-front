@@ -1,26 +1,34 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setSelectedStep, setSelectedPostId } from "../store/slices/postSlice";
-import type { RootState } from "../store/store";
-import PostList from "../components/post/PostList";
-import type { OopsPost } from "../types/OopsList";
-import LeftPoint from "../assets/icons/left-point.svg?react";
-import UpArrow from "../assets/icons/UpArrow.svg?react";
-import DownArrow from "../assets/icons/DownArrow.svg?react";
-import "../App.css";
+import { setSelectedStep, setSelectedPostId } from "../../store/slices/postSlice";
+import type { RootState } from "../../store/store";
+import PostList from "../../components/post/PostList";
+import type { OopsPost } from "../../types/OopsList";
+import LeftPoint from "../../assets/icons/left-point.svg?react";
+import UpArrow from "../../assets/icons/UpArrow.svg?react";
+import DownArrow from "../../assets/icons/DownArrow.svg?react";
+import "../../App.css";
 
-import { usePreviousPosts } from "../hooks/PostPage/usePreviousPosts";
-import { axiosInstance } from "../apis/axios";
+import { usePreviousPosts } from "../../hooks/PostPage/GetHook/usePreviousPosts";
+import { axiosInstance } from "../../apis/axios";
 
 const BASE_CATEGORY_COUNT = 15;
 const normalize = (s: string) => s.trim().toLowerCase();
 
+/**
+ * PostWrite 컴포넌트
+ * - 웁스 중 / 극복 중 / 극복 완료 단계별 게시글 작성
+ * - 카테고리 & 토픽 선택, 이미지 업로드, 댓글 종류 선택 지원
+ * - Redux로 이전 단계 게시글 연계 (previousPosts)
+ * - 글 작성 완료 후 PostSuccess 페이지로 이동
+ */
 const PostWrite = () => {
-  //토픽 이름 받아오기
+  // location에서 전달된 topicName
   const location = useLocation();
   const topicNameFromState: string = location.state?.topicName;
-  // 토픽 마스터 (이름 id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
+  
+  // 토픽 마스터 (라벨 -> id 매핑) — 실제 서비스 상황에 맞춰 교체 가능
   const topicMaster = useMemo(
     () =>
       [
@@ -53,9 +61,9 @@ const PostWrite = () => {
     return m;
   }, [topicMaster]);
 
+  // redux 전역 상태
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const selectedStep = useSelector(
     (state: RootState) => state.post.selectedStep
   );
@@ -63,24 +71,25 @@ const PostWrite = () => {
     (state: RootState) => state.post.selectedPostId
   );
 
+  // 입력 ref
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const categoryRef = useRef<HTMLButtonElement>(null);
 
+  // 입력 상태
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [commentType, setCommentType] = useState<string[]>([]);
-
-  // 새 구조: 라벨만 직접 선택/표시
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
-  // 실제 서버로 보낼 ID — 라벨 매핑에 의해 자동 결정
+  // 선택 id 상태 (실제 서버로 이동할 상태)
   const [categoryId, setCategoryId] = useState<number | null>(null); // 1~15
   const [topicId, setTopicId] = useState<number | null>(null); // 토픽에 매칭되면 세팅
   const isTopicLocked = topicId !== null;
 
+  // 카테고리/토픽 목록
   const [categories] = useState<string[]>([
     "일상",
     "연애",
@@ -100,12 +109,12 @@ const PostWrite = () => {
   ]);
   const [topics, setTopics] = useState<string[]>([]); // 표시/매칭용 토픽 라벨 목록
 
-  // ui
+  // 드롭다운 및 파일 업로드 ref
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 이전 단계 글 목록
+  // 이전 단계 글 목록가져오기
   const { posts: previousPosts, fetchPreviousPosts } = usePreviousPosts();
 
   // 이미지 업로드 핸들러
@@ -123,9 +132,7 @@ const PostWrite = () => {
     fileInputRef.current?.click();
   };
 
-  // 매핑용 맵
-
-  // 카테고리(1~15) 라벨 → categoryId
+  // 카테고리(1~15) 라벨 → categoryId 매핑
   const categoryMap = useMemo(() => {
     const m = new Map<string, number>();
     categories.slice(0, BASE_CATEGORY_COUNT).forEach((name, idx) => {
@@ -230,7 +237,6 @@ const PostWrite = () => {
   }, [topicNameFromState, applySelection]);
 
   // OopsList에서 클릭했을때 해당하는 카테고리 고정
-
   useEffect(() => {
     if (!selectedPostId) return;
 
@@ -270,6 +276,7 @@ const PostWrite = () => {
   const clampCategoryId = (id: number | null) =>
     id && id >= 1 && id <= BASE_CATEGORY_COUNT ? id : null;
 
+  // 글 작성 api 호출
   const submitPost = async (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
     const data: OopsPost = {
       title,
@@ -328,7 +335,7 @@ const PostWrite = () => {
   const isFormValid =
     !!title.trim() && !!content.trim() && (!!categoryId || !!topicId);
 
-  // 핸들러
+  // 제출 버튼 클릭 핸들러 
   const handleSubmit = (situation: "OOPS" | "OVERCOMING" | "OVERCOME") => {
     if (!title.trim()) {
       titleRef.current?.focus();
