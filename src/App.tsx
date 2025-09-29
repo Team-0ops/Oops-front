@@ -26,8 +26,8 @@ import ExRandomFeed from "./pages/ExRandomFeed";
 // 로그인 관련 페이지
 import SigninPage from "./pages/SigninPage";
 import SignupPage from "./pages/SignupPage";
-import FindIdPwPage from "./pages/FindIdPw";
-import TermsPage from "./pages/TermsPage";
+import FindIdPwPage from "./pages/AuthPage/FindIdPw";
+import TermsPage from "./pages/AuthPage/TermsPage";
 
 // 글쓰기, 완료, 교훈 모달
 import PostWrite from "./pages/PostPage/PostWrite";
@@ -35,12 +35,12 @@ import PostSuccess from "./pages/PostPage/PostSuccess";
 import SearchPage from "./pages/SearchPage";
 
 //마이페이지
-import MyPageLayout from "./pages/MyPageLayout";
-import MyFailuresPage from "./pages/MyFailuresPage";
-import MyLessonsPage from "./pages/MyLessonsPage";
-import MyProfilePage from "./pages/MyProfilePage";
+import MyPageLayout from "./pages/MyPage/MyPageLayout";
+import MyFailuresPage from "./pages/MyPage/MyFailuresPage";
+import MyLessonsPage from "./pages/MyPage/MyLessonsPage";
+import MyProfilePage from "./pages/MyPage/MyProfilePage";
 
-import OthersProfilePage from "./pages/OthersProfilePage";
+import OthersProfilePage from "./pages/MyPage/OthersProfilePage";
 
 //행운부적 페이지
 import LuckyDraw from "./pages/LuckyDrawPage/LuckyDraw";

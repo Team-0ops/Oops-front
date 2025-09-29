@@ -1,5 +1,8 @@
-//import React from "react";
-
+/**
+ * 간단한 알림 모달 컴포넌트
+ * - 화면 중앙에 메시지를 띄우고, 확인 버튼을 누르면 닫히는 구조
+ * - 부모에서 'message', 'onCLose' props 전달 
+ */
 interface AlertModalProps {
   message: string;
   onClose: () => void;

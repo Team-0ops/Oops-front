@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Warning from "../assets/icons/warning.svg?react";
-import { getMyProfile, patchMyProfile } from "../apis/mypageApi";
-import type { MyProfileRes } from "../types/mypage";
-import { useAuth } from "../context/AuthContext";
+import { getMyProfile, patchMyProfile } from "../../apis/mypageApi";
+import type { MyProfileRes } from "../../types/mypage";
+import { useAuth } from "../../context/AuthContext";
 
+/**
+ * 프로필 이미지 경로 후보 생성
+ * - blob/data URL, http(s) URL, 상대 경로 등을 모두 대응
+ */
 function makeImgCandidates(raw?: string | null): string[] {
   if (!raw) return [];
   if (/^(blob:|data:)/i.test(raw)) return [raw];
@@ -15,7 +19,11 @@ function makeImgCandidates(raw?: string | null): string[] {
   );
 }
 
-// 하드 리로드
+/**
+ * 페이지 전체를 새로고침하는 하드 리로드
+ * - 캐시 우회 위해 쿼리 파라미터(r=timestamp) 추가
+ * - 뒤로가기 기록을 남기지 않음
+ */
 function hardReload() {
   try {
     sessionStorage.setItem("PROFILE_RELOADED_ONCE", "1");
@@ -26,12 +34,22 @@ function hardReload() {
   window.location.replace(url.toString());
 }
 
+/**
+ * 마이페이지 - 내 프로필 화면
+ * - 사용자 정보 조회 (getMyProfile)
+ * - 프로필 이미지 업로드 및 교체 (patchMyProfile)
+ * - 업로드 중/실패 시 미리보기 및 롤백 처리
+ * - 포인트, 댓글/게시물 신고 수 안내
+ * - 로그아웃 기능 제공
+ */
 export default function MyProfilePage() {
+  // 상태값
   const [profile, setProfile] = useState<MyProfileRes | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  // 프로필 이미지 업로드 관련 ref
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const inflightPreviewRef = useRef<string | null>(null);
@@ -42,6 +60,7 @@ export default function MyProfilePage() {
     uploadingRef.current = uploading;
   }, [uploading]);
 
+  // 사용자 정보
   const [userId, setUserId] = useState<string | null>(
     (typeof localStorage !== "undefined" && localStorage.getItem("userId")) ||
       null
@@ -61,6 +80,7 @@ export default function MyProfilePage() {
     }
   }, []);
 
+  // accessToken 없을 때 처리
   useEffect(() => {
     if (!accessToken) {
       setLoading(false);
@@ -91,6 +111,7 @@ export default function MyProfilePage() {
     };
   }, [accessToken]);
 
+  // 프로필 조회 및 갱신
   useEffect(() => {
     if (!accessToken) return;
     if (uploadingRef.current) return;
@@ -106,6 +127,7 @@ export default function MyProfilePage() {
     };
   }, [accessToken, location.key]);
 
+  // 페이지 show/visibility 이벤트에 따른 갱신
   useEffect(() => {
     const onShow = () => {
       if (uploadingRef.current || !accessToken) return;
@@ -121,6 +143,7 @@ export default function MyProfilePage() {
     };
   }, [accessToken]);
 
+  // userId 변경 시 캐시 정리
   useEffect(() => {
     const now = localStorage.getItem("userId") || null;
     if (now !== userId) {
@@ -135,6 +158,7 @@ export default function MyProfilePage() {
     }
   });
 
+  // 프로필 이미지 후보 업데이트
   useEffect(() => {
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -142,6 +166,7 @@ export default function MyProfilePage() {
     };
   }, []);
 
+  // 리소스 해제
   useEffect(() => {
     const url = profile?.profileImageUrl || null;
 
@@ -163,6 +188,7 @@ export default function MyProfilePage() {
     fileInputRef.current?.click();
   };
 
+  // 파일 선택 -> 업로드 -> 성공 시 하드 리로드
   const onSelectImage: React.ChangeEventHandler<HTMLInputElement> = async (
     e
   ) => {
@@ -225,6 +251,8 @@ export default function MyProfilePage() {
   };
 
   const imgErrorRef = useRef(0);
+
+  // 이미지 로딩 실패 시 다음 후보로 교체 / 재조회
   const handleImgError = async () => {
     // 리로드 모드에서는 단순 폴백만 유지
     const tryCount = ++imgErrorRef.current;
@@ -254,6 +282,7 @@ export default function MyProfilePage() {
     setImgSrc(null);
   };
 
+  // 로그아웃 처리
   const handleLogout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -317,6 +346,7 @@ export default function MyProfilePage() {
       </div>
 
       <div className="flex items-center justify-center rounded-lg bg-[#B3E378] p-4 text-[#1D1D1D]">
+        {/* 내 포인트 표시 */}
         <span className="mr-[6px] font-pretendard text-[12px] font-semibold text-[#4D4D4D]">
           내 포인트 :
         </span>
@@ -326,6 +356,7 @@ export default function MyProfilePage() {
       </div>
       <div className="w-full h-[1px] bg-[#E9E5E2] mt-2" />
       <div className="space-y-[10px]">
+        {/* 댓글 신고 수 / 게시물 신고 수 안내 */}
         <div className="w-[335px] space-y-2 p-5">
           <div className="flex items-center gap-[10px]">
             <Warning className="h-5 w-5 shrink-0" />
@@ -359,6 +390,7 @@ export default function MyProfilePage() {
       </div>
 
       <div className="flex justify-center">
+        {/* 로그아웃 버튼 */}
         <button
           onClick={handleLogout}
           disabled={loggingOut}

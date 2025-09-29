@@ -3,19 +3,26 @@ import Down from "../../assets/icons/DownArrow.svg?react";
 import Up from "../../assets/icons/UpArrow.svg?react";
 
 interface Props {
-  categories: string[];
-  value: string;
-  onChange: (val: string) => void;
+  categories: string[]; // 선택 가능한 카테고리 목록
+  value: string; // 현재 선택된 카테고리
+  onChange: (val: string) => void; // 카테고리 선택 시 실행할 콜백
 }
 
+/**
+ * 카테고리 드롭다운 컴포넌트
+ * - 버튼 클릭 시 드롭다운 열림/닫힘
+ * - 외부 클릭 시 자동으로 닫힘 (mousedown 이벤트 감지)
+ * - 선택 시 onChange 콜백 실행 및 드롭다운 닫기
+ */
 export default function CategoryDropdown({
   categories,
   value,
   onChange,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const boxRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false); // 드롭다운 열림 여부
+  const boxRef = useRef<HTMLDivElement>(null); // 드롭다운 영역 참조
 
+  // 외부 클릭 감지 -> 드롭다운 닫기
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
@@ -38,7 +45,7 @@ export default function CategoryDropdown({
         {open ? <Up className="h-3 w-3" /> : <Down className="h-3 w-3" />}
       </button>
 
-      {/* 드롭다운 */}
+      {/* 드롭다운 리스트 */}
       {open && (
         <ul
           className="absolute z-10 mt-1 max-h-[118px] w-[120px]
@@ -49,8 +56,8 @@ export default function CategoryDropdown({
             <li
               key={c}
               onClick={() => {
-                onChange(c);
-                setOpen(false);
+                onChange(c); // 선택된 카테고리 전달
+                setOpen(false); // 드롭다운 닫기
               }}
               className={`cursor-pointer px-[13px] py-[8px] ${
                 value === c ? "text-black" : "text-[#999999]"
