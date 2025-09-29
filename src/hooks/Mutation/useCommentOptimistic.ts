@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { submitComment } from "../PostPage/PostHook/useSubmitComment";
-import type { Comment } from "../../types/Comment";
+import type { Comment } from "../../types/comment/Comment";
 
 export type AddCommentVars = {
   postId: number; // 댓글이 속한 게시글 ID

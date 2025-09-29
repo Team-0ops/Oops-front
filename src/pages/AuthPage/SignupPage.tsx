@@ -7,7 +7,7 @@ import PasswordInput from "../../components/auth/PasswordInput";
 import TermsGroup from "../../components/auth/TermsGroup";
 import TextInput from "../../components/auth/TextInput";
 import { postSignup, type TermsAgreementItem } from "../../apis/auth/authApi";
-import AlertModal from "../../components/auth/AlertModal";
+import AlertModal from "../../components/modals/commonAlert/AlertModal";
 
 interface Terms {
   all: boolean;

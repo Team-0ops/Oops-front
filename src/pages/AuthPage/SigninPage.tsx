@@ -4,7 +4,7 @@ import Button from "../../components/common/Button";
 import PasswordInput from "../../components/auth/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
 import TextInput from "../../components/auth/TextInput";
-import AlertModal from "../../components/auth/AlertModal";
+import AlertModal from "../../components/modals/commonAlert/AlertModal";
 
 import { useDispatch } from "react-redux";
 import { setUserId } from "../../store/slices/userSlice";

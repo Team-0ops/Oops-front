@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Comment } from "../../types/Comment";
-import Report from "../modals/Report";
+import type { Comment } from "../../types/comment/Comment";
+import Report from "../modals/report/Report";
 import CommentForm from "./CommentForm";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";

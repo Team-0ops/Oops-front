@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Comment } from "../../types/Comment";
+import type { Comment } from "../../types/comment/Comment";
 
 interface CommentFormProps {
   comment: Comment;
