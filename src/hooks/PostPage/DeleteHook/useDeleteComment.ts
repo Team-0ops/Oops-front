@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { axiosInstance } from "../../../apis/axios";
+import { deleteCommentApi } from "../../../apis/Comment/commentDelete";
 
 /**
  * useDeleteComment 훅
@@ -17,7 +17,7 @@ export const useDeleteComment = () => {
   const deleteComment = async (postId: number, commentId: number) => {
     setSuccess(false);
     try {
-      await axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
+      await deleteCommentApi(postId, commentId)
       setSuccess(true);
       console.log("성공!");
     } catch (err) {
