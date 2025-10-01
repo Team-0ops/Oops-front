@@ -24,8 +24,8 @@ import ExRandomFeed from "./pages/ExRandomFeed";
 // import CategoryDrawerTest from "./pages/CategoryDrawerTest";
 
 // 로그인 관련 페이지
-import SigninPage from "./pages/SigninPage";
-import SignupPage from "./pages/SignupPage";
+import SigninPage from "./pages/AuthPage/SigninPage";
+import SignupPage from "./pages/AuthPage/SignupPage";
 import FindIdPwPage from "./pages/AuthPage/FindIdPw";
 import TermsPage from "./pages/AuthPage/TermsPage";
 
