@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { axiosInstance } from "../../../apis/axios";
+import { cheerCommentApi } from "../../../apis/Comment/commentCheer";
 
 /**
  * useCheerComment 훅
@@ -11,7 +11,7 @@ export function useCheerComment() {
   const cheerComment = async (commentId: number) => {
     setSuccess(false);
     try {
-      await axiosInstance.post(`/comments/${commentId}/cheers`);
+      await cheerCommentApi(commentId);
       setSuccess(true);
       console.log("성공!");
     } catch (err) {

@@ -1,4 +1,4 @@
-import type { Comment } from "../../types/Comment";
+import type { Comment } from "../../types/comment/Comment";
 import CommentItem from "./CommentItem";
 
 interface CommentListProps {

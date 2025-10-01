@@ -2,7 +2,7 @@ import X from "../../assets/icons/X.svg?react";
 import Arrow from "../../assets/icons/Arrow.svg?react";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
-import { submitLesson } from "../../hooks/PostPage/PostHook/useSubmitLesson";
+import { submitLesson } from "../../../hooks/PostPage/PostHook/useSubmitLesson";
 
 interface FeedbackProps {
   postId: number; // 교훈이 달릴 게시글 id

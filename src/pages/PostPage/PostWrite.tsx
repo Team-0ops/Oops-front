@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setSelectedStep, setSelectedPostId } from "../../store/slices/postSlice";
 import type { RootState } from "../../store/store";
 import PostList from "../../components/post/PostList";
-import type { OopsPost } from "../../types/OopsList";
+import type { OopsPost } from "../../types/post/OopsList";
 import LeftPoint from "../../assets/icons/left-point.svg?react";
 import UpArrow from "../../assets/icons/UpArrow.svg?react";
 import DownArrow from "../../assets/icons/DownArrow.svg?react";

@@ -7,10 +7,10 @@ import RedLike from "../../assets/icons/RedLike.svg?react";
 import Icon from "../../assets/icons/BasicIcon.svg?react";
 
 import CommentList from "../../components/comment/CommentList";
-import FeedbackView from "../../components/modals/FeedbackView";
-import Report from "../../components/modals/Report";
-import DeleteModal from "../../components/modals/Delete";
-import type { ReportTarget } from "../../components/modals/Report";
+import FeedbackView from "../../components/modals/feedback/FeedbackView";
+import Report from "../../components/modals/report/Report";
+import DeleteModal from "../../components/modals/deleteAlert/Delete";
+import type { ReportTarget } from "../../components/modals/report/Report";
 import { usePostDetail } from "../../hooks/PostPage/PostHook/usePostDetail";
 import { useCheer, useIsCheered } from "../../hooks/PostPage/PostHook/useCheer";
 import { getLesson } from "../../hooks/PostPage/GetHook/useGetLesson";
@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/pagination";
-import Feedback from "../../components/modals/Feedback";
+import Feedback from "../../components/modals/feedback/Feedback";
 
 // 상황 키와 라벨 매핑
 const SITUATION_ORDER = [

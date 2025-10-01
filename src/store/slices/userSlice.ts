@@ -4,6 +4,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 interface UserState {
   userId: string|null;
   // 필요한 추가 정보도 여기에 (예: nickname, email 등)
+  // 필요한건 userId 하나 이기에 userId만!
 }
 
 const initialState: UserState = {

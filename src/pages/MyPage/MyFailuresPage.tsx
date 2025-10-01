@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import PostCard from "../components/common/PostCard";
-import MyStatusTab from "../components/myPage/MyStatusTab";
-import type { MyStatus } from "../components/myPage/MyStatusTab";
-import CategoryDropdown from "../components/myPage/CategoryDropdown";
-import type { MyPostCardVM, MyPostDto, MyPostStatus } from "../types/mypage";
-import { getMyPosts } from "../apis/mypageApi";
-import { getAllCategories } from "../apis/categoryApi";
+import PostCard from "../../components/common/PostCard";
+import MyStatusTab from "../../components/myPage/MyStatusTab";
+import type { MyStatus } from "../../components/myPage/MyStatusTab";
+import CategoryDropdown from "../../components/myPage/CategoryDropdown";
+import type { MyPostCardVM, MyPostDto, MyPostStatus } from "../../types/mypage";
+import { getMyPosts } from "../../apis/mypageApi";
+import { getAllCategories } from "../../apis/categoryApi";
 
 type CategoryVM = {
   id: number;
@@ -14,6 +14,9 @@ type CategoryVM = {
   key: string;
 };
 
+/**
+ * MyStatus → API 요청 파라미터 변환
+ */
 function statusToParam(s: MyStatus): MyPostStatus {
   switch (s) {
     case "oops":
@@ -25,12 +28,18 @@ function statusToParam(s: MyStatus): MyPostStatus {
   }
 }
 
+/**
+ * 문자열이 비어있지 않으면 반환
+ */
 function nonEmpty(x?: string | null): string | undefined {
   if (!x) return undefined;
   const s = String(x).trim();
   return s ? s : undefined;
 }
 
+/**
+ * 배열에서 첫 번째 이미지 URL 추출
+ */
 function firstFromArray(arr: any[]): string | undefined {
   if (!Array.isArray(arr) || arr.length === 0) return undefined;
   const first = arr[0];
@@ -48,6 +57,9 @@ function firstFromArray(arr: any[]): string | undefined {
   return undefined;
 }
 
+/**
+ * 데이터 객체에서 이미지 URL 후보 추출
+ */
 function pickImage(d: any): string | undefined {
   return (
     nonEmpty(d?.image) ||
@@ -59,6 +71,12 @@ function pickImage(d: any): string | undefined {
   );
 }
 
+/**
+ * 마이페이지 - 내 실패담 목록 페이지
+ * - 상태 탭(MyStatusTab)과 카테고리(CategoryDropdown) 선택 지원
+ * - getMyPosts API로 게시글 목록을 불러옴
+ * - 무한 스크롤/페이지네이션 로직 포함 (page, hasNext)
+ */
 export default function MyFailuresPage() {
   const [tabStatus, setTabStatus] = useState<MyStatus>("oops");
   const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
@@ -72,6 +90,9 @@ export default function MyFailuresPage() {
   const [catLoading, setCatLoading] = useState(false);
   const [catErr, setCatErr] = useState<string | null>(null);
 
+  /**
+   * 상태 탭 변경 시 → 게시글 목록 초기화 후 새로 불러오기
+   */
   const handleChangeTab = (next: MyStatus) => {
     setTabStatus(next);
     setPage(0);
@@ -79,6 +100,9 @@ export default function MyFailuresPage() {
     setHasNext(true);
   };
 
+  /**
+   * 카테고리 목록 로드
+   */
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -101,6 +125,9 @@ export default function MyFailuresPage() {
     loadCategories();
   }, []);
 
+  /**
+   * 게시글 목록 로드 (탭/카테고리/페이지 변경 시 실행)
+   */
   useEffect(() => {
     if (page > 0 && !hasNext) return;
 
@@ -136,17 +163,20 @@ export default function MyFailuresPage() {
     fetchList();
   }, [page, categoryId, tabStatus, size]);
 
+  // 카테고리 배열
   const categoryNames = useMemo(
     () => categories.map((c) => c.name),
     [categories]
   );
 
+  // 현재 카테고리
   const currentCategoryName = useMemo(() => {
     if (categoryId === undefined) return "전체";
     const found = categories.find((c) => c.id === categoryId);
     return found?.name ?? "전체";
   }, [categoryId, categories]);
 
+  // 현재 상태 필터링된 카드 목록
   const displayCards = useMemo(() => {
     const target = statusToParam(tabStatus);
     return cards.filter((c) => {
@@ -155,6 +185,9 @@ export default function MyFailuresPage() {
     });
   }, [cards, tabStatus]);
 
+  /**
+   * 카테고리 변경 핸들러
+   */
   const onChangeCategory = (name: string) => {
     if (name === "전체") {
       setCategoryId(undefined);
@@ -169,6 +202,7 @@ export default function MyFailuresPage() {
 
   return (
     <section className="space-y-2 px-4 pt-2 pb-4">
+      {/* 상태 탭 + 카테고리 드롭다운 */}
       <div className="flex items-center gap-[6px]">
         <MyStatusTab value={tabStatus} onChange={handleChangeTab} />
         <CategoryDropdown
@@ -178,10 +212,12 @@ export default function MyFailuresPage() {
         />
       </div>
 
+      {/* 에러/로딩 상태 */}
       {catLoading && <div className="text-gray-500">카테고리 불러오는 중…</div>}
       {catErr && <div className="text-red-500">{catErr}</div>}
       {err && <div className="text-red-500">{err}</div>}
 
+      {/* 게시글 카드 목록 */}
       <div className="flex flex-col gap-[12px]">
         {displayCards.map((p: MyPostCardVM) => {
           const img =
@@ -209,10 +245,12 @@ export default function MyFailuresPage() {
         {loading && <div className="text-center py-4">불러오는 중...</div>}
       </div>
 
+      {/* 더 불러올게 없을 때 표시 */}
       {!loading && !hasNext && displayCards.length > 0 && (
         <div className="text-center text-gray-400 py-4"></div>
       )}
 
+      {/* 게시글 없음 안내 */}
       {!loading && displayCards.length === 0 && !err && (
         <div className="text-center text-gray-500 py-10">
           작성한 실패담이 없습니다.
@@ -222,6 +260,9 @@ export default function MyFailuresPage() {
   );
 }
 
+/**
+ * MyPostDto → 카드 뷰 모델 변환
+ */
 function mapToCardVM(d: MyPostDto): MyPostCardVM {
   const anyD: any = d ?? {};
   const id = anyD.postId ?? anyD.id;

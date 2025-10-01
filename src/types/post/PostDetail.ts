@@ -1,5 +1,5 @@
 import type { CommonResponse } from "../common";
-import type { Comment } from "../Comment";
+import type { Comment } from "../comment/Comment";
 
 export interface Category {
   categoryId: number;

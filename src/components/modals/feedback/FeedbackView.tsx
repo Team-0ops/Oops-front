@@ -1,4 +1,4 @@
-import { useGetLesson } from "../../hooks/PostPage/GetHook/useGetLesson";
+import { useGetLesson } from "../../../hooks/PostPage/GetHook/useGetLesson";
 
 interface FeedbackViewProps {
   postId: number; // 교훈이 달린 게시글 id

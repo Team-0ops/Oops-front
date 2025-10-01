@@ -1,14 +1,29 @@
 import axios from "axios";
 
+/**
+ * 공통 Axios 인스턴스 생성
+ * - baseURL: 모든 요청은 `/api` prefix를 사용
+ * - withCredentials: true → 쿠키를 포함한 요청 허용
+ */
 const instance = axios.create({
   baseURL: "/api",
   withCredentials: true,
 });
 
+/**
+ * 토큰 문자열 마스킹 (로그 출력용)
+ * @param t - 토큰 문자열
+ * @returns 앞 10자리 + ... + 끝 6자리
+ */
 function mask(t?: string | null) {
   return t ? `${t.slice(0, 10)}...${t.slice(-6)}` : "none";
 }
 
+/**
+ * 요청 인터셉터
+ * - localStorage에 저장된 accessToken을 Authorization 헤더에 추가
+ * - `/my-page/profile` 요청 시 로그 출력
+ */
 instance.interceptors.request.use((config) => {
   const token =
     typeof localStorage !== "undefined"
@@ -24,6 +39,7 @@ instance.interceptors.request.use((config) => {
       config.headers = h;
     }
   }
+  // 프로필 요청 로깅
   try {
     const url = config.url || "";
     if (url.includes("/my-page/profile")) {
@@ -36,9 +52,15 @@ instance.interceptors.request.use((config) => {
       );
     }
   } catch {}
+
   return config;
 });
 
+/**
+ * 응답 인터셉터
+ * - 프로필 요청일 경우 응답 로그 출력
+ * - 401 응답일 경우 localStorage에서 토큰 삭제
+ */
 instance.interceptors.response.use(
   (res) => {
     try {
@@ -67,6 +89,7 @@ instance.interceptors.response.use(
       }
     } catch {}
 
+    // 인증 실패 시 토큰 제거
     if (error?.response?.status === 401) {
       try {
         localStorage.removeItem("accessToken");

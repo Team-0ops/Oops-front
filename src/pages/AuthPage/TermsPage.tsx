@@ -1,19 +1,28 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import LeftArrow from "../assets/icons/left-point.svg?react";
-import Button from "../components/common/Button";
-import { getTerms, type TermItem } from "../apis/termsApi";
+import Button from "../../components/common/Button";
+import { getTerms, type TermItem } from "../../apis/termsApi";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+/**
+ * 약관 상세 페이지
+ * - API에서 약관 목록 가져오기
+ * - 특정 약관 id/key 파라미터로 스크롤 이동
+ * - 동의 시 세션스토리지에 저장 후 회원가입 페이지로 돌아감
+ */
 export default function TermsPage() {
   const navigate = useNavigate();
   const [search] = useSearchParams();
   const [terms, setTerms] = useState<TermItem[]>([]);
   const location = useLocation();
 
+  // 약관 제목 가져오기 (title/name 중 존재하는 값)
   const getTitle = (t: TermItem | any): string =>
     (t?.title as string | undefined) ?? (t?.name as string | undefined) ?? "";
 
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // 약관 api 호출
   useEffect(() => {
     void (async () => {
       try {
@@ -26,6 +35,7 @@ export default function TermsPage() {
     })();
   }, []);
 
+  // 검색 파라미터에서 id/key 추출
   const anchor = useMemo(() => {
     const idParam = search.get("id");
     const keyParam = search.get("key");
@@ -33,12 +43,14 @@ export default function TermsPage() {
     return { id: Number.isFinite(id) ? (id as number) : null, key: keyParam };
   }, [search]);
 
+  // state로 받은 termId 우선 적용
   const targetId = useMemo(() => {
     if (anchor.id != null) return anchor.id;
     const s = (location.state as any)?.termId;
     return typeof s === "number" ? s : null;
   }, [anchor, location.state]);
 
+  // 약관 키 추출 (privacy/marketing/service)
   const keyFromName = (name: string) => {
     if (!name) return "service";
     if (name.includes("개인정보")) return "privacy";
@@ -46,6 +58,7 @@ export default function TermsPage() {
     return "service";
   };
 
+  // 특정 약관 스크롤 이동
   useEffect(() => {
     if (!terms.length) return;
 
@@ -74,6 +87,11 @@ export default function TermsPage() {
     }
   }, [terms, anchor]);
 
+  /**
+   * 약관 동의 버튼 클릭
+   * - sessionStorage에 해당 약관을 동의 상태로 기록
+   * - 이후 회원가입 페이지로 이동
+   */
   const handleAgree = () => {
     const stored = sessionStorage.getItem("signupTerms");
     const currentTerm = targetId
@@ -84,6 +102,7 @@ export default function TermsPage() {
       try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
+          // 배열 형태 -> termId, agreed 리스트
           const map = new Map<number, boolean>(
             parsed.map((x: any) => [x.termId, !!x.agreed])
           );
@@ -94,6 +113,7 @@ export default function TermsPage() {
           }));
           sessionStorage.setItem("signupTerms", JSON.stringify(merged));
         } else if (parsed && typeof parsed === "object") {
+          // 객체 형태 -> TermsGroup 스타일
           const obj = parsed as {
             all?: boolean;
             service?: boolean;
@@ -107,6 +127,7 @@ export default function TermsPage() {
           }
           sessionStorage.setItem("signupTerms", JSON.stringify(obj));
         } else if (targetId != null) {
+          // 예외 처리 -> 단일 약관 동의만 저장
           sessionStorage.setItem(
             "signupTerms",
             JSON.stringify([{ termId: targetId, agreed: true }])
@@ -132,6 +153,7 @@ export default function TermsPage() {
 
   return (
     <section className="flex min-h-dvh w-full flex-col items-center bg-[#FFFBF8]">
+      {/* 헤더 */}
       <div className="mt-[62px] flex w-[335px] items-center gap-[10px]">
         <button type="button" onClick={() => navigate(-1)}>
           <LeftArrow className="h-[18px] w-[18px]" />
@@ -141,6 +163,7 @@ export default function TermsPage() {
         </h2>
       </div>
 
+      {/* 본문 */}
       <div className="mt-[18px] flex w-[335px] flex-col gap-[18px]">
         {/* 약관 내용 (API 데이터에서 받아옴) */}
         <div className="h-[600px] overflow-y-auto space-y-[24px]">
@@ -152,6 +175,7 @@ export default function TermsPage() {
               }}
               className="p-[12px] rounded-[8px] bg-white/0"
             >
+              {/* 제목 + 필수/선택 표시 */}
               <div className="mb-[8px] flex items-center gap-[8px]">
                 <h3 className="text-[14px] font-semibold text-[#1D1D1D]">
                   {getTitle(t)}
@@ -163,6 +187,7 @@ export default function TermsPage() {
                   <span className="text-[11px] text-[#808080]">(선택)</span>
                 )}
               </div>
+              {/* 본문 내용 */}
               <div className="text-[12px] whitespace-pre-line leading-[18px] text-[#4D4D4D]">
                 {(t as any).content}
               </div>

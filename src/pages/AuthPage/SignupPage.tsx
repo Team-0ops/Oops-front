@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ChangeEvent, FormEvent } from "react";
 import LogoMark from "../assets/icons/logoNew.svg?react";
-import Button from "../components/common/Button";
-import PasswordInput from "../components/auth/PasswordInput";
-import TermsGroup from "../components/auth/TermsGroup";
-import TextInput from "../components/auth/TextInput";
-import { postSignup, type TermsAgreementItem } from "../apis/auth/authApi";
-import AlertModal from "../components/auth/AlertModal";
+import Button from "../../components/common/Button";
+import PasswordInput from "../../components/auth/PasswordInput";
+import TermsGroup from "../../components/auth/TermsGroup";
+import TextInput from "../../components/auth/TextInput";
+import { postSignup, type TermsAgreementItem } from "../../apis/auth/authApi";
+import AlertModal from "../../components/modals/commonAlert/AlertModal";
 
 interface Terms {
   all: boolean;
@@ -22,8 +22,14 @@ const TERM_ID = {
   marketing: 3,
 } as const;
 
+/**
+ * 회원가입 페이지
+ * - 이메일, 비밀번호, 닉네임 입력
+ * - 이용약관 동의(필수/선택)
+ * - 회원가입 성공 시 → 로그인 페이지로 이동
+ */
 const SignupPage = () => {
-  //폼 상태
+  //입력 상태
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -45,12 +51,14 @@ const SignupPage = () => {
   });
 
   const location = useLocation();
+
+  // 입력값 저장 + 세션 보관
   const setFormAndSave = (next: typeof form) => {
     setForm(next);
     sessionStorage.setItem("signupForm", JSON.stringify(next));
   };
 
-  //핸들러
+  // 입력 핸들러
   const handleInput =
     (key: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
       const nextForm = { ...form, [key]: e.target.value };
@@ -61,7 +69,7 @@ const SignupPage = () => {
       }
     };
 
-  //약관 값 불러오기
+  // 약관/입력값 세션에서 불러오기
   useEffect(() => {
     if (location.state?.fromTerms) {
       const storedTerms = sessionStorage.getItem("signupTerms");
@@ -100,13 +108,14 @@ const SignupPage = () => {
     }
   }, [location.state]);
 
-  //중복확인
+  // 이메일 중복 확인 (API 미구현, 현재는 강제 true 처리)
   const handleEmailCheck = () => {
     // api없음
     setEmailChecked(true); // '확인됨' 상태로 강제
     sessionStorage.setItem("emailChecked", "true");
   };
 
+  // 회원가입 제출
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!terms.service || !terms.privacy) {
@@ -223,6 +232,7 @@ const SignupPage = () => {
               20자 이하 를 입력해주세요.
             </span>
           </label>
+
           {/* 닉네임 */}
           <TextInput
             type="text"
@@ -236,6 +246,7 @@ const SignupPage = () => {
             //hint="3자 이상 10자 이하 글자수를 지켜 작성해주세요!"
           />
 
+          {/* 약관 동의 */}
           <div className="mt-6 w-full">
             <hr className="w-full border-t border-[#ECE6DF]" />{" "}
             <p className="mt-2 text-center text-[12px] font-semibold text-[#666666]">

@@ -1,7 +1,7 @@
 import X from "../../assets/icons/X.svg?react";
 import { useEffect, useState } from "react";
-import { useReportPost } from "../../hooks/PostPage/PostHook/useReportPost";
-import { useReportComment } from "../../hooks/PostPage/PostHook/useReportComment";
+import { useReportPost } from "../../../hooks/PostPage/PostHook/useReportPost";
+import { useReportComment } from "../../../hooks/PostPage/PostHook/useReportComment";
 
 export type ReportTarget = {
   type: "post" | "comment" | "reComment"; // 신고 대상 구분

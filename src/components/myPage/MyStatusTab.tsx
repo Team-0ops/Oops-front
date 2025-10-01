@@ -1,11 +1,17 @@
 export type MyStatus = "oops" | "doing" | "done";
 
 interface Props {
-  value: MyStatus;
-  onChange: (v: MyStatus) => void;
+  value: MyStatus; // 현재 선택된 상태값
+  onChange: (v: MyStatus) => void; // 상태 변경 시 실행할 콜백
 }
 
+/**
+ * 내 상태 탭 컴포넌트
+ * - "웁스 중" / "극복 중" / "극복 완료" 세 가지 상태 중 선택 가능
+ * - 선택된 상태는 어두운 배경 + 흰색 텍스트로 강조 표시
+ */
 export default function MyStatusTab({ value, onChange }: Props) {
+  // 탭 정의
   const tabs: { key: MyStatus; label: string }[] = [
     { key: "oops", label: "웁스 중" },
     { key: "doing", label: "극복 중" },

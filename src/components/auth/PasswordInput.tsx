@@ -1,14 +1,20 @@
 import { useState, forwardRef, type InputHTMLAttributes } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
+/**
+ * 비밀번호 입력 전용 인풋 컴포넌트
+ * - 비밀번호 보이기/숨기기 토글 지원
+ * - 에러 상태시 border 색상 빨간색 표시
+ * - ref 전달 기능
+ */
 type PasswordInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "type"
 > & {
-  error?: boolean;
-  height?: string;
-  padding?: string;
-  borderColor?: string;
+  error?: boolean; // 에러 상태 여부
+  height?: string; // 인풋 높이
+  padding?: string; // 인풋 패딩
+  borderColor?: string; // 기본 border 색상
 };
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
@@ -23,14 +29,14 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     },
     ref
   ) => {
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState(false); // 비밀번호 가시성 상태
 
     return (
       <div className="relative w-full">
         <input
           ref={ref}
           {...rest}
-          type={visible ? "text" : "password"}
+          type={visible ? "text" : "password"} // 상태에 따라 보이기/숨기기
           style={{
             height,
             padding,
@@ -43,6 +49,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                      pr-[40px] ${className}`}
         />
 
+        {/* 눈 아이콘 버튼 */}
         <button
           type="button"
           onClick={() => setVisible(!visible)}

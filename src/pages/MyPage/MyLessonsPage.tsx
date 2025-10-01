@@ -7,8 +7,8 @@ import {
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ArrowIcon from "../assets/icons/Arrow.svg?react";
-import { getMyLessons } from "../apis/mypageApi";
-import type { LessonWithPostDto } from "../types/mypage";
+import { getMyLessons } from "../../apis/mypageApi";
+import type { LessonWithPostDto } from "../../types/mypage";
 
 const POST_DETAIL_BASE = "/post";
 
@@ -18,6 +18,11 @@ const HIDE_SCROLLBAR_CSS = `
   .my-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 
+/**
+ * 교훈 서버 응답 타입 확장
+ * - 게시글 삭제 여부(postStatus)
+ * - 이미지 필드 다양한 케이스 대응
+ */
 type LessonServerDto = LessonWithPostDto & {
   postStatus?: "ACTIVE" | "DELETED" | string | null;
 
@@ -34,12 +39,19 @@ type LessonServerDto = LessonWithPostDto & {
   content?: string | null;
 };
 
+/**
+ * 뷰 전용 교훈 타입
+ * - 태그 정규화된 배열(_tags)
+ * - 게시글 삭제 여부 플래그
+ * - 가공된 썸네일 URL
+ */
 type LessonView = LessonWithPostDto & {
   _tags: string[];
   isPostDeleted: boolean;
   postThumbnailUrl?: string;
 };
 
+/* 유틸: 문자열 → URL 유효성 검사 */
 const toUrl = (v: any): string | undefined => {
   if (!v) return undefined;
   const s = String(v).trim();
@@ -47,6 +59,7 @@ const toUrl = (v: any): string | undefined => {
   return /^https?:\/\//i.test(s) ? s : undefined;
 };
 
+/* 유틸: 이미지 배열에서 첫 번째 URL 추출 */
 const firstFrom = (arr: any[] | null | undefined): string | undefined => {
   if (!Array.isArray(arr) || arr.length === 0) return undefined;
   const s0 = toUrl(arr[0]);
@@ -61,9 +74,17 @@ const firstFrom = (arr: any[] | null | undefined): string | undefined => {
   );
 };
 
+/**
+ * 마이페이지 - 내 교훈 목록 페이지
+ * - getMyLessons API로 교훈 전체 목록 불러오기
+ * - 태그 기반 필터링(토글 chip)
+ * - 게시글 삭제 여부에 따른 UI 분기 처리
+ * - 삭제된 게시글: "삭제된 게시글입니다." 표시
+ * - 삭제되지 않은 게시글: 상세 페이지로 이동 가능
+ */
 export default function MyLessonsPage() {
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [allLessons, setAllLessons] = useState<LessonView[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null); // 선택된 태그
+  const [allLessons, setAllLessons] = useState<LessonView[]>([]); // 전체 교훈 목록
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -93,15 +114,13 @@ export default function MyLessonsPage() {
             (it.postStatus ?? "").toString().toUpperCase() === "DELETED" ||
             !it.postId;
 
+          // 교훈/게시글 정보 가공
           const lessonTitle = String(it.lessonTitle ?? it.title ?? "");
           const lessonContent = String(it.lessonContent ?? it.content ?? "");
-
           const postTitle = String(it.postTitle ?? "");
           const postContent: string | undefined = it.postContent ?? undefined;
-
           const postCategoryName: string | undefined =
             it.postCategoryName ?? it.categoryName ?? undefined;
-
           const postThumbnailUrl: string | undefined =
             toUrl(it.postThumbnailUrl) ||
             firstFrom(it.postImageUrls) ||
@@ -124,7 +143,7 @@ export default function MyLessonsPage() {
         });
 
         acc.push(...mapped);
-        if (!items || list.length < pageSize) break;
+        if (!items || list.length < pageSize) break; // 더 이상 페이지 없음
         page += 1;
       }
 
@@ -136,11 +155,11 @@ export default function MyLessonsPage() {
     }
   }, []);
 
+  // 최초/탭 복귀 시 재조회
   useEffect(() => {
     fetchAllLessons();
   }, [fetchAllLessons]);
 
-  // 탭 복귀 시 재조회
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === "visible") fetchAllLessons();
@@ -149,6 +168,7 @@ export default function MyLessonsPage() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchAllLessons]);
 
+  /* 교훈에 포함된 모든 태그 집합 */
   const chipTags = useMemo(() => {
     const set = new Set<string>(
       allLessons.flatMap((l) => l._tags).filter(Boolean)
@@ -156,19 +176,23 @@ export default function MyLessonsPage() {
     return Array.from(set);
   }, [allLessons]);
 
+  /* 선택된 태그에 따라 필터링된 교훈 */
   const visibleLessons = useMemo(() => {
     if (!selectedTag) return allLessons;
     return allLessons.filter((l) => l._tags.includes(selectedTag));
   }, [allLessons, selectedTag]);
 
+  /* 태그 토글 핸들러 */
   const toggleTag = (t: string) =>
     setSelectedTag((prev) => (prev === t ? null : t));
 
+  /* 게시글 상세 이동 */
   const navigatePost = (postId?: number, isPostDeleted?: boolean) => {
     if (!postId || isPostDeleted) return;
     navigate(`${POST_DETAIL_BASE}/${postId}`);
   };
 
+  /* 키보드 접근성 지원 */
   const onKeyGoPost = (
     e: KeyboardEvent<HTMLDivElement>,
     postId?: number,
@@ -184,7 +208,7 @@ export default function MyLessonsPage() {
     <section className="p-4">
       <style>{HIDE_SCROLLBAR_CSS}</style>
 
-      {/* 태그 */}
+      {/* 태그 chip */}
       <div className="-mx-4 mb-4 px-4 overflow-x-auto whitespace-nowrap my-scroll-hide">
         <div className="inline-flex gap-[10px]">
           {chipTags.map((t) => {
@@ -210,6 +234,7 @@ export default function MyLessonsPage() {
       {loading && <p className="p-4">불러오는 중...</p>}
       {err && <p className="p-4 text-red-500">{err}</p>}
 
+      {/* 교훈 카드 목록 */}
       {!loading && !err && (
         <>
           {visibleLessons.length > 0 ? (

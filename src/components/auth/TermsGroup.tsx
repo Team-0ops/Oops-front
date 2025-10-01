@@ -1,21 +1,29 @@
 import { useNavigate } from "react-router-dom";
 
+// 약관 동의 상태 타입
 export interface Terms {
-  all: boolean;
-  service: boolean;
-  privacy: boolean;
-  marketing: boolean;
+  all: boolean; // 전체 동의
+  service: boolean; // 서비스 이용약관 동의
+  privacy: boolean; // 개인정보 이용 동의
+  marketing: boolean; // 마케팅 수신 동의 (선택)
 }
 
 interface Props {
-  value: Terms;
-  onChange: (next: Terms) => void;
+  value: Terms; // 현재 약관 상태
+  onChange: (next: Terms) => void; // 상태 변경 핸들러
 }
 
+/**
+ * 약관 동의 체크박스 그룹 컴포넌트
+ * @param value , onChange
+ * - 전체 선택 및 개별 선택 기능
+ * - service/privacy 필수 약관은 최초 클릭 시 약관 상세 페이지로 이동
+ */
 export default function TermsGroup({ value, onChange }: Props) {
   const navigate = useNavigate();
   const TERM_ID = { service: 1, privacy: 2, marketing: 3 } as const;
 
+  // 약관 상세 페이지로 이동
   const goToTerms = (k: keyof Terms) => {
     const id =
       k === "service"
@@ -32,7 +40,9 @@ export default function TermsGroup({ value, onChange }: Props) {
     }
   };
 
+  // 토글 처리
   const toggle = (key: keyof Terms) => {
+    // 필수 약관 최초 클릭 시 상세 페이지로 이동
     if (
       (key === "service" || key === "privacy" || key === "marketing") &&
       !value[key] &&
@@ -68,6 +78,7 @@ export default function TermsGroup({ value, onChange }: Props) {
     onChange(nextState);
   };
 
+  // 체크박스 행 컴포넌트
   const Row = ({
     label,
     k,
@@ -86,7 +97,7 @@ export default function TermsGroup({ value, onChange }: Props) {
                  grid-cols-[28px_1fr] items-center rounded-[4px]"
         style={{ backgroundColor: bgColor }}
       >
-        {/* 체크박스 */}
+        {/* 체크박스 input*/}
         <input
           type="checkbox"
           checked={checked}

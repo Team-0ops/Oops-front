@@ -1,15 +1,21 @@
 import { useState } from "react";
 import LogoMark from "../assets/icons/logoNew.svg?react";
-import Button from "../components/common/Button";
-import PasswordInput from "../components/auth/PasswordInput";
+import Button from "../../components/common/Button";
+import PasswordInput from "../../components/auth/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
-import TextInput from "../components/auth/TextInput";
-import AlertModal from "../components/auth/AlertModal";
+import TextInput from "../../components/auth/TextInput";
+import AlertModal from "../../components/modals/commonAlert/AlertModal";
 
 import { useDispatch } from "react-redux";
-import { setUserId } from "../store/slices/userSlice";
-import { useAuth } from "../context/AuthContext";
+import { setUserId } from "../../store/slices/userSlice";
+import { useAuth } from "../../context/AuthContext";
 
+/**
+ * 로그인 페이지
+ * - 이메일, 비밀번호 입력 후 로그인
+ * - 로그인 실패 시 AlertModal 표시
+ * - 로그인 성공 시 Redux store 및 localStorage에 userId 저장
+ */
 const SigninPage = () => {
   const dispatch = useDispatch();
 
@@ -26,6 +32,8 @@ const SigninPage = () => {
     e.preventDefault();
     try {
       await login({ email: id, password: pw });
+
+      // userId 저장
       const uid =
         user?.userId ??
         (localStorage.getItem("userId")
@@ -36,35 +44,10 @@ const SigninPage = () => {
         dispatch(setUserId(String(uid)));
         localStorage.setItem("userId", String(uid));
       }
+
+      // 메인페이지로 이동 후 새로 고침
       navigate("/", { replace: true });
       navigate(0);
-
-      // 기존의 로그인에서 token이 객체값이여서 object Object로 헤더 입력되었기에 오류발생
-      // 로컬스토리지 확인결과 accessToken과 refreshToken이 있었는데 두개를 동시에 token 변수에 저장하다보니
-      // obj obj와 같이 두개의 객체형태가 Bearer 헤더값에 들어가서 오류 발생했음
-      // 지피티의 도움으로 아래와같이 accessToken과 refreshToken으로 나누어서 토큰값 전달.
-      // accessToken, refreshToken 구조 분리 저장!
-      // if (tokenObj && typeof tokenObj === "object") {
-      //   if (tokenObj.accessToken) {
-      //     localStorage.setItem("accessToken", tokenObj.accessToken);
-      //     console.log("accessToken:", tokenObj.accessToken);
-      //   }
-      //   if (tokenObj.refreshToken) {
-      //     localStorage.setItem("refreshToken", tokenObj.refreshToken);
-      //     console.log("refreshToken:", tokenObj.refreshToken);
-      //   }
-      // } else if (typeof tokenObj === "string") {
-      //   localStorage.setItem("accessToken", tokenObj);
-      //   console.log("accessToken:", tokenObj);
-      // } else {
-      //   // 예외 처리
-      //   console.warn("서버 응답에 토큰 정보가 없습니다.", tokenObj);
-      //   setAlertMsg("서버 응답에 토큰 정보가 없습니다.");
-      //   setShowAlert(true);
-      //   return;
-      // }
-
-      // navigate("/"); // 로그인 후 메인페이지로 이동
     } catch (error: any) {
       console.error("로그인 실패:", error);
       setAlertMsg("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -86,6 +69,7 @@ const SigninPage = () => {
           onSubmit={handleSubmit}
           className="mt-[36px] w-[310px] flex flex-col gap-3"
         >
+          {/* 이메일 입력 */}
           <TextInput
             type="email"
             placeholder="이메일을 입력해주세요."
@@ -107,6 +91,7 @@ const SigninPage = () => {
             log in
           </Button>
 
+          {/* 추가 링크 */}
           <div className="mt-2 flex justify-end text-[12px] text-[#B3B3B3]">
             <Link to="/find-idpw" className="hover:underline">
               아이디/비밀번호 찾기
