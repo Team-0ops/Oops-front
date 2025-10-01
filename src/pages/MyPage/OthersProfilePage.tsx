@@ -3,9 +3,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/common/Navbar";
 import Footer from "../../components/common/Footer";
 import PostCard from "../../components/common/PostCard";
-import LeftArrow from "../assets/icons/left-point.svg?react";
+import LeftArrow from "../../assets/icons/left-point.svg?react";
 //import othersProfile from "../assets/icons/othersprofile.svg";
-import BasicIconUrl from "../assets/icons/BasicIcon.svg";
+import BasicIconUrl from "../../assets/icons/BasicIcon.svg"
 
 import type { OthersProfileResult } from "../../types/mypage";
 import { getOthersProfile } from "../../apis/othersApi";

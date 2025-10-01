@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import LogoMark from "../assets/icons/logoNew.svg?react";
-import LeftArrow from "../assets/icons/left-point.svg?react";
+import LogoMark from "../../assets/icons/logoNew.svg?react";
+import LeftArrow from "../../assets/icons/left-point.svg?react";
 import Button from "../../components/common/Button";
 import { useNavigate } from "react-router-dom";
 import TextInput from "../../components/auth/TextInput";

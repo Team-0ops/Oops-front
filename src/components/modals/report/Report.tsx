@@ -1,4 +1,4 @@
-import X from "../../assets/icons/X.svg?react";
+import X from "../../../assets/icons/X.svg?react";
 import { useEffect, useState } from "react";
 import { useReportPost } from "../../../hooks/PostPage/PostHook/useReportPost";
 import { useReportComment } from "../../../hooks/PostPage/PostHook/useReportComment";

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import Warning from "../assets/icons/warning.svg?react";
+import Warning from "../../assets/icons/warning.svg?react";
 import { getMyProfile, patchMyProfile } from "../../apis/mypageApi";
 import type { MyProfileRes } from "../../types/mypage";
 import { useAuth } from "../../context/AuthContext";

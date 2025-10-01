@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ChangeEvent, FormEvent } from "react";
-import LogoMark from "../assets/icons/logoNew.svg?react";
+import LogoMark from "../../assets/icons/logoNew.svg?react";
 import Button from "../../components/common/Button";
 import PasswordInput from "../../components/auth/PasswordInput";
 import TermsGroup from "../../components/auth/TermsGroup";

@@ -1,4 +1,4 @@
-import X from "../../assets/icons/X.svg?react";
+import X from "../../../assets/icons/X.svg?react";
 
 interface DeleteModalProps {
   onConfirm: () => void; // 삭제 확정 시 실행되는 콜백

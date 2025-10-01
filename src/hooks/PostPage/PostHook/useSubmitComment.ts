@@ -1,4 +1,4 @@
-import { axiosInstance } from "../../../apis/axios";
+import { submitCommentApi } from "../../../apis/Comment/commentSubmit";
 
 /**
  * submitComment
@@ -14,10 +14,8 @@ export async function submitComment(
 ) {
   console.log(postId, content, parentId);
   try {
-    const response = await axiosInstance.post(`/posts/${postId}/comments`, {
-      parentId,
-      content,
-    });
+    const response = await submitCommentApi(postId,content,parentId)
+    console.log(response)
     return response.data;
   } catch (e) {
     console.log("실패");

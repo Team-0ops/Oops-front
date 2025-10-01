@@ -6,7 +6,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ArrowIcon from "../assets/icons/Arrow.svg?react";
+import ArrowIcon from "../../assets/icons/Arrow.svg?react";
 import { getMyLessons } from "../../apis/mypageApi";
 import type { LessonWithPostDto } from "../../types/mypage";
 

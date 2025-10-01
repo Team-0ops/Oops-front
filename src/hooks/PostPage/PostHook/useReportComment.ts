@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { axiosInstance } from "../../../apis/axios";
+import { reportCommentApi } from "../../../apis/Comment/commentReport";
 
 /**
  * useReportComment 훅
@@ -11,7 +11,7 @@ export function useReportComment(commentId: number | string) {
   const reportComment = async (content: string) => {
     setSuccess(false);
     try {
-      await axiosInstance.post(`/comments/${commentId}/reports`, { content });
+      await reportCommentApi(commentId, content);
       setSuccess(true);
     } catch (err) {
       console.error(err);

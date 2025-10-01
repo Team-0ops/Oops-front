@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import TabBar from "../../components/myPage/TabBar";
 import Navbar from "../../components/common/Navbar";
 import Footer from "../../components/common/Footer";
-import LeftArrow from "../assets/icons/left-point.svg?react";
+import LeftArrow from "../../assets/icons/left-point.svg?react";
 
 /**
  * 마이페이지 레이아웃 컴포넌트

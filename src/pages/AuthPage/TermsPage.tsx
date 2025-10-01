@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import LeftArrow from "../assets/icons/left-point.svg?react";
+import LeftArrow from "../../assets/icons/left-point.svg?react";
 import Button from "../../components/common/Button";
 import { getTerms, type TermItem } from "../../apis/termsApi";
 import { useEffect, useMemo, useRef, useState } from "react";

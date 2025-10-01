@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LogoMark from "../assets/icons/logoNew.svg?react";
+import LogoMark from "../../assets/icons/logoNew.svg?react";
 import Button from "../../components/common/Button";
 import PasswordInput from "../../components/auth/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
